@@ -233,7 +233,11 @@ package orichalcum.alchemy.alchemist
 			if (providerReferenceOrValue is String && _expressionQualifier.test(providerReferenceOrValue))
 				return conjure((providerReferenceOrValue as String).replace(_expressionRemovals, ''));
 			
-			return providerReferenceOrValue is Object ? inject(providerReferenceOrValue) : providerReferenceOrValue;
+			return providerReferenceOrValue is Object
+				&& !(providerReferenceOrValue is Boolean)
+				&& !(providerReferenceOrValue is Number)
+				? inject(providerReferenceOrValue, recipe)
+				: providerReferenceOrValue;
 		}
 		
 	}

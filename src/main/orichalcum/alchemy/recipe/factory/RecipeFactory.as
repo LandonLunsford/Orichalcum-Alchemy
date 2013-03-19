@@ -76,7 +76,7 @@ package orichalcum.alchemy.recipe.factory
 			/**
 			 * Hotfix
 			 */
-			if (_reflector.isPrimitiveType(qualifiedClassName))
+			if (qualifiedClassName === 'Object')
 				return new Recipe;
 			
 			const typeDescription:XML = describeType(reflector.getType(qualifiedClassName));

@@ -56,9 +56,9 @@ package orichalcum.alchemy.alchemist
 		
 		/* INTERFACE orichalcum.alchemy.alchemist.IAlchemist */
 		
-		public function provide(id:*):IMapper 
+		public function map(id:*):IMapper 
 		{
-			return delegate.provide(qualify(id));
+			return delegate.map(qualify(id));
 		}
 		
 		public function create(type:Class, recipe:Recipe = null):Object 

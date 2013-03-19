@@ -11,7 +11,7 @@ package orichalcum.alchemy.alchemist
 		function conjure(id:*, recipe:Recipe = null):*;
 		
 		// map provider
-		function provide(id:*):IMapper;
+		function map(id:*):IMapper;
 		//function provides(id:*):Boolean; //not exposed
 		//function providesDirectly(id:*):Boolean; //not exposed
 		

@@ -4,6 +4,7 @@ package
 	import org.flexunit.internals.TraceListener;
 	import org.flexunit.runner.FlexUnitCore;
 	import orichalcum.alchemy.alchemist.AlchemistTest;
+	import orichalcum.alchemy.alchemist.ValueMappingTest;
 	import orichalcum.alchemy.recipe.CompoundRecipeTest;
 	import orichalcum.alchemy.recipe.EmptyRecipeTest;
 	import orichalcum.alchemy.recipe.factory.RecipeFactoryTest;
@@ -22,6 +23,7 @@ package
 				,EmptyRecipeTest
 				,FullRecipeTest
 				,CompoundRecipeTest
+				,ValueMappingTest
 			);
 		}
 		

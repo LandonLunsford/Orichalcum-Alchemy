@@ -73,6 +73,12 @@ package orichalcum.alchemy.recipe.factory
 		
 		public function createRecipe(qualifiedClassName:String):Recipe
 		{
+			/**
+			 * Hotfix
+			 */
+			if (_reflector.isPrimitiveType(qualifiedClassName))
+				return new Recipe;
+			
 			const typeDescription:XML = describeType(reflector.getType(qualifiedClassName));
 			const factory:XML = typeDescription.factory[0];
 			const superclass:String = factory.extendsClass.@type[0].toString();

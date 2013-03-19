@@ -150,7 +150,7 @@ package orichalcum.alchemy.alchemist
 		[Test]
 		public function testConjureMapped():void
 		{
-			_alchemist.provide(ClassWithMemberAndSetterInject).to(type(ClassWithMemberAndSetterInject));
+			_alchemist.map(ClassWithMemberAndSetterInject).to(type(ClassWithMemberAndSetterInject));
 			const target:ClassWithMemberAndSetterInject = _alchemist.conjure(ClassWithMemberAndSetterInject) as ClassWithMemberAndSetterInject;
 			assertNotNull(target.memeberInject);
 			assertNotNull(target.setterInject);
@@ -160,22 +160,22 @@ package orichalcum.alchemy.alchemist
 		[Test]
 		public function testShit():void
 		{
-			_alchemist.provide(Point).to(singleton(Point))
+			_alchemist.map(Point).to(singleton(Point))
 				.withConstructorArgument(1)
 				.withConstructorArgument(1);
 			assertEquals(1, _alchemist.conjure(Point).x);
 			assertEquals(1, _alchemist.conjure(Point).y);
 			
-			_alchemist.provide(Matrix).to(new Matrix)
+			_alchemist.map(Matrix).to(new Matrix)
 				.withProperty('a', 1)
 				.withDisposer('invert');
 			assertEquals(1, _alchemist.conjure(Matrix).a);
 			
-			_alchemist.provide('a').to(type(Rectangle));
+			_alchemist.map('a').to(type(Rectangle));
 			
 			
 			
-			_alchemist.provide('b').to(reference('a'))
+			_alchemist.map('b').to(reference('a'))
 				.withProperty('x', 1);
 				
 				
@@ -184,7 +184,7 @@ package orichalcum.alchemy.alchemist
 			assertEquals(0, _alchemist.conjure('a').x);
 			assertEquals(1, _alchemist.conjure('b').x);
 			
-			_alchemist.provide('c').to(reference('b'))
+			_alchemist.map('c').to(reference('b'))
 			assertEquals(1, _alchemist.conjure('c').x);
 			
 			// doesnt inherit b's recipe config as a fallback

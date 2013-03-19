@@ -70,7 +70,7 @@ package orichalcum.alchemy.alchemist
 		
 		/* INTERFACE orichalcum.alchemy.alchemist.IAlchemist */
 		
-		public function provide(id:*):IMapper 
+		public function map(id:*):IMapper 
 		{
 			return new Mapper(id, _providers, _recipes);
 		}

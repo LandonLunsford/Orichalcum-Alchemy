@@ -9,7 +9,7 @@ package orichalcum.alchemy.recipe
 	{
 		private var _fullRecipe:Recipe;
 		private var _halfRecipe:Recipe;
-		private var _expectedCompoundRecipe:Recipe;
+		private var _fullExtendsHalf:Recipe;
 		
 		[Before]
 		public function setup():void
@@ -28,17 +28,17 @@ package orichalcum.alchemy.recipe
 			_halfRecipe.composer = 'INIT';
 			_halfRecipe.disposer = 'DISPOSE';
 			
-			_expectedCompoundRecipe = new Recipe;
-			_expectedCompoundRecipe.constructorArguments = [
+			_fullExtendsHalf = new Recipe;
+			_fullExtendsHalf.constructorArguments = [
 				_halfRecipe.constructorArguments[0]
 				,_halfRecipe.constructorArguments[1]
 				,_fullRecipe.constructorArguments[2]
 				,_fullRecipe.constructorArguments[3]
 			];
-			_expectedCompoundRecipe.properties = { a:'A', b:'b' };
-			_expectedCompoundRecipe.bindings = _fullRecipe.bindings.concat(_halfRecipe.bindings);
-			_expectedCompoundRecipe.composer = _halfRecipe.composer;
-			_expectedCompoundRecipe.disposer = _halfRecipe.disposer;
+			_fullExtendsHalf.properties = { a:'A', b:'b' };
+			_fullExtendsHalf.bindings = _fullRecipe.bindings.concat(_halfRecipe.bindings);
+			_fullExtendsHalf.composer = _halfRecipe.composer;
+			_fullExtendsHalf.disposer = _halfRecipe.disposer;
 		}
 		
 		[Test]
@@ -56,13 +56,23 @@ package orichalcum.alchemy.recipe
 		public function testFullExtendsHalf():void
 		{
 			const extension:Recipe = _fullRecipe.clone().extend(_halfRecipe.clone());
-			assertThat(extension.constructorArguments, equalTo(_expectedCompoundRecipe.constructorArguments));
-			assertThat(extension.properties, hasProperties(_expectedCompoundRecipe.properties));
-			assertThat(extension.bindings, equalTo(_expectedCompoundRecipe.bindings));
-			assertThat(extension.composer, equalTo(_expectedCompoundRecipe.composer));
-			assertThat(extension.disposer, equalTo(_expectedCompoundRecipe.disposer));
+			assertThat(extension.constructorArguments, equalTo(_fullExtendsHalf.constructorArguments));
+			assertThat(extension.properties, hasProperties(_fullExtendsHalf.properties));
+			assertThat(extension.bindings, equalTo(_fullExtendsHalf.bindings));
+			assertThat(extension.composer, equalTo(_fullExtendsHalf.composer));
+			assertThat(extension.disposer, equalTo(_fullExtendsHalf.disposer));
 		}
 		
+		[Test]
+		public function testHalfExtendsFull():void
+		{
+			const extension:Recipe = _halfRecipe.clone().extend(_fullRecipe.clone());
+			assertThat(extension.constructorArguments, equalTo(_fullRecipe.constructorArguments));
+			assertThat(extension.properties, hasProperties(_fullRecipe.properties));
+			assertThat(extension.bindings, equalTo(_halfRecipe.bindings.concat(_fullRecipe.bindings)));
+			assertThat(extension.composer, equalTo(_fullRecipe.composer));
+			assertThat(extension.disposer, equalTo(_fullRecipe.disposer));
+		}
 	}
 
 }

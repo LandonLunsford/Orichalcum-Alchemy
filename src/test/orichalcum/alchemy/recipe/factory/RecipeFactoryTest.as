@@ -94,6 +94,7 @@ package orichalcum.alchemy.recipe.factory
 			assertFalse(_hasNothing.hasProperties);
 		}
 		
+		[Ignore]
 		[Test]
 		public function debugTrace():void
 		{

@@ -1,12 +1,10 @@
 package orichalcum.alchemy.recipe 
 {
-	import org.flexunit.asserts.assertFalse;
-	import org.flexunit.asserts.assertTrue;
-	import org.flexunit.asserts.fail;
 	import org.hamcrest.assertThat;
+	import org.hamcrest.object.equalTo;
+	import org.hamcrest.object.hasProperties;
+	import org.hamcrest.object.isFalse;
 	import orichalcum.alchemy.binding.Binding;
-	import orichalcum.alchemy.recipe.factory.error.RecipeFactoryError;
-	import subject.recipe.FullRecipe;
 
 	public class FullRecipeTest 
 	{
@@ -15,103 +13,110 @@ package orichalcum.alchemy.recipe
 		[Before]
 		public function setup():void
 		{
-			_fullRecipe = new FullRecipe;
-		}
-		
-		[After]
-		public function teardown():void
-		{
-			_fullRecipe = null;
+			_fullRecipe = new Recipe;
+			_fullRecipe.constructorArguments = [0, 1, 2];
+			_fullRecipe.properties = { a:'a', b:'b', c:'c' };
+			_fullRecipe.bindings = [new Binding('a')];
+			_fullRecipe.composer = 'init';
+			_fullRecipe.disposer = 'dispose';
 		}
 		
 		[Test]
 		public function testHasConstructorArguments():void
 		{
-			assertTrue(_fullRecipe.hasConstructorArguments);
+			assertThat(_fullRecipe.hasConstructorArguments);
 		}
 		
 		[Test]
 		public function testHasProperties():void
 		{
-			assertTrue(_fullRecipe.hasProperties);
+			assertThat(_fullRecipe.hasProperties);
 		}
 		
 		[Test]
 		public function testHasBindings():void
 		{
-			assertTrue(_fullRecipe.hasBindings);
+			assertThat(_fullRecipe.hasBindings);
 		}
 		
 		[Test]
 		public function testHasComposer():void
 		{
-			assertTrue(_fullRecipe.hasComposer);
+			assertThat(_fullRecipe.hasComposer);
 		}
 		
 		[Test]
 		public function testHasDisposer():void
 		{
-			assertTrue(_fullRecipe.hasDisposer);
+			assertThat(_fullRecipe.hasDisposer);
 		}
 		
 		[Test]
 		public function testCloneHas():void
 		{
 			const clone:Recipe = _fullRecipe.clone();
-			assertTrue(clone.hasConstructorArguments);
-			assertTrue(clone.hasProperties);
-			assertTrue(clone.hasBindings);
-			assertTrue(clone.hasComposer);
-			assertTrue(clone.hasDisposer);
+			assertThat(clone.hasConstructorArguments);
+			assertThat(clone.hasProperties);
+			assertThat(clone.hasBindings);
+			assertThat(clone.hasComposer);
+			assertThat(clone.hasDisposer);
 		}
 		
 		[Test]
 		public function testExtensionHas():void
 		{
 			const extension:Recipe = _fullRecipe.extend(_fullRecipe.clone());
-			assertTrue(extension.hasConstructorArguments);
-			assertTrue(extension.hasProperties);
-			assertTrue(extension.hasBindings);
-			assertTrue(extension.hasComposer);
-			assertTrue(extension.hasDisposer);
+			assertThat(extension.hasConstructorArguments);
+			assertThat(extension.hasProperties);
+			assertThat(extension.hasBindings);
+			assertThat(extension.hasComposer);
+			assertThat(extension.hasDisposer);
 		}
 		
 		[Test]
 		public function testEmptyHas():void
 		{
 			const empty:Recipe = _fullRecipe.empty();
-			assertFalse(empty.hasConstructorArguments);
-			assertFalse(empty.hasProperties);
-			assertFalse(empty.hasBindings);
-			assertFalse(empty.hasComposer);
-			assertFalse(empty.hasDisposer);
+			assertThat(empty.hasConstructorArguments, isFalse());
+			assertThat(empty.hasProperties, isFalse());
+			assertThat(empty.hasBindings, isFalse());
+			assertThat(empty.hasComposer, isFalse());
+			assertThat(empty.hasDisposer, isFalse());
 		}
 		
 		[Test]
-		public function testCloneContent():void
+		public function testClone():void
 		{
 			const clone:Recipe = _fullRecipe.clone();
-			fail('tests nothing.');
-			// need array equals assert
-			//assertThat(_fullRecipe.constructorArguments, clone.constructorArguments);
-			// need object equals assert
-			//assertFalse(clone.hasProperties);
+			assertThat(clone.constructorArguments, equalTo(_fullRecipe.constructorArguments));
+			assertThat(clone.properties, hasProperties(_fullRecipe.properties));
+			assertThat(clone.bindings, equalTo(_fullRecipe.bindings));
+			assertThat(clone.composer, equalTo(_fullRecipe.composer));
+			assertThat(clone.disposer, equalTo(_fullRecipe.disposer));
 		}
 		
 		[Test]
-		public function testExtensionContent():void
+		public function testExtendEmpty():void
 		{
-			const extension:Recipe = _fullRecipe.extend(_fullRecipe.clone());
-			fail('tests nothing.');
+			var extension:Recipe = _fullRecipe.extend(new Recipe);
+			assertThat(extension.constructorArguments, equalTo(_fullRecipe.constructorArguments));
+			assertThat(extension.properties, hasProperties(_fullRecipe.properties));
+			assertThat(extension.bindings, equalTo(_fullRecipe.bindings));
+			assertThat(extension.composer, equalTo(_fullRecipe.composer));
+			assertThat(extension.disposer, equalTo(_fullRecipe.disposer));
 		}
 		
 		[Test]
-		public function testEmptyContent():void
+		public function testExtendFull():void
 		{
-			const empty:Recipe = _fullRecipe.empty();
-			fail('tests nothing.');
+			var extension:Recipe = (new Recipe).extend(_fullRecipe);
+			assertThat(extension.constructorArguments, equalTo(_fullRecipe.constructorArguments));
+			assertThat(extension.properties, hasProperties(_fullRecipe.properties));
+			assertThat(extension.bindings, equalTo(_fullRecipe.bindings));
+			assertThat(extension.composer, equalTo(_fullRecipe.composer));
+			assertThat(extension.disposer, equalTo(_fullRecipe.disposer));
 		}
-		
+
 	}
 
 }

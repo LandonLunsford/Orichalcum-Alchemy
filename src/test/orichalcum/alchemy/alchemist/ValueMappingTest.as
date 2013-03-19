@@ -1,12 +1,13 @@
 package orichalcum.alchemy.alchemist 
 {
 	import flash.events.EventDispatcher;
-	import org.flexunit.asserts.fail;
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.equalTo;
+	import org.hamcrest.object.hasProperty;
 	import org.hamcrest.object.isFalse;
 	import org.hamcrest.object.nullValue;
 	import org.hamcrest.object.strictlyEqualTo;
+	import orichalcum.alchemy.provider.factory.value;
 
 	public class ValueMappingTest 
 	{
@@ -26,7 +27,6 @@ package orichalcum.alchemy.alchemist
 		{
 			_alchemist.map(_id).to(null);
 			assertThat(_alchemist.conjure(_id), nullValue());
-			
 		}
 		
 		[Test]
@@ -114,19 +114,24 @@ package orichalcum.alchemy.alchemist
 				.withProperty('x', 1)
 				.withBinding('click', 'go')
 				.withComposer('init')
-				.withDisposer('uninit');
+				.withDisposer('dispose');
 				
 			assertThat(_alchemist.conjure(_id));
 		}
 		
+		/**
+		 * Should this functionality be supported given most of the recipe will be ignored?
+		 */
 		[Test]
 		public function testMapToInjectedObject():void
 		{
-			_alchemist.map(_id).to({
+			_alchemist.map('poo').to({
 					bindee: new EventDispatcher
 					,go: function():void {}
-					,init: function():void {}
-					,dispose: function():void {}
+					,init: function():void { this.initialized = true; }
+					,dispose: function():void { this.disposed = true; }
+					,initialized: false
+					,disposed: false
 				})
 				.withConstructorArgument(1)
 				.withProperty('x', 1)
@@ -134,23 +139,36 @@ package orichalcum.alchemy.alchemist
 				.withComposer('init')
 				.withDisposer('dispose');
 				
-			assertThat(_alchemist.conjure(_id));
+			const object:Object = _alchemist.conjure('poo');
+			assertThat(object.initialized, isFalse());
+			assertThat(object.disposed, isFalse());
+			assertThat(object, hasProperty('x', equalTo(1)));
+			assertThat(object.bindee.hasEventListener('complete'));
 			
-			fail('Add more assertions');
+			/**
+			 * Cannot be accomplished unless the recipe is mapped to the instance as the key
+			 */
+			_alchemist.destroy(object);
 		}
 		
 		[Test]
 		public function tesMapToReferenceConflict():void
 		{
-			fail('Add more assertions');
-			
+			const valueA:int = 0;
+			const valueB:String = '{a}';
+			_alchemist.map('a').to(valueA);
+			_alchemist.map('b').to(valueB);
+			assertThat(_alchemist.conjure('b'), equalTo(valueA));
 		}
 		
 		[Test]
 		public function testMapToReferenceConflictResolution():void
 		{
-			fail('Add more assertions');
-			
+			const valueA:int = 0;
+			const valueB:String = '{a}';
+			_alchemist.map('a').to(valueA);
+			_alchemist.map('b').to(value(valueB));
+			assertThat(_alchemist.conjure('b'), equalTo(valueB));
 		}
 		
 	}

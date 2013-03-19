@@ -1,20 +1,29 @@
 package orichalcum.alchemy.mapper 
 {
+	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.binding.Binding;
+	import orichalcum.alchemy.error.AlchemyError;
+	import orichalcum.alchemy.provider.factory.multiton;
+	import orichalcum.alchemy.provider.factory.reference;
+	import orichalcum.alchemy.provider.factory.singleton;
+	import orichalcum.alchemy.provider.factory.type;
 	import orichalcum.alchemy.recipe.Recipe;
+	import orichalcum.reflection.IReflector;
 	import orichalcum.utility.StringUtil;
 
 	public class Mapper implements IMapper
 	{
+		private var _reflector:IReflector;
 		private var _id:String;
 		private var _providers:Dictionary;
 		private var _recipes:Dictionary;
 		private var _recipe:Recipe;
 		private var _constructorArgumentIndex:int;
 		
-		public function Mapper(id:String, providers:Dictionary, recipes:Dictionary) 
+		public function Mapper(reflector:IReflector, id:String, providers:Dictionary, recipes:Dictionary) 
 		{
+			_reflector = reflector;
 			_id = id;
 			_providers = providers;
 			_recipes = recipes;
@@ -27,6 +36,41 @@ package orichalcum.alchemy.mapper
 			_providers[_id] && onProviderOverwrite(_id);
 			_providers[_id] = providerValueOrReference;
 			return this;
+		}
+		
+		public function toReference(id:String):IMapper
+		{
+			return to(reference(id));
+		}
+		
+		public function asPrototype():IMapper
+		{
+			return toPrototype(getClass(_id));
+		}
+		
+		public function toPrototype(clazz:Class):IMapper
+		{
+			return to(type(clazz));
+		}
+		
+		public function asSingleton():IMapper
+		{
+			return toSingleton(getClass(_id));
+		}
+		
+		public function toSingleton(type:Class):IMapper
+		{
+			return to(singleton(type));
+		}
+		
+		public function asMultiton(poolSize:uint):IMapper
+		{
+			return toMultiton(getClass(_id), poolSize);
+		}
+		
+		public function toMultiton(type:Class, poolSize:uint):IMapper
+		{
+			return to(multiton(type, poolSize));
 		}
 		
 		public function withConstructorArguments(...args):IMapper 
@@ -101,6 +145,14 @@ package orichalcum.alchemy.mapper
 			// for now I am contempt with just tracing the information
 			// additional strict mode could listen for this and throw an error
 			trace(StringUtil.substitute(message, substitutions));
+		}
+		
+		private function getClass(id:String):void 
+		{
+			if (_reflector.isType(id))
+				return _reflector.getType(id);
+				
+			throw new AlchemyError('Argument "id" ({0}) passed to method "map" must represent a valid public class when using the "asPrototype|asSingleton|asMultiton" methods.', id);
 		}
 		
 	}

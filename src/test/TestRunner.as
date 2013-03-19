@@ -4,6 +4,7 @@ package
 	import org.flexunit.internals.TraceListener;
 	import org.flexunit.runner.FlexUnitCore;
 	import orichalcum.alchemy.alchemist.AlchemistTest;
+	import orichalcum.alchemy.alchemist.ReferenceMappingTest;
 	import orichalcum.alchemy.alchemist.ValueMappingTest;
 	import orichalcum.alchemy.recipe.CompoundRecipeTest;
 	import orichalcum.alchemy.recipe.EmptyRecipeTest;
@@ -16,7 +17,6 @@ package
 		{
 			const core:FlexUnitCore = new FlexUnitCore;
 			core.addListener(new TraceListener);
-			//core.run(AlchemistTest);
 			core.run(
 				AlchemistTest
 				,RecipeFactoryTest
@@ -24,6 +24,7 @@ package
 				,FullRecipeTest
 				,CompoundRecipeTest
 				,ValueMappingTest
+				,ReferenceMappingTest
 			);
 		}
 		

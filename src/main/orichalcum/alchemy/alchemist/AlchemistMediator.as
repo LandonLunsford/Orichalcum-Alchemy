@@ -72,7 +72,7 @@ package orichalcum.alchemy.alchemist
 		
 		public function map(id:*):IMapper 
 		{
-			return new Mapper(id, _providers, _recipes);
+			return new Mapper(_reflector, id, _providers, _recipes);
 		}
 		
 		private function provides(id:*):Boolean 

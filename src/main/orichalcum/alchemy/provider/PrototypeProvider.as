@@ -1,0 +1,23 @@
+package orichalcum.alchemy.provider 
+{
+	import orichalcum.alchemy.alchemist.IAlchemist;
+	import orichalcum.alchemy.recipe.Recipe;
+
+	public class PrototypeProvider extends InstanceProvider
+	{
+		
+		public function PrototypeProvider(type:Class)
+		{
+			super(type);
+		}
+		
+		/* INTERFACE orichalcum.alchemist.guise.IProvider */
+		
+		override public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		{
+			return activeAlchemist.create(type, activeRecipe);
+		}
+		
+	}
+
+}

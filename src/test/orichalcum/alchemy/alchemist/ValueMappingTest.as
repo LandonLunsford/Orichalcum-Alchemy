@@ -139,6 +139,20 @@ package orichalcum.alchemy.alchemist
 			fail('Add more assertions');
 		}
 		
+		[Test]
+		public function tesMapToReferenceConflict():void
+		{
+			fail('Add more assertions');
+			
+		}
+		
+		[Test]
+		public function testMapToReferenceConflictResolution():void
+		{
+			fail('Add more assertions');
+			
+		}
+		
 	}
 
 }

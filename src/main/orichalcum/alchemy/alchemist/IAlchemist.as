@@ -46,7 +46,7 @@ package orichalcum.alchemy.alchemist
 		function set expressionRemovals(value:RegExp):void;
 		
 		// utility
-		//function createRecipe(classOrInstance:*):Recipe //not exposed yet
+		//function createRecipe(classOrInstance:*):Recipe //not exposed -- creation will occur through IMapper
 	}
 
 }

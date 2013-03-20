@@ -145,10 +145,8 @@ package orichalcum.alchemy.alchemist
 			assertThat(object, hasProperty('x', equalTo(1)));
 			assertThat(object.bindee.hasEventListener('complete'));
 			
-			/**
-			 * Cannot be accomplished unless the recipe is mapped to the instance as the key
-			 */
 			_alchemist.destroy(object);
+			assertThat(object.disposed, isTrue());
 		}
 		
 		[Test]

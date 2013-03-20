@@ -147,6 +147,7 @@ package orichalcum.alchemy.alchemist
 			
 			_alchemist.destroy(object);
 			assertThat(object.disposed, isTrue());
+			assertThat(object.bindee.hasEventListener('complete'), isFalse());
 		}
 		
 		[Test]

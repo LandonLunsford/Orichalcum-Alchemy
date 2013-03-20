@@ -22,24 +22,23 @@ package orichalcum.alchemy.alchemist
 		public function setup():void
 		{
 			_alchemist = new Alchemist;
-			_alchemist.map(Multiton).to(multiton(_type, _poolSize));
+			_alchemist.map(_type).to(multiton(_type, _poolSize));
 		}
 		
 		[Test]
 		public function testIsType():void
 		{
-			assertThat(_alchemist.conjure(_id), isA(_type));
+			assertThat(_alchemist.conjure(_type), isA(_type));
 		}
 		
 		[Test]
 		public function testIsNeverTheSameInstance():void
 		{
-			_alchemist.map(Multiton).to(multiton(_type, _poolSize));
-			Multiton.totalInstances = 0;
+			_type.totalInstances = 0;
 			for (var i:int = 100; i >= 0; i--)
-				_alchemist.conjure(Multiton);
+				_alchemist.conjure(_type);
 				
-			assertThat(Multiton.totalInstances, equalTo(_poolSize));
+			assertThat(_type.totalInstances, equalTo(_poolSize));
 		}
 		
 	}

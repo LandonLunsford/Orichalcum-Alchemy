@@ -5,6 +5,7 @@ package
 	import org.flexunit.runner.FlexUnitCore;
 	import orichalcum.alchemy.alchemist.AlchemistTest;
 	import orichalcum.alchemy.alchemist.ReferenceMappingTest;
+	import orichalcum.alchemy.alchemist.SingletonMappingTest;
 	import orichalcum.alchemy.alchemist.ValueMappingTest;
 	import orichalcum.alchemy.recipe.CompoundRecipeTest;
 	import orichalcum.alchemy.recipe.EmptyRecipeTest;
@@ -25,6 +26,7 @@ package
 				,CompoundRecipeTest
 				,ValueMappingTest
 				,ReferenceMappingTest
+				,SingletonMappingTest
 			);
 		}
 		

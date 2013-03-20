@@ -1,6 +1,5 @@
 package orichalcum.alchemy.mapper 
 {
-	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.binding.Binding;
 	import orichalcum.alchemy.error.AlchemyError;
@@ -8,6 +7,7 @@ package orichalcum.alchemy.mapper
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.singleton;
 	import orichalcum.alchemy.provider.factory.type;
+	import orichalcum.alchemy.provider.factory.value;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.utility.StringUtil;
@@ -20,6 +20,7 @@ package orichalcum.alchemy.mapper
 		private var _recipes:Dictionary;
 		private var _recipe:Recipe;
 		private var _constructorArgumentIndex:int;
+		private var value:*;
 		
 		public function Mapper(reflector:IReflector, id:String, providers:Dictionary, recipes:Dictionary) 
 		{
@@ -36,6 +37,11 @@ package orichalcum.alchemy.mapper
 			_providers[_id] && onProviderOverwrite(_id);
 			_providers[_id] = providerValueOrReference;
 			return this;
+		}
+		
+		public function toValue(any:*):IMapper
+		{
+			return to(value(any));
 		}
 		
 		public function toReference(id:String):IMapper
@@ -147,7 +153,7 @@ package orichalcum.alchemy.mapper
 			trace(StringUtil.substitute(message, substitutions));
 		}
 		
-		private function getClass(id:String):void 
+		private function getClass(id:String):Class 
 		{
 			if (_reflector.isType(id))
 				return _reflector.getType(id);

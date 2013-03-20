@@ -122,7 +122,9 @@ package orichalcum.alchemy.alchemist
 				throw new AlchemyError('Alchemist has no provider for id "{0}"', id);
 			}
 			
-			return evaluateWithRecipe(provider, recipe || getRecipe(id));	
+			var provision:* = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
+			recipe && (_recipesByInstance[provision] = recipe);
+			return provision;	
 		}
 		
 		public function create(type:Class, recipe:Recipe = null):Object
@@ -137,7 +139,9 @@ package orichalcum.alchemy.alchemist
 		
 		public function destroy(instance:Object, recipe:Recipe = null):Object
 		{
-			return _instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, recipe));
+			throw new ArgumentError('argument "recipe" is not needed');
+
+			return _instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, _recipesByInstance[instance]));
 		}
 		
 		public function extend():IAlchemist

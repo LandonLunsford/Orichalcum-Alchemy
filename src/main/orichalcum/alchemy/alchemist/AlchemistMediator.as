@@ -28,12 +28,20 @@ package orichalcum.alchemy.alchemist
 		private var _notFound:NotFound;
 		private var _expressionQualifier:RegExp;
 		private var _expressionRemovals:RegExp;
+
+		/**
+		 * This will be used to remove "recipe" arg from many user-facing methods
+		 * Additionally it is required to facilitate disposer/binding of run-time configured objects
+		 * Note unless I store the compound recipes (faulty) I must re-compute them at "destroy" time
+		 */
+		private var _recipesByInstance:Dictionary;
 		
 		public function AlchemistMediator(reflector:IReflector) 
 		{
 			_reflector = reflector;
 			_providers = new Dictionary;
 			_recipes = new Dictionary;
+			_recipesByInstance = new Dictionary;
 			_recipeFactory = new RecipeFactory(reflector, new StandardMetatagBundle);
 			_instanceFactory = new InstanceFactory(this);
 			_compoundRecipe = new Recipe;

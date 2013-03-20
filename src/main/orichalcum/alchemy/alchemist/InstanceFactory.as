@@ -48,13 +48,13 @@ package orichalcum.alchemy.alchemist
 		
 		private function compose(instance:Object, recipe:Recipe):Object
 		{
-			recipe.hasComposer && instance[recipe.composer].call();
+			recipe.hasComposer && (instance[recipe.composer] as Function).call(instance);
 			return instance;
 		}
 		
 		public function destroy(instance:Object, recipe:Recipe):Object 
 		{
-			recipe.hasDisposer && instance[recipe.disposer].call();
+			recipe.hasDisposer && (instance[recipe.disposer] as Function).call(instance);
 			return unject(unbind(instance, recipe), recipe);
 		}
 		

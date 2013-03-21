@@ -66,12 +66,12 @@ package orichalcum.alchemy.alchemist
 			return delegate.create(type);
 		}
 		
-		public function inject(instance:Object, recipe:Recipe = null):Object 
+		public function inject(instance:Object):Object 
 		{
-			return delegate.inject(instance, recipe);
+			return delegate.inject(instance);
 		}
 		
-		public function destroy(instance:Object, recipe:Recipe = null):Object 
+		public function destroy(instance:Object):Object 
 		{
 			return delegate.destroy(instance);
 		}

@@ -27,12 +27,12 @@ package orichalcum.alchemy.alchemist
 		
 		// lifecycle
 		function create(type:Class, recipe:Recipe = null):Object;
-		function inject(instance:Object, recipe:Recipe = null):Object;
-		function destroy(instance:Object, recipe:Recipe = null):Object
-		//function bind(instance:Object, recipe:Recipe = null):Object	//not exposed
-		//function compose(instance:Object, recipe:Recipe = null):Object //not exposed
-		//function unbind(instance:Object, recipe:Recipe = null):Object //not exposed
-		//function unject(instance:Object, recipe:Recipe = null):Object //not exposed yet
+		function inject(instance:Object):Object;
+		function destroy(instance:Object):Object;
+		//function bind(instance:Object):Object	//not exposed
+		//function compose(instance:Object):Object //not exposed
+		//function unbind(instance:Object):Object //not exposed
+		//function unject(instance:Object):Object //not exposed yet
 		
 		// modularity
 		function extend():IAlchemist;

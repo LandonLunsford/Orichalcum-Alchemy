@@ -132,15 +132,13 @@ package orichalcum.alchemy.alchemist
 			return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe));
 		}
 		
-		public function inject(instance:Object, recipe:Recipe = null):Object
+		public function inject(instance:Object):Object
 		{
-			return _instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, recipe));
+			return _instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, _recipesByInstance[instance]));
 		}
 		
-		public function destroy(instance:Object, recipe:Recipe = null):Object
+		public function destroy(instance:Object):Object
 		{
-			throw new ArgumentError('argument "recipe" is not needed');
-
 			return _instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, _recipesByInstance[instance]));
 		}
 		
@@ -245,11 +243,7 @@ package orichalcum.alchemy.alchemist
 			if (providerReferenceOrValue is String && _expressionQualifier.test(providerReferenceOrValue))
 				return conjure((providerReferenceOrValue as String).replace(_expressionRemovals, ''));
 			
-			return providerReferenceOrValue is Object
-				&& !(providerReferenceOrValue is Boolean)
-				&& !(providerReferenceOrValue is Number)
-				? inject(providerReferenceOrValue, recipe)
-				: providerReferenceOrValue;
+			return providerReferenceOrValue;
 		}
 		
 	}

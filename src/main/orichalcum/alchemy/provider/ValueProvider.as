@@ -31,6 +31,8 @@ package orichalcum.alchemy.provider
 		
 		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):*
 		{
+			return _value;
+			
 			/**
 			 * What I really want is _reflector.isPrimitive(_reflector.getTypeName(_value))
 			 * currently I am enabling type "Object" for testing purposes? I should rewrite the test

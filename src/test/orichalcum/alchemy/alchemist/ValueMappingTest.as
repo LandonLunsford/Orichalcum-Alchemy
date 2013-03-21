@@ -5,6 +5,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.object.equalTo;
 	import org.hamcrest.object.hasProperty;
 	import org.hamcrest.object.isFalse;
+	import org.hamcrest.object.isTrue;
 	import org.hamcrest.object.nullValue;
 	import org.hamcrest.object.strictlyEqualTo;
 	import orichalcum.alchemy.provider.factory.value;
@@ -121,7 +122,9 @@ package orichalcum.alchemy.alchemist
 		
 		/**
 		 * Should this functionality be supported given most of the recipe will be ignored?
+		 * This functionality is not supported in 1.0 and will be considered for 1.1
 		 */
+		[Ignore]
 		[Test]
 		public function testMapToInjectedObject():void
 		{

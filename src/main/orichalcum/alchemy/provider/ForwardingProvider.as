@@ -15,7 +15,12 @@ package orichalcum.alchemy.provider
 		
 		override public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
-			return super.provide(activeAlchemist, activeRecipe).provide(activeAlchemist, activeRecipe);
+			//return super.provide(activeAlchemist, activeRecipe).provide(activeAlchemist, activeRecipe);
+			
+			/**
+			 * Client providers should not be able to directly communicate to the secure layer
+			 */
+			return activeAlchemist.conjure(type).provide(activeAlchemist, activeRecipe);
 		}
 		
 	}

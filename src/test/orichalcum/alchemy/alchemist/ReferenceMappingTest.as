@@ -26,14 +26,14 @@ package orichalcum.alchemy.alchemist
 			_alchemist = new Alchemist;
 		}
 		
-		[Test(expects = "orichalcum.alchemy.error.AlchemyError")]
+		[Test(expects = "Error")]
 		public function testMapToNull():void
 		{
 			_alchemist.map(_id).to(reference(null));
 			_alchemist.conjure(_id);
 		}
 		
-		[Test(expects = "orichalcum.alchemy.error.AlchemyError")]
+		[Test(expects = "Error")]
 		public function testMapToUndefined():void
 		{
 			_alchemist.map(_id).to(reference(undefined));

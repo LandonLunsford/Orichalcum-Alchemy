@@ -1,4 +1,3 @@
-//updated
 package orichalcum.alchemy.alchemist 
 {
 	import flash.geom.Point;

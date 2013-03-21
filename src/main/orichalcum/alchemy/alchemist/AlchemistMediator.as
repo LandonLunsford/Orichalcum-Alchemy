@@ -83,28 +83,7 @@ package orichalcum.alchemy.alchemist
 			return new Mapper(_reflector, id, _providers, _recipes);
 		}
 		
-		private function provides(id:*):Boolean 
-		{
-			return providesDirectly(id) || (_parent && _parent.provides(id));
-		}
-		
-		private function providesDirectly(id:*):Boolean 
-		{
-			return _providers[id] != undefined;
-		}
-		
-		private function cooks(id:*):Boolean
-		{
-			return cooksDirectly(id) || (_parent && _parent.cooks(id));
-		}
-		
-		private function cooksDirectly(id:*):Boolean 
-		{
-			return _recipes[id] != undefined;
-		}
-		
 		/**
-		 * 
 		 * For better API do an evaluation here on provider
 		 * let _providers hold providerOrReferenceOrValue
 		 * This will allow for smaller data footprint because I wont need to wrap values/references in providers
@@ -244,6 +223,38 @@ package orichalcum.alchemy.alchemist
 				return conjure((providerReferenceOrValue as String).replace(_expressionRemovals, ''));
 			
 			return providerReferenceOrValue;
+		}
+		
+		/**
+		 * @deprecated
+		 */
+		private function provides(id:*):Boolean 
+		{
+			return providesDirectly(id) || (_parent && _parent.provides(id));
+		}
+		
+		/**
+		 * @deprecated
+		 */
+		private function providesDirectly(id:*):Boolean 
+		{
+			return _providers[id] != undefined;
+		}
+		
+		/**
+		 * @deprecated
+		 */
+		private function cooks(id:*):Boolean
+		{
+			return cooksDirectly(id) || (_parent && _parent.cooks(id));
+		}
+		
+		/**
+		 * @deprecated
+		 */
+		private function cooksDirectly(id:*):Boolean 
+		{
+			return _recipes[id] != undefined;
 		}
 		
 	}

@@ -1,37 +1,78 @@
 package orichalcum.alchemy.alchemist 
 {
-	import flash.display.Sprite;
-	import org.flexunit.asserts.fail;
 	import org.hamcrest.assertThat;
-	import org.hamcrest.core.isA;
-	import org.hamcrest.core.not;
-	import org.hamcrest.object.equalTo;
-	import org.hamcrest.object.strictlyEqualTo;
-	import orichalcum.alchemy.provider.factory.multiton;
-	import orichalcum.alchemy.provider.factory.type;
-	import subject.Multiton;
+	import org.hamcrest.object.isTrue;
+	import org.hamcrest.object.notNullValue;
+	import orichalcum.alchemy.provider.factory.factory;
+	import orichalcum.alchemy.recipe.Recipe;
 
 	public class FactoryMappingTest 
 	{
 		
 		private var _alchemist:Alchemist;
-		private var _type:Class = Multiton;
-		private var _poolSize:int = 3;
+		private var _id:String = 'id';
+		private var _factoryCalled:Boolean;
 		
 		
 		[Before]
 		public function setup():void
 		{
 			_alchemist = new Alchemist;
-			_alchemist.map(_type).to(multiton(_type, _poolSize));
+			_factoryCalled = false;
+		}
+		
+		[Test(expects = "ArgumentError")]
+		public function testNullFactory():void
+		{
+			factory(null);
+		}
+		
+		[Test(expects = "ArgumentError")]
+		public function testFactoryWithTooManyArguments():void
+		{
+			factory(function(a:*,b:*):void{});
 		}
 		
 		[Test]
-		public function testIsType():void
+		public function testZeroArgumentFactoryMethod():void
 		{
-			fail()
+			
+			const method:Function = function():* { _factoryCalled = true; };
+			_alchemist.map(_id).to(factory(method));
+			_alchemist.conjure(_id);
+			assertThat(_factoryCalled, isTrue());
 		}
 		
+		[Test]
+		public function testOneArgumentFactoryMethod():void
+		{
+			const method:Function = function(activeAlchamist:IAlchemist):*
+			{
+				_factoryCalled = true;
+				assertThat(activeAlchamist, notNullValue());
+			};
+			_alchemist.map(_id).to(factory(method));
+			_alchemist.conjure(_id);
+			assertThat(_factoryCalled, isTrue());
+		}
+		
+		/**
+		 * Candidate feature for 1.1 release
+		 */
+		[Ignore]
+		[Test]
+		public function testTwoArgumentFactoryMethod():void
+		{
+			const method:Function = function(activeAlchamist:IAlchemist, activeRecipe:Recipe):*
+			{
+				_factoryCalled = true;
+				assertThat(activeAlchamist, notNullValue());
+				assertThat(activeRecipe, notNullValue());
+			};
+			_alchemist.map(_id).to(factory(method));
+			_alchemist.conjure(_id);
+			assertThat(_factoryCalled, isTrue());
+		}
 		
 	}
 

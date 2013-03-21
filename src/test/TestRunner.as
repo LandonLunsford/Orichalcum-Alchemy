@@ -4,8 +4,10 @@ package
 	import org.flexunit.internals.TraceListener;
 	import org.flexunit.runner.FlexUnitCore;
 	import orichalcum.alchemy.alchemist.AlchemistTest;
+	import orichalcum.alchemy.alchemist.FactoryMappingTest;
 	import orichalcum.alchemy.alchemist.MultitonMappingTest;
 	import orichalcum.alchemy.alchemist.PrototypeMappingTest;
+	import orichalcum.alchemy.alchemist.ProviderMappingTest;
 	import orichalcum.alchemy.alchemist.ReferenceMappingTest;
 	import orichalcum.alchemy.alchemist.SingletonMappingTest;
 	import orichalcum.alchemy.alchemist.ValueMappingTest;
@@ -31,6 +33,8 @@ package
 				,SingletonMappingTest
 				,PrototypeMappingTest
 				,MultitonMappingTest
+				,FactoryMappingTest
+				,ProviderMappingTest
 			);
 		}
 		

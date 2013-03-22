@@ -25,17 +25,17 @@ package
 			core.addListener(new TraceListener);
 			core.run(
 				AlchemistTest
-				,RecipeFactoryTest
-				,EmptyRecipeTest
-				,FullRecipeTest
-				,CompoundRecipeTest
-				,ValueMappingTest
-				,ReferenceMappingTest
-				,SingletonMappingTest
-				,PrototypeMappingTest
-				,MultitonMappingTest
-				,FactoryMappingTest
-				,ProviderMappingTest
+				//,RecipeFactoryTest
+				//,EmptyRecipeTest
+				//,FullRecipeTest
+				//,CompoundRecipeTest
+				//,ValueMappingTest
+				//,ReferenceMappingTest
+				//,SingletonMappingTest
+				//,PrototypeMappingTest
+				//,MultitonMappingTest
+				//,FactoryMappingTest
+				//,ProviderMappingTest
 				,ConstructorArgumentInjectionTest
 			);
 		}

@@ -120,7 +120,10 @@ package orichalcum.alchemy.alchemist
 		
 		public function create(type:Class, recipe:Recipe = null):Object
 		{
+			throw new ArgumentError('UNMAPPED CLASSES ARENT GETTING THE CLASS MAPPED RECIPES...');
+			
 			//return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe || _recipeFactory.getRecipeForClass(type)));
+			//return _instanceFactory.create(type, getRecipeForClassOrInstance(type, _recipeFactory.getRecipeForClass(type)));
 			return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe));
 		}
 		

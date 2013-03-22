@@ -120,10 +120,10 @@ package orichalcum.alchemy.alchemist
 		
 		public function create(type:Class, recipe:Recipe = null):Object
 		{
-			throw new ArgumentError('UNMAPPED CLASSES ARENT GETTING THE CLASS MAPPED RECIPES...');
-			
-			//return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe || _recipeFactory.getRecipeForClass(type)));
-			//return _instanceFactory.create(type, getRecipeForClassOrInstance(type, _recipeFactory.getRecipeForClass(type)));
+			/**
+			 * The fallback "getRecipe" for the class recipe should be moved into every get recipe for class/instance
+			 */
+			//return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe || getRecipe(getQualifiedClassName(type))));
 			return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe));
 		}
 		
@@ -209,9 +209,18 @@ package orichalcum.alchemy.alchemist
 			/**
 			 * This works because I keep the runtime-configured and metadata-configured time recipes independent
 			 */
+			
+			//_compoundRecipe.empty().extend(_recipeFactory.getRecipeByClassName(qualifiedClassName));
+			//
+			//const runtimeConfiguredTypeRecipe:Recipe = getRecipe(qualifiedClassName);
+			//
+			//runtimeConfiguredTypeRecipe && _compoundRecipe.extend(runtimeConfiguredTypeRecipe);
+			//runtimeConfiguredRecipe && _compoundRecipe.extend(runtimeConfiguredRecipe);
+			//
+			//return _compoundRecipe;
+			
 			if (runtimeConfiguredRecipe)
 				return _compoundRecipe.empty().extend(_recipeFactory.getRecipeByClassName(qualifiedClassName)).extend(runtimeConfiguredRecipe);
-			
 			return _recipeFactory.getRecipeByClassName(qualifiedClassName);
 		}
 		

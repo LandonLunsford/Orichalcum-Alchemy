@@ -7,12 +7,16 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.object.strictlyEqualTo;
 	import subject.ClassWithOneConstructorParameter;
 	import subject.ClassWithTwoConstructorParameters;
+	import subject.ClassWithTwoConstructorParametersAndTwoConstructorInjects;
 	import subject.ClassWithZeroConstructorParameters;
+	import subject.ClassWithZeroConstructorParametersAndOneConstructorInject;
 
 	public class ConstructorArgumentInjectionTest 
 	{
 		
 		private var _alchemist:Alchemist;
+		private var _constructorArgument0:Point = new Point;
+		private var _constructorArgument1:Point = new Point;
 		
 		
 		[Before]
@@ -37,7 +41,7 @@ package orichalcum.alchemy.alchemist
 		[Test]
 		public function testCreateTwoParameterClassWithZeroArguments():void
 		{
-			const creation:ClassWithTwoConstructorParameters = _alchemist.create(ClassWithTwoConstructorParameters) as ClassWithTwoConstructorParameters;
+			const creation:ClassWithTwoConstructorParameters = _alchemist.conjure(ClassWithTwoConstructorParameters) as ClassWithTwoConstructorParameters;
 			assertThat(creation.constructorArgument0, notNullValue());
 			assertThat(creation.constructorArgument1, notNullValue());
 		}
@@ -54,38 +58,62 @@ package orichalcum.alchemy.alchemist
 		[Test]
 		public function testCreateOneParameterClassWithOneArgument():void
 		{
-			const argument0:Point = new Point;
 			_alchemist.map(ClassWithOneConstructorParameter)
-				.withConstructorArgument(argument0);
+				.withConstructorArgument(_constructorArgument0);
 				
 			const creation:ClassWithOneConstructorParameter = _alchemist.create(ClassWithOneConstructorParameter) as ClassWithOneConstructorParameter;
-			assertThat(argument0, strictlyEqualTo(creation.constructorArgument0));
+			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));
 		}
 		
 		[Test]
 		public function testCreateTwoParameterClassWithTwoArguments():void
 		{
-			const argument0:Point = new Point;
-			const argument1:Point = new Point;
 			_alchemist.map(ClassWithTwoConstructorParameters)
-				.withConstructorArgument(argument0)
-				.withConstructorArgument(argument1);
+				.withConstructorArgument(_constructorArgument0)
+				.withConstructorArgument(_constructorArgument1);
 				
 			const creation:ClassWithTwoConstructorParameters = _alchemist.create(ClassWithTwoConstructorParameters) as ClassWithTwoConstructorParameters;
-			assertThat(argument0, strictlyEqualTo(creation.constructorArgument0));
-			assertThat(argument1, strictlyEqualTo(creation.constructorArgument1));
+			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));
+			assertThat(_constructorArgument1, strictlyEqualTo(creation.constructorArgument1));
 		}
 		
 		[Test]
 		public function testCreateTwoParameterClassWithOneArgument():void
 		{
-			const argument0:Point = new Point;
 			_alchemist.map(ClassWithTwoConstructorParameters)
-				.withConstructorArgument(argument0);
+				.withConstructorArgument(_constructorArgument0);
 				
 			const creation:ClassWithTwoConstructorParameters = _alchemist.create(ClassWithTwoConstructorParameters) as ClassWithTwoConstructorParameters;
-			assertThat(argument0, strictlyEqualTo(creation.constructorArgument0));
+			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));
 			assertThat(creation.constructorArgument1, notNullValue());
+		}
+		
+		[Test(expects = "Error")]
+		public function testCreateClassWithZeroConstructorParametersAndOneMetadataInject():void
+		{
+			_alchemist.create(ClassWithZeroConstructorParametersAndOneConstructorInject);
+		}
+		
+		[Test]
+		public function testCreateClassWithTwoConstructorParametersAndTwoConstructorInjects():void
+		{
+			_alchemist.map('constructorArgument0').to(_constructorArgument0);
+			_alchemist.map('constructorArgument1').to(_constructorArgument1);
+			const creation:ClassWithTwoConstructorParametersAndTwoConstructorInjects = _alchemist.create(ClassWithTwoConstructorParametersAndTwoConstructorInjects) as ClassWithTwoConstructorParametersAndTwoConstructorInjects;
+			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));
+			assertThat(_constructorArgument1, strictlyEqualTo(creation.constructorArgument1));
+		}
+		
+		[Test]
+		public function testStaticConstructorInjectOverrideWithRuntimeConfiguration():void
+		{
+			_alchemist.map(ClassWithTwoConstructorParametersAndTwoConstructorInjects)
+				.withConstructorArgument(_constructorArgument0)
+				.withConstructorArgument(_constructorArgument1);
+				
+			const creation:ClassWithTwoConstructorParametersAndTwoConstructorInjects = _alchemist.create(ClassWithTwoConstructorParametersAndTwoConstructorInjects) as ClassWithTwoConstructorParametersAndTwoConstructorInjects;
+			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));
+			assertThat(_constructorArgument1, strictlyEqualTo(creation.constructorArgument1));
 		}
 		
 	}

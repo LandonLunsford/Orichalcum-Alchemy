@@ -120,6 +120,7 @@ package orichalcum.alchemy.alchemist
 		
 		public function create(type:Class, recipe:Recipe = null):Object
 		{
+			//return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe || _recipeFactory.getRecipeForClass(type)));
 			return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe));
 		}
 		
@@ -205,20 +206,23 @@ package orichalcum.alchemy.alchemist
 			/**
 			 * This works because I keep the runtime-configured and metadata-configured time recipes independent
 			 */
-			return runtimeConfiguredRecipe
-				? _compoundRecipe.empty().extend(_recipeFactory.getRecipeByClassName(qualifiedClassName)).extend(runtimeConfiguredRecipe)
-				: _recipeFactory.getRecipeByClassName(qualifiedClassName);
+			if (runtimeConfiguredRecipe)
+				return _compoundRecipe.empty().extend(_recipeFactory.getRecipeByClassName(qualifiedClassName)).extend(runtimeConfiguredRecipe);
+			
+			return _recipeFactory.getRecipeByClassName(qualifiedClassName);
 		}
 		
-		private function conjureUnmappedType(id:*):* 
+		private function conjureUnmappedType(qualifiedClassName:String):* 
 		{
+			//throw new ArgumentError('UNMAPPED CLASSES ARENT GETTING THE CLASS MAPPED RECIPES...');
 			/*
+			 * 
 			 * I really dont want to map here because the user doesnt explicitely map it,
 			 * and if they overwrite they will be warned
 			 * what I want is to just create the instance with the factory cached recipe (not an extension)
 			 * because there will be no modification
 			 */
-			return create(_reflector.getType(id));
+			return create(_reflector.getType(qualifiedClassName), getRecipe(qualifiedClassName));
 		}
 		
 		public function evaluate(providerReferenceOrValue:*):*

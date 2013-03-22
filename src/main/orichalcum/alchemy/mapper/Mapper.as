@@ -136,8 +136,12 @@ package orichalcum.alchemy.mapper
 		private function get recipe():Recipe
 		{
 			if (_recipe) return _recipe;
-			_recipes[_id] && onRecipeOverwrite(_id);
-			return _recipes[_id] = _recipe = new Recipe;
+			if (_recipes[_id])
+			{
+				onRecipeOverwrite(_id);
+				return _recipe = _recipes[_id].empty();
+			}
+			return _recipe = _recipes[_id] = new Recipe;
 		}
 		
 		private function onProviderOverwrite(id:String):void

@@ -20,7 +20,6 @@ package orichalcum.alchemy.mapper
 		private var _recipes:Dictionary;
 		private var _recipe:Recipe;
 		private var _constructorArgumentIndex:int;
-		private var value:*;
 		
 		public function Mapper(reflector:IReflector, id:String, providers:Dictionary, recipes:Dictionary) 
 		{

@@ -126,6 +126,11 @@ package orichalcum.alchemy.mapper
 			return this;
 		}
 		
+		public function withMediator(mediatorInstanceClassOrId:*):IMapper 
+		{
+			throw new ArgumentError('withMediator is unimplemented');
+		}
+		
 		/* PRIVATE PARTS */
 		
 		private function get recipe():Recipe

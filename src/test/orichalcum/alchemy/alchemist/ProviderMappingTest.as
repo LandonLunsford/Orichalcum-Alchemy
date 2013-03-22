@@ -11,7 +11,7 @@ package orichalcum.alchemy.alchemist
 		
 		private var _alchemist:Alchemist;
 		private var _id:String = 'id';
-		private var _provision:*;
+		private var _provision:* = 0;
 		
 		
 		[Before]
@@ -23,7 +23,6 @@ package orichalcum.alchemy.alchemist
 		[Test]
 		public function test():void
 		{
-			_provision = 0;
 			_alchemist.map(_id).to(provider(ProviderMappingTest));
 			assertThat(_alchemist.conjure(_id), strictlyEqualTo(_provision));
 		}

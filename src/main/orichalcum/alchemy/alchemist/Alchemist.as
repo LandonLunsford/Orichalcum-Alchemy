@@ -8,35 +8,47 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.mapper.Mapper;
 	import orichalcum.alchemy.metatag.bundle.IMetatagBundle;
 	import orichalcum.alchemy.metatag.bundle.StandardMetatagBundle;
-	import orichalcum.alchemy.provider.factory.type;
-	import orichalcum.alchemy.provider.factory.value;
 	import orichalcum.alchemy.provider.IProvider;
 	import orichalcum.alchemy.recipe.factory.RecipeFactory;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
-	
 
 	internal class Alchemist implements IDisposable, IAlchemist
 	{
-		private var _parent:Alchemist;
 		private var _reflector:IReflector;
+		private var _expressionQualifier:RegExp;
+		private var _expressionRemovals:RegExp;
+		private var _parent:Alchemist;
+		
+		/**
+		 * A unique class must be used to represent the absence of a provision|provider
+		 * This is to avoid reserving real values (mainly null or undefined) that the client may want to use
+		 */
+		private var _notFound:NotFound;
+		
 		private var _providers:Dictionary;
 		private var _recipes:Dictionary;
 		private var _recipeFactory:RecipeFactory;
 		private var _instanceFactory:InstanceFactory;
-		private var _compoundRecipe:Recipe;
-		private var _notFound:NotFound;
-		private var _expressionQualifier:RegExp;
-		private var _expressionRemovals:RegExp;
-
+		
 		/**
 		 * This will be used to remove "recipe" arg from many user-facing methods
 		 * Additionally it is required to facilitate disposer/binding of run-time configured objects
 		 * Note unless I store the compound recipes (faulty) I must re-compute them at "destroy" time
 		 */
 		private var _recipesByInstance:Dictionary;
+		
+		/**
+		 * This is so that the alchemist need not create new recipes every recursive step taken
+		 * while processing injection requests.
+		 * 
+		 * @usage var scopedRecipe:Recipe = (_recipePool[i++] ||= new Recipe).empty();
+		 * The caller of the recursive function must reset i to 0 when complete for maximum efficiency
+		 */
+		private var _recipePool:Array;
+		private var _recipePoolIndex:int;
 		
 		public function Alchemist() 
 		{
@@ -46,10 +58,10 @@ package orichalcum.alchemy.alchemist
 			_recipesByInstance = new Dictionary;
 			_recipeFactory = new RecipeFactory(_reflector, new StandardMetatagBundle);
 			_instanceFactory = new InstanceFactory(this);
-			_compoundRecipe = new Recipe;
 			_notFound = new NotFound;
 			_expressionQualifier = /^{.*}$/;
 			_expressionRemovals = /{|}|\s/gm;
+			_recipePool = [];
 		}
 		
 		/* INTERFACE orichalcum.lifecycle.IDisposable */
@@ -99,7 +111,6 @@ package orichalcum.alchemy.alchemist
 		 * For better API do an evaluation here on provider
 		 * let _providers hold providerOrReferenceOrValue
 		 * This will allow for smaller data footprint because I wont need to wrap values/references in providers
-		 * 
 		 */
 		private function _conjure(id:String, recipe:Recipe = null):* 
 		{
@@ -118,23 +129,31 @@ package orichalcum.alchemy.alchemist
 			return provision;	
 		}
 		
+		/**
+		 * This method is to bypass mapped providers
+		 */
 		public function create(type:Class, recipe:Recipe = null):Object
 		{
-			/**
-			 * The fallback "getRecipe" for the class recipe should be moved into every get recipe for class/instance
-			 */
-			//return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe || getRecipe(getQualifiedClassName(type))));
-			return _instanceFactory.create(type, getRecipeForClassOrInstance(type, recipe));
+			const instance:* = _instanceFactory.create(type, getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe));
+			returnRecipeFlyweight();
+			return instance;
 		}
 		
+		/**
+		 * This method is to apply injection, but leave creation up to the client
+		 */
 		public function inject(instance:Object):Object
 		{
-			return _instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, _recipesByInstance[instance]));
+			const instance:* = _instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
+			returnRecipeFlyweight();
+			return instance;
 		}
 		
 		public function destroy(instance:Object):Object
 		{
-			return _instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, _recipesByInstance[instance]));
+			const instance:* = _instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
+			returnRecipeFlyweight();
+			return instance;
 		}
 		
 		public function extend():IAlchemist
@@ -199,36 +218,50 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * It may be helpful to expose this ustility.
 		 */
-		private function getRecipeForClassOrInstance(classOrInstance:Object, runtimeConfiguredRecipe:Recipe = null):Recipe 
+		private function getRecipeForClassOrInstance(classOrInstance:Object, recipeFlyweight:Recipe, runtimeConfiguredRecipe:Recipe = null):Recipe 
 		{
-			return getRecipeForClassName(getQualifiedClassName(classOrInstance), runtimeConfiguredRecipe);
+			return getRecipeForClassName(getQualifiedClassName(classOrInstance), recipeFlyweight, runtimeConfiguredRecipe);
 		}
 		
-		private function getRecipeForClassName(qualifiedClassName:String, runtimeConfiguredRecipe:Recipe = null):Recipe
+		private function getRecipeForClassName(qualifiedClassName:String, recipeFlyweight:Recipe, runtimeConfiguredRecipe:Recipe = null):Recipe
+		{
+			return getMergedRecipe(recipeFlyweight, _recipeFactory.getRecipeByClassName(qualifiedClassName), getRecipe(qualifiedClassName), runtimeConfiguredRecipe);
+		}
+		
+		private function getMergedRecipe(recipeFlyweight:Recipe, staticTypeRecipe:Recipe, runtimeTypeRecipe:Recipe, runtimeInstanceRecipe:Recipe):Recipe
 		{
 			/**
-			 * This works because I keep the runtime-configured and metadata-configured time recipes independent
+			 * Flyweight POOL must be used
+			 * Because of recursive nature of the algorithm
+			 * each recursion clobbers the parent's recipe config
+			 * 
+			 * Hotfix -- generate a new recipe in this scope
+			 * Bestfix -- create recipe flyweight pool for efficiency
+			 * 
+			 * To implement flyweight pool, pass flyweight to this function
+			 * this function should get flyweights with counter that is reset
+			 * i.e. var scopedRecipe:Recipe = (_recipePool[i++] ||= new Recipe).empty();
+			 * 
+			 * Then the "getMergedRecipe()" caller must set "i" to 0 when the recursion has ended
 			 */
+			 
+			//const recipe:Recipe = new Recipe;
 			
-			//_compoundRecipe.empty().extend(_recipeFactory.getRecipeByClassName(qualifiedClassName));
-			//
-			//const runtimeConfiguredTypeRecipe:Recipe = getRecipe(qualifiedClassName);
-			//
-			//runtimeConfiguredTypeRecipe && _compoundRecipe.extend(runtimeConfiguredTypeRecipe);
-			//runtimeConfiguredRecipe && _compoundRecipe.extend(runtimeConfiguredRecipe);
-			//
-			//return _compoundRecipe;
+			//const recipe:Recipe = _recipePool[_recipePoolIndex]
+				//? _recipePool[_recipePoolIndex++].empty()
+				//: _recipePool[_recipePoolIndex++] = new Recipe;
 			
-			if (runtimeConfiguredRecipe)
-				return _compoundRecipe.empty().extend(_recipeFactory.getRecipeByClassName(qualifiedClassName)).extend(runtimeConfiguredRecipe);
-			return _recipeFactory.getRecipeByClassName(qualifiedClassName);
+			const recipe:Recipe = recipeFlyweight ? recipeFlyweight.empty() : new Recipe;
+				
+			recipe.extend(staticTypeRecipe);
+			runtimeTypeRecipe && recipe.extend(runtimeTypeRecipe);
+			runtimeInstanceRecipe && recipe.extend(runtimeInstanceRecipe);
+			return recipe;
 		}
 		
 		private function conjureUnmappedType(qualifiedClassName:String):* 
 		{
-			//throw new ArgumentError('UNMAPPED CLASSES ARENT GETTING THE CLASS MAPPED RECIPES...');
 			/*
-			 * 
 			 * I really dont want to map here because the user doesnt explicitely map it,
 			 * and if they overwrite they will be warned
 			 * what I want is to just create the instance with the factory cached recipe (not an extension)
@@ -310,6 +343,16 @@ package orichalcum.alchemy.alchemist
 		private function cooksDirectly(id:*):Boolean 
 		{
 			return _recipes[id] != undefined;
+		}
+		
+		private function getRecipeFlyweight():Recipe 
+		{
+			return _recipePool[_recipePoolIndex++] ||= new Recipe;
+		}
+		
+		private function returnRecipeFlyweight():void
+		{
+			_recipePoolIndex--;
 		}
 		
 	}

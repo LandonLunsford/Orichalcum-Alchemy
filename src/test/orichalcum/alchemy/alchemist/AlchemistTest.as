@@ -21,44 +21,10 @@ package orichalcum.alchemy.alchemist
 	import subject.ClassWithAllMetatags;
 	import subject.ClassWithMemberAndSetterInject;
 
-	/**
-	 * Need to make list of all the fascets I want to test
-	 * In the regression tests I should only test against the Alchemist interface
-	 * and other client-consumed items (orichalcum.provider.factory.*)
-	 * 
-	 * Next test recipe, and recipe extension ?
-	 * 
-	 * Regression
-	 * Need to test Id validation layer
-	 * 		feed all arguments
-	 * 
-	 * function conjure(id:*, recipe:Recipe = null):*
-	 * 
-	 * 
-	 * function provide(id:*):IProviderMapper
-	 * 
-	 * 
-	 * function cook(id:*):IRecipeMapper;
-	 * 
-	 * 
-	 * function create(type:Class, recipe:Recipe = null):Object;
-	 * function inject(instance:Object, recipe:Recipe = null):Object;
-	 * function destroy(instance:Object, recipe:Recipe = null):Object;
-	 * 
-	 * 
-	 * 
-		// modularity
-		function extend():IAlchemist;
-		
-		// configuration
-		function get metatagBundle():IMetatagBundle;
-		function set metatagBundle(value:IMetatagBundle):void;
-		
-		function get expressionQualifier():String;
-		function set expressionQualifier(value:String):void;
-	 */
+
 	public class AlchemistTest 
 	{
+		
 		private var _alchemist:IAlchemist;
 		
 		[Before]

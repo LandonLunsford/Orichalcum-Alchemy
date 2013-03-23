@@ -212,7 +212,13 @@ package orichalcum.alchemy.alchemist
 		
 		private function getRecipe(id:String):Recipe
 		{
-			return _recipes[id] || (_parent && _parent.getRecipe(id));
+			if (id in _recipes)
+				return _recipes[id];
+				
+			if (_parent)
+				return _parent.getRecipe(id);
+				
+			return null;
 		}
 		
 		/**

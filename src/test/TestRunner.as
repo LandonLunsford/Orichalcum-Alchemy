@@ -3,6 +3,7 @@ package
 	import flash.display.Sprite;
 	import org.flexunit.internals.TraceListener;
 	import org.flexunit.runner.FlexUnitCore;
+	import orichalcum.alchemy.alchemist.AlchemistExtensionTest;
 	import orichalcum.alchemy.alchemist.AlchemistTest;
 	import orichalcum.alchemy.alchemist.ConstructorArgumentInjectionTest;
 	import orichalcum.alchemy.alchemist.EventHandlerTest;
@@ -47,6 +48,7 @@ package
 				//,PostConstructTest
 				//,PreDestroyTest
 				,EventHandlerTest
+				,AlchemistExtensionTest
 			);
 		}
 		

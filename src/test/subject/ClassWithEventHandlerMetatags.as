@@ -9,9 +9,6 @@ package subject
 	{
 		public var target:IEventDispatcher;
 		public var root:DisplayObjectContainer;
-		public var onCompleteCalled:Boolean;
-		public var target_onCompleteCalled:Boolean;
-		public var root_child_child_onCompleteCalled:Boolean;
 		
 		public function ClassWithEventHandlerMetatags() 
 		{
@@ -29,22 +26,13 @@ package subject
 		}
 		
 		[EventHandler(event = 'complete')]
-		public function onComplete():void
-		{
-			onCompleteCalled = true;
-		}
+		public function onComplete():void {}
 		
 		[EventHandler(event = 'complete', target = 'target')]
-		public function target_onComplete():void
-		{
-			target_onCompleteCalled = true;
-		}
+		public function target_onComplete():void {}
 		
 		[EventHandler(event = 'complete', target = 'root.child.child')]
-		public function root_child_child_onComplete():void
-		{
-			root_child_child_onCompleteCalled = true;
-		}
+		public function root_child_child_onComplete():void {}
 		
 	}
 

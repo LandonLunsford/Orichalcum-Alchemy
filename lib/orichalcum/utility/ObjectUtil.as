@@ -21,6 +21,7 @@ package orichalcum.utility
 		
 		static public function find(targetRoot:Object, targetPath:String, pathDelimiter:String = '.'):*
 		{
+			if (!targetPath|| !targetPath.length) return targetRoot;
 			var target:* = targetRoot, nextTargetName:String, previousPeriodIndex:int, nextPeriodIndex:int;
 			while (true)
 			{

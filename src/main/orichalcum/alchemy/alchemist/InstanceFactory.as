@@ -2,9 +2,9 @@ package orichalcum.alchemy.alchemist
 {
 	import flash.events.IEventDispatcher;
 	import flash.utils.getQualifiedClassName;
-	import orichalcum.alchemy.binding.IBinding;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.evaluator.IEvaluator;
+	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.utility.ObjectUtil;
@@ -20,6 +20,7 @@ package orichalcum.alchemy.alchemist
 	 */
 	internal class InstanceFactory implements IDisposable
 	{
+		
 		private var _evaluator:IEvaluator;
 		
 		public function InstanceFactory(evaluator:IEvaluator) 
@@ -48,44 +49,44 @@ package orichalcum.alchemy.alchemist
 		
 		private function compose(instance:Object, recipe:Recipe):Object
 		{
-			recipe.hasComposer && (instance[recipe.composer] as Function).call(instance);
+			recipe.hasComposer && (instance[recipe.postConstruct] as Function).call(instance);
 			return instance;
 		}
 		
 		public function destroy(instance:Object, recipe:Recipe):Object 
 		{
-			recipe.hasDisposer && (instance[recipe.disposer] as Function).call(instance);
+			recipe.hasDisposer && (instance[recipe.preDestroy] as Function).call(instance);
 			return unject(unbind(instance, recipe), recipe);
 		}
 		
 		private function bind(instance:Object, recipe:Recipe):Object
 		{
-			if (!recipe.hasBindings)
+			if (!recipe.hasEventHandlers)
 				return instance;
 			
-			for each(var binding:IBinding in recipe.bindings)
+			for each(var eventHandler:IEventHandler in recipe.eventHandlers)
 			{
-				var target:IEventDispatcher = ObjectUtil.find(instance, binding.targetPath) as IEventDispatcher;
+				var target:IEventDispatcher = ObjectUtil.find(instance, eventHandler.targetPath) as IEventDispatcher;
 				
-				if (!(binding.listenerName in instance))
-					throw new AlchemyError('Unable to bind "{0}" to "{1}". Method named "{0}" not found on "{2}"', binding.listenerName, binding.type, getQualifiedClassName(instance));
+				if (!(eventHandler.listenerName in instance))
+					throw new AlchemyError('Unable to bind "{0}" to "{1}". Method named "{0}" not found on "{2}"', eventHandler.listenerName, eventHandler.type, getQualifiedClassName(instance));
 				
-				binding.listener = instance[binding.listenerName];
-				target.addEventListener(binding.type, binding.handle, binding.useCapture, binding.priority);
+				eventHandler.listener = instance[eventHandler.listenerName];
+				target.addEventListener(eventHandler.type, eventHandler.handle, eventHandler.useCapture, eventHandler.priority);
 			}
 			return instance;
 		}
 		
 		private function unbind(instance:Object, recipe:Recipe):Object
 		{
-			if (!recipe.hasBindings)
+			if (!recipe.hasEventHandlers)
 				return instance;
 			
-			for each(var binding:IBinding in recipe.bindings)
+			for each(var eventHandler:IEventHandler in recipe.eventHandlers)
 			{
-				var target:IEventDispatcher = ObjectUtil.find(instance, binding.targetPath) as IEventDispatcher;
-				if (target.hasEventListener(binding.type))
-					target.removeEventListener(binding.type, binding.handle);
+				var target:IEventDispatcher = ObjectUtil.find(instance, eventHandler.targetPath) as IEventDispatcher;
+				if (target.hasEventListener(eventHandler.type))
+					target.removeEventListener(eventHandler.type, eventHandler.handle);
 			}
 			return instance;
 		}

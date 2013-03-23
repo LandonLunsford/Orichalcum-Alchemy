@@ -1,4 +1,4 @@
-package orichalcum.alchemy.binding 
+package orichalcum.alchemy.handler 
 {
 	import flash.events.Event;
 	import flash.events.IEventDispatcher;
@@ -6,7 +6,7 @@ package orichalcum.alchemy.binding
 	import orichalcum.utility.ObjectUtil;
 	import orichalcum.utility.StringUtil;
 
-	public class Binding implements IBinding, IDisposable
+	public class EventHandler implements IEventHandler, IDisposable
 	{
 		static private var _delegateArguments:Array = [];
 		
@@ -23,7 +23,7 @@ package orichalcum.alchemy.binding
 		private var _stopPropagation:Boolean;
 		private var _stopImmediatePropagation:Boolean;
 		
-		public function Binding(
+		public function EventHandler(
 			type:String = null
 			,listenerName:String = null
 			,target:String = null

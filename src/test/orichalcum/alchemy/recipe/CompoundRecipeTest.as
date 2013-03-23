@@ -3,7 +3,7 @@ package orichalcum.alchemy.recipe
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.equalTo;
 	import org.hamcrest.object.hasProperties;
-	import orichalcum.alchemy.binding.Binding;
+	import orichalcum.alchemy.handler.EventHandler;
 
 	public class CompoundRecipeTest 
 	{
@@ -17,16 +17,16 @@ package orichalcum.alchemy.recipe
 			_fullRecipe = new Recipe;
 			_fullRecipe.constructorArguments = [0, 1, 2, 3];
 			_fullRecipe.properties = { a:'a', b:'b' };
-			_fullRecipe.bindings = [new Binding('a'), new Binding('b')];
-			_fullRecipe.composer = 'init';
-			_fullRecipe.disposer = 'dispose';
+			_fullRecipe.eventHandlers = [new EventHandler('a'), new EventHandler('b')];
+			_fullRecipe.postConstruct = 'init';
+			_fullRecipe.preDestroy = 'dispose';
 			
 			_halfRecipe = new Recipe;
 			_halfRecipe.constructorArguments = [0, 1];
 			_halfRecipe.properties = { a:'A' };
-			_halfRecipe.bindings = [new Binding('a')];
-			_halfRecipe.composer = 'INIT';
-			_halfRecipe.disposer = 'DISPOSE';
+			_halfRecipe.eventHandlers = [new EventHandler('a')];
+			_halfRecipe.postConstruct = 'INIT';
+			_halfRecipe.preDestroy = 'DISPOSE';
 			
 			_fullExtendsHalf = new Recipe;
 			_fullExtendsHalf.constructorArguments = [
@@ -36,9 +36,9 @@ package orichalcum.alchemy.recipe
 				,_fullRecipe.constructorArguments[3]
 			];
 			_fullExtendsHalf.properties = { a:'A', b:'b' };
-			_fullExtendsHalf.bindings = _fullRecipe.bindings.concat(_halfRecipe.bindings);
-			_fullExtendsHalf.composer = _halfRecipe.composer;
-			_fullExtendsHalf.disposer = _halfRecipe.disposer;
+			_fullExtendsHalf.eventHandlers = _fullRecipe.eventHandlers.concat(_halfRecipe.eventHandlers);
+			_fullExtendsHalf.postConstruct = _halfRecipe.postConstruct;
+			_fullExtendsHalf.preDestroy = _halfRecipe.preDestroy;
 		}
 		
 		[Test]
@@ -47,9 +47,9 @@ package orichalcum.alchemy.recipe
 			const extension:Recipe = _fullRecipe.clone().extend(_fullRecipe.clone());
 			assertThat(extension.constructorArguments, equalTo(_fullRecipe.constructorArguments));
 			assertThat(extension.properties, hasProperties(_fullRecipe.properties));
-			assertThat(extension.bindings, equalTo(_fullRecipe.bindings.concat(_fullRecipe.bindings)));
-			assertThat(extension.composer, equalTo(_fullRecipe.composer));
-			assertThat(extension.disposer, equalTo(_fullRecipe.disposer));
+			assertThat(extension.eventHandlers, equalTo(_fullRecipe.eventHandlers.concat(_fullRecipe.eventHandlers)));
+			assertThat(extension.postConstruct, equalTo(_fullRecipe.postConstruct));
+			assertThat(extension.preDestroy, equalTo(_fullRecipe.preDestroy));
 		}
 		
 		[Test]
@@ -58,9 +58,9 @@ package orichalcum.alchemy.recipe
 			const extension:Recipe = _fullRecipe.clone().extend(_halfRecipe.clone());
 			assertThat(extension.constructorArguments, equalTo(_fullExtendsHalf.constructorArguments));
 			assertThat(extension.properties, hasProperties(_fullExtendsHalf.properties));
-			assertThat(extension.bindings, equalTo(_fullExtendsHalf.bindings));
-			assertThat(extension.composer, equalTo(_fullExtendsHalf.composer));
-			assertThat(extension.disposer, equalTo(_fullExtendsHalf.disposer));
+			assertThat(extension.eventHandlers, equalTo(_fullExtendsHalf.eventHandlers));
+			assertThat(extension.postConstruct, equalTo(_fullExtendsHalf.postConstruct));
+			assertThat(extension.preDestroy, equalTo(_fullExtendsHalf.preDestroy));
 		}
 		
 		[Test]
@@ -69,9 +69,9 @@ package orichalcum.alchemy.recipe
 			const extension:Recipe = _halfRecipe.clone().extend(_fullRecipe.clone());
 			assertThat(extension.constructorArguments, equalTo(_fullRecipe.constructorArguments));
 			assertThat(extension.properties, hasProperties(_fullRecipe.properties));
-			assertThat(extension.bindings, equalTo(_halfRecipe.bindings.concat(_fullRecipe.bindings)));
-			assertThat(extension.composer, equalTo(_fullRecipe.composer));
-			assertThat(extension.disposer, equalTo(_fullRecipe.disposer));
+			assertThat(extension.eventHandlers, equalTo(_halfRecipe.eventHandlers.concat(_fullRecipe.eventHandlers)));
+			assertThat(extension.postConstruct, equalTo(_fullRecipe.postConstruct));
+			assertThat(extension.preDestroy, equalTo(_fullRecipe.preDestroy));
 		}
 	}
 

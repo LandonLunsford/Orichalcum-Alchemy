@@ -1,9 +1,9 @@
-package orichalcum.alchemy.binding 
+package orichalcum.alchemy.handler 
 {
 	import flash.events.Event;
 	import flash.events.IEventDispatcher;
 
-	public interface IBinding
+	public interface IEventHandler
 	{
 		function get listener():Function;
 		function set listener(value:Function):void;

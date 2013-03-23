@@ -168,7 +168,7 @@ package orichalcum.alchemy.alchemist
 			
 			_alchemist.map(Matrix).to(new Matrix)
 				.withProperty('a', 1)
-				.withDisposer('invert');
+				.withPreDestroy('invert');
 			assertEquals(1, _alchemist.conjure(Matrix).a);
 			
 			_alchemist.map('a').to(type(Rectangle));

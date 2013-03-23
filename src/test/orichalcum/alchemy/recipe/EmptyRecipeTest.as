@@ -28,7 +28,7 @@ package orichalcum.alchemy.recipe
 		[Test]
 		public function testHasBindings():void
 		{
-			assertThat(_emptyRecipe.hasBindings, isFalse());
+			assertThat(_emptyRecipe.hasEventHandlers, isFalse());
 		}
 		
 		[Test]
@@ -49,7 +49,7 @@ package orichalcum.alchemy.recipe
 			const clone:Recipe = _emptyRecipe.clone();
 			assertThat(clone.hasConstructorArguments, isFalse());
 			assertThat(clone.hasProperties, isFalse());
-			assertThat(clone.hasBindings, isFalse());
+			assertThat(clone.hasEventHandlers, isFalse());
 			assertThat(clone.hasComposer, isFalse());
 			assertThat(clone.hasDisposer, isFalse());
 		}
@@ -60,7 +60,7 @@ package orichalcum.alchemy.recipe
 			const extension:Recipe = _emptyRecipe.extend(_emptyRecipe.clone());
 			assertThat(extension.hasConstructorArguments, isFalse());
 			assertThat(extension.hasProperties, isFalse());
-			assertThat(extension.hasBindings, isFalse());
+			assertThat(extension.hasEventHandlers, isFalse());
 			assertThat(extension.hasComposer, isFalse());
 			assertThat(extension.hasDisposer, isFalse());
 		}
@@ -71,7 +71,7 @@ package orichalcum.alchemy.recipe
 			const empty:Recipe = _emptyRecipe.empty();
 			assertThat(empty.hasConstructorArguments, isFalse());
 			assertThat(empty.hasProperties, isFalse());
-			assertThat(empty.hasBindings, isFalse());
+			assertThat(empty.hasEventHandlers, isFalse());
 			assertThat(empty.hasComposer, isFalse());
 			assertThat(empty.hasDisposer, isFalse());
 		}

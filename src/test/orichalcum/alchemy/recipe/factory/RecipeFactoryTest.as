@@ -49,13 +49,13 @@ package orichalcum.alchemy.recipe.factory
 		[Test]
 		public function testHasBindings():void
 		{
-			assertTrue(_hasEverything.hasBindings);
+			assertTrue(_hasEverything.hasEventHandlers);
 		}
 		
 		[Test]
 		public function testHasNoBindings():void
 		{
-			assertFalse(_hasNothing.hasBindings);
+			assertFalse(_hasNothing.hasEventHandlers);
 		}
 		
 		[Test]
@@ -100,9 +100,9 @@ package orichalcum.alchemy.recipe.factory
 		{
 			var recipe:Recipe = _hasEverything;
 			trace(recipe.constructorArguments);
-			trace(recipe.bindings);
-			trace(recipe.composer);
-			trace(recipe.disposer);
+			trace(recipe.eventHandlers);
+			trace(recipe.postConstruct);
+			trace(recipe.preDestroy);
 			trace(recipe.properties);
 		}
 		

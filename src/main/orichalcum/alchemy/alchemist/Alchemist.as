@@ -244,15 +244,8 @@ package orichalcum.alchemy.alchemist
 			 * 
 			 * Then the "getMergedRecipe()" caller must set "i" to 0 when the recursion has ended
 			 */
-			 
-			//const recipe:Recipe = new Recipe;
-			
-			//const recipe:Recipe = _recipePool[_recipePoolIndex]
-				//? _recipePool[_recipePoolIndex++].empty()
-				//: _recipePool[_recipePoolIndex++] = new Recipe;
 			
 			const recipe:Recipe = recipeFlyweight ? recipeFlyweight.empty() : new Recipe;
-				
 			recipe.extend(staticTypeRecipe);
 			runtimeTypeRecipe && recipe.extend(runtimeTypeRecipe);
 			runtimeInstanceRecipe && recipe.extend(runtimeInstanceRecipe);

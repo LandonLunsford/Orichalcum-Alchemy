@@ -1,8 +1,8 @@
 package orichalcum.alchemy.mapper 
 {
 	import flash.utils.Dictionary;
-	import orichalcum.alchemy.binding.Binding;
 	import orichalcum.alchemy.error.AlchemyError;
+	import orichalcum.alchemy.handler.EventHandler;
 	import orichalcum.alchemy.provider.factory.multiton;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.singleton;
@@ -107,21 +107,21 @@ package orichalcum.alchemy.mapper
 			return this;
 		}
 		
-		public function withComposer(value:String):IMapper 
+		public function withPostConstruct(value:String):IMapper 
 		{
-			recipe.composer = value;
+			recipe.postConstruct = value;
 			return this;
 		}
 		
-		public function withDisposer(value:String):IMapper 
+		public function withPreDestroy(value:String):IMapper 
 		{
-			recipe.disposer = value;
+			recipe.preDestroy = value;
 			return this;
 		}
 		
-		public function withBinding(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:uint = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false):IMapper 
+		public function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:uint = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false):IMapper 
 		{
-			recipe.bindings.push(new Binding(type, listener, target, priority, useCapture, stopPropagation, stopImmediatePropagation));
+			recipe.eventHandlers.push(new EventHandler(type, listener, target, priority, useCapture, stopPropagation, stopImmediatePropagation));
 			return this;
 		}
 		

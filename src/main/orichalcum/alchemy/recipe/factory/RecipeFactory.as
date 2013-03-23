@@ -4,8 +4,8 @@ package orichalcum.alchemy.recipe.factory
 	import flash.utils.describeType;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
-	import orichalcum.alchemy.binding.Binding;
 	import orichalcum.alchemy.error.AlchemyError;
+	import orichalcum.alchemy.handler.EventHandler;
 	import orichalcum.alchemy.metatag.bundle.IMetatagBundle;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.recipe.Recipe;
@@ -145,7 +145,7 @@ package orichalcum.alchemy.recipe.factory
 				}
 				if (postConstructs.length() > 0)
 				{
-					recipe.composer = postConstructs[0].parent().@name;
+					recipe.postConstruct = postConstructs[0].parent().@name;
 				}
 					
 				// Pre Destroy
@@ -156,7 +156,7 @@ package orichalcum.alchemy.recipe.factory
 				}
 				if (preDestroys.length() > 0)
 				{
-					recipe.disposer = preDestroys[0].parent().@name;
+					recipe.preDestroy = preDestroys[0].parent().@name;
 				}
 				
 				// Event Handlers
@@ -193,7 +193,7 @@ package orichalcum.alchemy.recipe.factory
 					
 					var keylessArgs:XMLList = metatagArgs.(@key == '');
 					var method:XML = eventHandlerMetadata.parent();
-					var handler:Binding = new Binding;
+					var handler:EventHandler = new EventHandler;
 					
 					if (eventArgs.length() > 0)
 						handler.type = eventArgs[0].@value[0].toString();
@@ -221,7 +221,7 @@ package orichalcum.alchemy.recipe.factory
 						|| stopImmediatePropagationArgs.length() > 0
 						&& stopImmediatePropagationArgs.@value.toString() == 'true';
 					
-					recipe.bindings.push(handler);
+					recipe.eventHandlers.push(handler);
 				}
 			}
 			return recipe;

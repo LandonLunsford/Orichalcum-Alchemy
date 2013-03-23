@@ -17,9 +17,9 @@ package orichalcum.alchemy.mapper
 		function withConstructorArgument(value:*, index:int = -1):IMapper;
 		function withProperties(properties:Object):IMapper;
 		function withProperty(name:String, value:*):IMapper;
-		function withComposer(value:String):IMapper;
-		function withDisposer(value:String):IMapper;
-		function withBinding(
+		function withPostConstruct(value:String):IMapper;
+		function withPreDestroy(value:String):IMapper;
+		function withEventHandler(
 			type:String
 			,listener:String
 			,target:String = null

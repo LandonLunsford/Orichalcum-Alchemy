@@ -37,7 +37,7 @@ package orichalcum.alchemy.alchemist
 		public function testRuntimeConfiguredPostConstructCalledByCreate():void
 		{
 			_alchemist.map(ClassWithPostConstruct)
-				.withComposer(_postConstruct);
+				.withPostConstruct(_postConstruct);
 			
 			const creation:ClassWithPostConstruct = _alchemist.create(ClassWithPostConstruct) as ClassWithPostConstruct;
 			assertThat(creation.postConstructCalled, isTrue());
@@ -47,7 +47,7 @@ package orichalcum.alchemy.alchemist
 		public function testRuntimeConfiguredPostConstructNotCalledByInject():void
 		{
 			_alchemist.map(ClassWithPostConstruct)
-				.withComposer(_postConstruct);
+				.withPostConstruct(_postConstruct);
 				
 			const creation:ClassWithPostConstruct = _alchemist.inject(new ClassWithPostConstruct) as ClassWithPostConstruct;
 			assertThat(creation.postConstructCalled, isFalse());
@@ -57,7 +57,7 @@ package orichalcum.alchemy.alchemist
 		public function testRuntimeConfiguredPostConstructOverridesMetadataConfiguredPostConstruct():void
 		{
 			_alchemist.map(ClassWithPostConstructMetatag)
-				.withComposer('otherPostConstruct');
+				.withPostConstruct('otherPostConstruct');
 				
 			const creation:ClassWithPostConstructMetatag = _alchemist.create(ClassWithPostConstructMetatag) as ClassWithPostConstructMetatag;
 			assertThat(creation.postConstructCalled, isFalse());

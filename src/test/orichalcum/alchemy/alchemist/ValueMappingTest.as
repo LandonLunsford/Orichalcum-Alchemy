@@ -113,9 +113,9 @@ package orichalcum.alchemy.alchemist
 			_alchemist.map(_id).to(true)
 				.withConstructorArgument(1)
 				.withProperty('x', 1)
-				.withBinding('click', 'go')
-				.withComposer('init')
-				.withDisposer('dispose');
+				.withEventHandler('click', 'go')
+				.withPostConstruct('init')
+				.withPreDestroy('dispose');
 				
 			assertThat(_alchemist.conjure(_id));
 		}
@@ -138,9 +138,9 @@ package orichalcum.alchemy.alchemist
 				})
 				.withConstructorArgument(1)
 				.withProperty('x', 1)
-				.withBinding('complete', 'go', 'bindee')
-				.withComposer('init')
-				.withDisposer('dispose');
+				.withEventHandler('complete', 'go', 'bindee')
+				.withPostConstruct('init')
+				.withPreDestroy('dispose');
 				
 			const object:Object = _alchemist.conjure('poo');
 			assertThat(object.initialized, isFalse());

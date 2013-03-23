@@ -31,7 +31,7 @@ package orichalcum.alchemy.alchemist
 		public function testRuntimeConfiguredPreDestroyIsCalledByDestroy():void
 		{
 			_alchemist.map(ClassWithPreDestroy)
-				.withDisposer(_preDestroy);
+				.withPreDestroy(_preDestroy);
 			
 			const creation:ClassWithPreDestroy = new ClassWithPreDestroy;
 			_alchemist.destroy(creation);
@@ -42,7 +42,7 @@ package orichalcum.alchemy.alchemist
 		public function testMetadataConfiguredPreDestroyOverridenByRuntimeConfiguredPreDestroy():void
 		{
 			_alchemist.map(ClassWithPreDestroyMetatag)
-				.withDisposer('otherPreDestroy');
+				.withPreDestroy('otherPreDestroy');
 			
 			const creation:ClassWithPreDestroyMetatag = new ClassWithPreDestroyMetatag;
 			_alchemist.destroy(creation);
@@ -56,7 +56,7 @@ package orichalcum.alchemy.alchemist
 			const id:String = 'id';
 			_alchemist.map(id)
 				.toSingleton(ClassWithPreDestroy)
-				.withDisposer(_preDestroy);
+				.withPreDestroy(_preDestroy);
 				
 			const creation:ClassWithPreDestroy = _alchemist.conjure(id) as ClassWithPreDestroy;
 			_alchemist.destroy(creation);

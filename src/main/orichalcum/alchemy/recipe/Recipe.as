@@ -141,7 +141,7 @@ package orichalcum.alchemy.recipe
 		{
 			return _preDestroy;
 		}
-
+		
 		public function set preDestroy(value:String):void 
 		{
 			_preDestroy = value;

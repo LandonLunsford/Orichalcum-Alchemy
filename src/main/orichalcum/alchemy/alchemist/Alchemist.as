@@ -1,5 +1,7 @@
 package orichalcum.alchemy.alchemist 
 {
+	import flash.display.DisplayObject;
+	import flash.events.Event;
 	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
@@ -15,9 +17,13 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
 	
-	
-	internal class Alchemist implements IDisposable, IAlchemist
+	/**
+	 * In order for mediator to work the user must conjure the view mapped to the mediator then destroy the view
+	 */
+	public class Alchemist implements IDisposable, IAlchemist
 	{
+		private var _activeMediators:Array = [];
+		
 		
 		/**
 		 * @private
@@ -72,10 +78,21 @@ package orichalcum.alchemy.alchemist
 		private var _recipes:Dictionary = new Dictionary;
 		
 		/**
+		 * Contains all mapped mediators
+		 */
+		private var _mediators:Dictionary = new Dictionary;
+		
+		/**
 		 * Used to facilitate unbinding and pre-destroy hooks for runtime configured instances
 		 * @private
 		 */
 		private var _recipesByInstance:Dictionary = new Dictionary;
+		
+		/**
+		 * Used to lookup the appropriate mediator mapped to a specific view instance
+		 * @private
+		 */
+		private var _mediatorsByView:Dictionary = new Dictionary;
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
@@ -130,9 +147,6 @@ package orichalcum.alchemy.alchemist
 		
 		/* INTERFACE orichalcum.lifecycle.IDisposable */
 		
-		/**
-		 * @inheritDoc
-		 */
 		public function dispose():void
 		{
 			for (var providerName:String in _providers)
@@ -153,17 +167,11 @@ package orichalcum.alchemy.alchemist
 		
 		/* INTERFACE orichalcum.alchemy.alchemist.IAlchemist */
 
-		/**
-		 * @inheritDoc
-		 */
 		public function map(id:*):IMapper
 		{
-			return new Mapper(_reflector, getValidId(id), _providers, _recipes);
+			return new Mapper(_reflector, getValidId(id), _providers, _recipes, _mediators);
 		}
 		
-		/**
-		 * @inheritDoc
-		 */
 		public function conjure(id:*, recipe:Recipe = null):*
 		{
 			id = getValidId(id);
@@ -172,17 +180,32 @@ package orichalcum.alchemy.alchemist
 			
 			if (provider === NotFound)
 			{
-				if (_reflector.isType(id))
-					return conjureUnmappedType(id);
-				
-				throw new AlchemyError('Alchemist has no provider for id "{0}"', id);
+				if (!_reflector.isType(id))
+					throw new AlchemyError('Alchemist has no provider mapped to "{0}"', id);
+					
+				return conjureUnmappedType(id);
 			}
 			
-			var provision:* = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
+			const provision:* = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
 			recipe && (_recipesByInstance[provision] = recipe);
 			
 			/**
-			 * Add the following code to implement instance pooling.
+			 * This will allow the display object to trigger its mediator when added to stage
+			 */
+			const mediator:* = getMediator(id);
+			if (mediator)
+			{
+				if (!(provision is DisplayObject))
+					throw new AlchemyError('"{0}" must be of type DisplayObject in order to be Mediated.', id);
+				
+				const view:DisplayObject = provision as DisplayObject;
+				view.addEventListener(Event.ADDED_TO_STAGE, activateMediator);
+				view.addEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
+				_mediatorsByView[view] = mediator;
+			}
+			
+			/**
+			 * Add the following code to implement pooled instance providers.
 			 * 
 			 * provider is IPooledInstanceProvider && (_pooledProvidersByInstance ||= new Dictionary)[provision] = provider;
 			 */
@@ -190,32 +213,26 @@ package orichalcum.alchemy.alchemist
 			return provision;	
 		}
 		
-		/**
-		 * @inheritDoc
-		 */
 		public function create(type:Class, recipe:Recipe = null):Object
 		{
+			if (!type) throw new ArgumentError('Argument "type" passed to method Alchemist.create() must not be null.');
 			const instance:* = _instanceFactory.create(type, getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe), this);
 			returnRecipeFlyweight();
 			return instance;
 		}
 		
-		/**
-		 * @inheritDoc
-		 */
 		public function inject(instance:Object):Object
 		{
-			const instance:* = _instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]), this);
+			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
+			_instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]), this);
 			returnRecipeFlyweight();
 			return instance;
 		}
 		
-		/**
-		 * @inheritDoc
-		 */
 		public function destroy(instance:Object):Object
 		{
-			const instance:* = _instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
+			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
+			_instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
 			returnRecipeFlyweight();
 			
 			/**
@@ -227,9 +244,6 @@ package orichalcum.alchemy.alchemist
 			return instance;
 		}
 		
-		/**
-		 * @inheritDoc
-		 */
 		public function extend():IAlchemist
 		{
 			const child:Alchemist = new Alchemist;
@@ -239,9 +253,6 @@ package orichalcum.alchemy.alchemist
 		
 		/* INTERFACE orichalcum.alchemy.evaluator.IEvaluator */
 		
-		/**
-		 * @inheritDoc
-		 */
 		public function evaluate(providerReferenceOrValue:*):*
 		{
 			return evaluateWithRecipe(providerReferenceOrValue, null);
@@ -275,6 +286,21 @@ package orichalcum.alchemy.alchemist
 				
 			if (_parent)
 				return _parent.getRecipe(id);
+				
+			return null;
+		}
+		
+		/**
+		 * Recursively looks-up the mediator for the ID through this alchemist and its ancestor chain
+		 * @private
+		 */
+		private function getMediator(id:String):*
+		{
+			if (id in _mediators)
+				return _mediators[id];
+				
+			if (_parent)
+				return _parent.getMediator(id);
 				
 			return null;
 		}
@@ -350,6 +376,22 @@ package orichalcum.alchemy.alchemist
 				return conjure((providerReferenceOrValue as String).replace(_expressionRemovals, ''));
 			
 			return providerReferenceOrValue;
+		}
+		
+		private function deactivateMediator(event:Event):void 
+		{
+			const view:DisplayObject = event.target as DisplayObject;
+			view.removeEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
+			const mediator:* = evaluate(_mediatorsByView[view]);
+			_activeMediators.push(mediator);
+		}
+		
+		private function activateMediator(event:Event):void 
+		{
+			const view:DisplayObject = event.target as DisplayObject;
+			view.removeEventListener(Event.ADDED_TO_STAGE, activateMediator);
+			const mediator:* = evaluate(_mediatorsByView[view]);
+			_activeMediators.splice(_activeMediators.indexOf(mediator), 1);
 		}
 		
 		/**

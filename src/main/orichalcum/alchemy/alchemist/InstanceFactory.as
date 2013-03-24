@@ -14,9 +14,7 @@ package orichalcum.alchemy.alchemist
 	 * This class performs the dirty work of the alchemist
 	 * It is the alchemists' instance creator, injector, binder,
 	 * composer, disposer, unbinder and injector
-	 * 
-	 * Requires Alchemist.conjure
-	 * Requires ExpressionEvaluator.evaluate
+	 * @private
 	 */
 	internal class InstanceFactory
 	{

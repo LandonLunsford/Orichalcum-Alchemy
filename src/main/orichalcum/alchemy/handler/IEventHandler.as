@@ -3,6 +3,9 @@ package orichalcum.alchemy.handler
 	import flash.events.Event;
 	import flash.events.IEventDispatcher;
 
+	/**
+	 * @private
+	 */
 	public interface IEventHandler
 	{
 		function get listener():Function;

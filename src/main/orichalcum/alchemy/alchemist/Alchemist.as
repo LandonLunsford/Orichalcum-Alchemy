@@ -14,64 +14,125 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
-
+	
+	
 	internal class Alchemist implements IDisposable, IAlchemist
 	{
-		private var _reflector:IReflector;
-		private var _expressionQualifier:RegExp;
-		private var _expressionRemovals:RegExp;
+		
+		/**
+		 * @private
+		 */
+		static private var _expressionQualifier:RegExp = /^{.*}$/;
+		
+		/**
+		 * @private
+		 */
+		static private var _expressionRemovals:RegExp = /{|}|\s/gm;
+		
+		/**
+		 * @private
+		 */
+		private var _reflector:IReflector = Reflector.getInstance(ApplicationDomain.currentDomain);
+		
+		/**
+		 * Contains all mapped providers
+		 * @private
+		 */
+		private var _providers:Dictionary = new Dictionary;
+		
+		/**
+		 * Contains all mapped recipes
+		 * @private
+		 */
+		private var _recipes:Dictionary = new Dictionary;
+		
+		/**
+		 * Generates recipes based on class metatags
+		 * @private
+		 */
+		private var _recipeFactory:RecipeFactory = new RecipeFactory(_reflector, new StandardMetatagBundle);
+		
+		/**
+		 * Creates, injects, binds, unbinds, unjects and destroys instances
+		 * @private
+		 */
+		private var _instanceFactory:InstanceFactory = new InstanceFactory(this);
+		
+		/**
+		 * Used to facilitate unbinding and pre-destroy hooks for runtime configured instances
+		 * @private
+		 */
+		private var _recipesByInstance:Dictionary = new Dictionary;
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
-		 * Used for finding fallback behavior in the parent alchemist
+		 * Finding fallback providers and recipes in the parent alchemist
 		 * thisAlchemist = parentAlchemist.extend()
+		 * @private
 		 */
 		private var _parent:Alchemist;
 		
 		/**
-		 * A unique class must be used to represent the absence of a provision|provider
-		 * This is to avoid reserving real values (mainly null or undefined) that the client may want to use
+		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
+		 * The caller of the recursive-compound-recipe-consuming-function must return the recipe flyweight after use.
+		 * @private
 		 */
-		private var _notFound:NotFound;
-		
-		private var _providers:Dictionary;
-		private var _recipes:Dictionary;
-		private var _recipeFactory:RecipeFactory;
-		private var _instanceFactory:InstanceFactory;
+		private var _recipeFlyweights:Array = [];
 		
 		/**
-		 * This will be used to remove "recipe" arg from many user-facing methods
-		 * Additionally it is required to facilitate disposer/binding of run-time configured objects
-		 * Note unless I store the compound recipes (faulty) I must re-compute them at "destroy" time
+		 * Used to manage the recipe flyweight pool
+		 * @private
 		 */
-		private var _recipesByInstance:Dictionary;
+		private var _recipeFlyweightsIndex:int;
+		
 		
 		/**
-		 * This is so that the alchemist need not create new recipes every recursive step taken
-		 * while processing injection requests.
-		 * 
-		 * @usage var scopedRecipe:Recipe = (_recipePool[i++] ||= new Recipe).empty();
-		 * The caller of the recursive function must reset i to 0 when complete for maximum efficiency
+		 * Used to identify strings that represent references to other mappings
+		 * @default /^{.*}$/
 		 */
-		private var _recipePool:Array;
-		private var _recipePoolIndex:int;
-		
-		public function Alchemist() 
+		static public function get expressionQualifier():RegExp
 		{
-			_reflector = Reflector.getInstance(ApplicationDomain.currentDomain);
-			_providers = new Dictionary;
-			_recipes = new Dictionary;
-			_recipesByInstance = new Dictionary;
-			_recipeFactory = new RecipeFactory(_reflector, new StandardMetatagBundle);
-			_instanceFactory = new InstanceFactory(this);
-			_notFound = new NotFound;
-			_expressionQualifier = /^{.*}$/;
-			_expressionRemovals = /{|}|\s/gm;
-			_recipePool = [];
+			return _expressionQualifier;
+		}
+		
+		static public function set expressionQualifier(value:RegExp):void
+		{
+			_expressionQualifier = value;
+		}
+		
+		/**
+		 * Used to strip the characters used to qualify a reference from the reference string
+		 * @default /{|}|\s/gm
+		 */
+		static public function get expressionRemovals():RegExp 
+		{
+			return _expressionRemovals;
+		}
+		
+		static public function set expressionRemovals(value:RegExp):void 
+		{
+			_expressionRemovals = value;
+		}
+		
+		/**
+		 * Used to customize the metatags used to qualify injections, post-construct, pre-destroy and event handlers
+		 * @default orichalcum.alchemy.metatag.bundle.StandardMetatagBundle
+		 */
+		static public function get metatagBundle():IMetatagBundle
+		{
+			return _recipeFactory.metatagBundle;
+		}
+		
+		static public function set metatagBundle(value:IMetatagBundle):void 
+		{
+			_recipeFactory.metatagBundle = value;
 		}
 		
 		/* INTERFACE orichalcum.lifecycle.IDisposable */
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function dispose():void
 		{
 			for (var providerName:String in _providers)
@@ -98,26 +159,24 @@ package orichalcum.alchemy.alchemist
 		
 		/* INTERFACE orichalcum.alchemy.alchemist.IAlchemist */
 
+		/**
+		 * @inheritDoc
+		 */
 		public function map(id:*):IMapper
 		{
-			return _map(qualify(id));
+			return new Mapper(_reflector, getValidId(id), _providers, _recipes);
 		}
 		
-		private function _map(id:String):IMapper 
-		{
-			return new Mapper(_reflector, id, _providers, _recipes);
-		}
-		
+		/**
+		 * @inheritDoc
+		 */
 		public function conjure(id:*, recipe:Recipe = null):*
 		{
-			return _conjure(qualify(id), recipe);
-		}
-		
-		private function _conjure(id:String, recipe:Recipe = null):* 
-		{
+			id = getValidId(id);
+			
 			const provider:* = getProvider(id);
 			
-			if (provider === _notFound)
+			if (provider === NotFound)
 			{
 				if (_reflector.isType(id))
 					return conjureUnmappedType(id);
@@ -178,36 +237,6 @@ package orichalcum.alchemy.alchemist
 			return child;
 		}
 		
-		public function get metatagBundle():IMetatagBundle
-		{
-			return _recipeFactory.metatagBundle;
-		}
-		
-		public function set metatagBundle(value:IMetatagBundle):void 
-		{
-			_recipeFactory.metatagBundle = value;
-		}
-		
-		public function get expressionQualifier():RegExp
-		{
-			return _expressionQualifier;
-		}
-		
-		public function set expressionQualifier(value:RegExp):void
-		{
-			_expressionQualifier = value;
-		}
-		
-		public function get expressionRemovals():RegExp 
-		{
-			return _expressionRemovals;
-		}
-		
-		public function set expressionRemovals(value:RegExp):void 
-		{
-			_expressionRemovals = value;
-		}
-		
 		/* PRIVATE PARTS */
 		
 		/**
@@ -222,7 +251,7 @@ package orichalcum.alchemy.alchemist
 			if (_parent)
 				return _parent.getProvider(id);
 			
-			return _notFound;
+			return NotFound;
 		}
 		
 		private function getRecipe(id:String):Recipe
@@ -301,7 +330,7 @@ package orichalcum.alchemy.alchemist
 			return providerReferenceOrValue;
 		}
 		
-		private function qualify(id:*):String
+		private function getValidId(id:*):String
 		{
 			if (id == null)
 				throw new ArgumentError('Argument "id" must not be null.');
@@ -362,21 +391,20 @@ package orichalcum.alchemy.alchemist
 		
 		private function getRecipeFlyweight():Recipe 
 		{
-			return _recipePool[_recipePoolIndex++] ||= new Recipe;
+			return _recipeFlyweights[_recipeFlyweightsIndex++] ||= new Recipe;
 		}
 		
 		private function returnRecipeFlyweight():void
 		{
-			_recipePoolIndex--;
+			_recipeFlyweightsIndex--;
 		}
-		
-		//private function get pooledProvidersByInstance():Dictionary
-		//{
-			//return _pooledProvidersByInstance ||= new Dictionary;
-		//}
-		
+
 	}
 
 }
 
+/**
+ * A unique class must be used to represent the absence of a provision|provider
+ * This is to avoid reserving real values (mainly null or undefined) that the client may want to use
+ */
 internal class NotFound{}

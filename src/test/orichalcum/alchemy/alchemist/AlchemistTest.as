@@ -20,6 +20,8 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.recipe.Recipe;
 	import subject.ClassWithAllMetatags;
 	import subject.ClassWithMemberAndSetterInject;
+	import subject.ClassWithPreDestroy;
+	import subject.ClassWithPreDestroyMetatag;
 
 
 	public class AlchemistTest 
@@ -157,6 +159,17 @@ package orichalcum.alchemy.alchemist
 			// good?? bad??
 			
 			_alchemist.conjure(Sprite);
+		}
+		
+		[Test]
+		public function testInstanceRecipeMapWithOverwriting():void
+		{
+			_alchemist.map(ClassWithPreDestroyMetatag);
+			const creation:ClassWithPreDestroyMetatag = _alchemist.conjure(ClassWithPreDestroyMetatag) as ClassWithPreDestroyMetatag;
+			_alchemist.map(ClassWithPreDestroyMetatag).withPreDestroy('otherPreDestroy');
+			_alchemist.destroy(creation);
+			trace('1st', creation.preDestroyCalled);
+			trace('other',creation.otherPreDestroyCalled);
 		}
 		
 	}

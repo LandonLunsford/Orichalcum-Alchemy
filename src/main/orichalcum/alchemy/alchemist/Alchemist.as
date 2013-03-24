@@ -22,6 +22,23 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * @private
 		 */
+		static private var _reflector:IReflector = Reflector.getInstance(ApplicationDomain.currentDomain);
+		
+		/**
+		 * Generates recipes based on class metatags
+		 * @private
+		 */
+		static private var _recipeFactory:RecipeFactory = new RecipeFactory(_reflector, new StandardMetatagBundle);
+		
+		/**
+		 * Creates, injects, binds, unbinds, unjects and destroys instances
+		 * @private
+		 */
+		static private var _instanceFactory:InstanceFactory = new InstanceFactory;
+		
+		/**
+		 * @private
+		 */
 		static private var _expressionQualifier:RegExp = /^{.*}$/;
 		
 		/**
@@ -30,9 +47,17 @@ package orichalcum.alchemy.alchemist
 		static private var _expressionRemovals:RegExp = /{|}|\s/gm;
 		
 		/**
+		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
+		 * The caller of the recursive-compound-recipe-consuming-function must return the recipe flyweight after use.
 		 * @private
 		 */
-		private var _reflector:IReflector = Reflector.getInstance(ApplicationDomain.currentDomain);
+		static private var _recipeFlyweights:Array = [];
+		
+		/**
+		 * Used to manage the recipe flyweight pool
+		 * @private
+		 */
+		static private var _recipeFlyweightsIndex:int;
 		
 		/**
 		 * Contains all mapped providers
@@ -47,18 +72,6 @@ package orichalcum.alchemy.alchemist
 		private var _recipes:Dictionary = new Dictionary;
 		
 		/**
-		 * Generates recipes based on class metatags
-		 * @private
-		 */
-		private var _recipeFactory:RecipeFactory = new RecipeFactory(_reflector, new StandardMetatagBundle);
-		
-		/**
-		 * Creates, injects, binds, unbinds, unjects and destroys instances
-		 * @private
-		 */
-		private var _instanceFactory:InstanceFactory = new InstanceFactory(this);
-		
-		/**
 		 * Used to facilitate unbinding and pre-destroy hooks for runtime configured instances
 		 * @private
 		 */
@@ -71,19 +84,6 @@ package orichalcum.alchemy.alchemist
 		 * @private
 		 */
 		private var _parent:Alchemist;
-		
-		/**
-		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
-		 * The caller of the recursive-compound-recipe-consuming-function must return the recipe flyweight after use.
-		 * @private
-		 */
-		private var _recipeFlyweights:Array = [];
-		
-		/**
-		 * Used to manage the recipe flyweight pool
-		 * @private
-		 */
-		private var _recipeFlyweightsIndex:int;
 		
 		
 		/**
@@ -146,15 +146,9 @@ package orichalcum.alchemy.alchemist
 				delete _recipes[recipeName];
 			}
 			_recipeFactory is IDisposable && (_recipeFactory as IDisposable).dispose();
-			_instanceFactory is IDisposable && (_instanceFactory as IDisposable).dispose();
 			_parent = null;
-			_reflector = null;
 			_providers = null;
 			_recipes = null;
-			_recipeFactory = null;
-			_instanceFactory = null;
-			_expressionQualifier = null;
-			_expressionRemovals = null;
 		}
 		
 		/* INTERFACE orichalcum.alchemy.alchemist.IAlchemist */
@@ -197,25 +191,28 @@ package orichalcum.alchemy.alchemist
 		}
 		
 		/**
-		 * This method is to bypass mapped providers
+		 * @inheritDoc
 		 */
 		public function create(type:Class, recipe:Recipe = null):Object
 		{
-			const instance:* = _instanceFactory.create(type, getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe));
+			const instance:* = _instanceFactory.create(type, getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe), this);
 			returnRecipeFlyweight();
 			return instance;
 		}
 		
 		/**
-		 * This method is to apply injection, but leave creation up to the client
+		 * @inheritDoc
 		 */
 		public function inject(instance:Object):Object
 		{
-			const instance:* = _instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
+			const instance:* = _instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]), this);
 			returnRecipeFlyweight();
 			return instance;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function destroy(instance:Object):Object
 		{
 			const instance:* = _instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
@@ -230,6 +227,9 @@ package orichalcum.alchemy.alchemist
 			return instance;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function extend():IAlchemist
 		{
 			const child:Alchemist = new Alchemist;
@@ -237,11 +237,21 @@ package orichalcum.alchemy.alchemist
 			return child;
 		}
 		
+		/* INTERFACE orichalcum.alchemy.evaluator.IEvaluator */
+		
+		/**
+		 * @inheritDoc
+		 */
+		public function evaluate(providerReferenceOrValue:*):*
+		{
+			return evaluateWithRecipe(providerReferenceOrValue, null);
+		}
+		
 		/* PRIVATE PARTS */
 		
 		/**
-		 * Evaluation-friendly implementation
-		 * Must return unique object to avoid reserving any value
+		 * Recursively looks-up the provider for the ID through this alchemist and its ancestor chain
+		 * @private
 		 */
 		private function getProvider(id:String):*
 		{
@@ -254,6 +264,10 @@ package orichalcum.alchemy.alchemist
 			return NotFound;
 		}
 		
+		/**
+		 * Recursively looks-up the recipe for the ID through this alchemist and its ancestor chain
+		 * @private
+		 */
 		private function getRecipe(id:String):Recipe
 		{
 			if (id in _recipes)
@@ -265,19 +279,28 @@ package orichalcum.alchemy.alchemist
 			return null;
 		}
 		
+		/**
+		 * @private
+		 */
 		private function getRecipeForClassOrInstance(classOrInstance:Object, recipeFlyweight:Recipe, runtimeConfiguredRecipe:Recipe = null):Recipe 
 		{
 			return getRecipeForClassName(getQualifiedClassName(classOrInstance), recipeFlyweight, runtimeConfiguredRecipe);
 		}
 		
+		/**
+		 * @private
+		 */
 		private function getRecipeForClassName(qualifiedClassName:String, recipeFlyweight:Recipe, runtimeConfiguredRecipe:Recipe = null):Recipe
 		{
 			return getMergedRecipe(recipeFlyweight, _recipeFactory.getRecipeByClassName(qualifiedClassName), getRecipe(qualifiedClassName), runtimeConfiguredRecipe);
 		}
 		
+		/**
+		 * @private
+		 */
 		private function getMergedRecipe(recipeFlyweight:Recipe, staticTypeRecipe:Recipe, runtimeTypeRecipe:Recipe, runtimeInstanceRecipe:Recipe):Recipe
 		{
-			/**
+			/*
 			 * Flyweight POOL must be used
 			 * Because of recursive nature of the algorithm
 			 * each recursion clobbers the parent's recipe config
@@ -299,6 +322,9 @@ package orichalcum.alchemy.alchemist
 			return recipe;
 		}
 		
+		/**
+		 * @private
+		 */
 		private function conjureUnmappedType(qualifiedClassName:String):* 
 		{
 			/*
@@ -310,14 +336,10 @@ package orichalcum.alchemy.alchemist
 			return create(_reflector.getType(qualifiedClassName), getRecipe(qualifiedClassName));
 		}
 		
-		public function evaluate(providerReferenceOrValue:*):*
-		{
-			return evaluateWithRecipe(providerReferenceOrValue, null);
-		}
-		
 		/**
 		 * Evaluating the contents of the provider map at "conjure-time" not only provides for a better user API
 		 * but also minimizes the libraries data footprint by avoiding excessive wrapping of values/references with providers
+		 * @private
 		 */
 		private function evaluateWithRecipe(providerReferenceOrValue:*, recipe:Recipe = null):*
 		{
@@ -330,6 +352,9 @@ package orichalcum.alchemy.alchemist
 			return providerReferenceOrValue;
 		}
 		
+		/**
+		 * @private
+		 */
 		private function getValidId(id:*):String
 		{
 			if (id == null)
@@ -358,47 +383,21 @@ package orichalcum.alchemy.alchemist
 		}
 		
 		/**
-		 * @deprecated
+		 * @private
 		 */
-		private function provides(id:*):Boolean 
-		{
-			return providesDirectly(id) || (_parent && _parent.provides(id));
-		}
-		
-		/**
-		 * @deprecated
-		 */
-		private function providesDirectly(id:*):Boolean 
-		{
-			return _providers[id] != undefined;
-		}
-		
-		/**
-		 * @deprecated
-		 */
-		private function cooks(id:*):Boolean
-		{
-			return cooksDirectly(id) || (_parent && _parent.cooks(id));
-		}
-		
-		/**
-		 * @deprecated
-		 */
-		private function cooksDirectly(id:*):Boolean 
-		{
-			return _recipes[id] != undefined;
-		}
-		
 		private function getRecipeFlyweight():Recipe 
 		{
 			return _recipeFlyweights[_recipeFlyweightsIndex++] ||= new Recipe;
 		}
 		
+		/**
+		 * @private
+		 */
 		private function returnRecipeFlyweight():void
 		{
 			_recipeFlyweightsIndex--;
 		}
-
+		
 	}
 
 }

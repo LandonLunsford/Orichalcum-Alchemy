@@ -7,12 +7,12 @@ package orichalcum.alchemy.provider
 
 	public class FactoryProvider implements IProvider, IDisposable
 	{
-		/**
-		 * function():*
-		 * function(alchemist:IAlchemist):*
-		 */
+		
 		private var _factory:Function;
 		
+		/**
+		 * @param factory The factory method (e.g. function():* or function(activeAlchemist:IAlchemist):*)
+		 */
 		public function FactoryProvider(factory:Function) 
 		{
 			if (factory == null)
@@ -39,7 +39,6 @@ package orichalcum.alchemy.provider
 			{
 				case 0: return _factory();
 				case 1: return _factory(activeAlchemist);
-				//case 2: return _factory(activeAlchemist, activeRecipe);
 			}
 		}
 		

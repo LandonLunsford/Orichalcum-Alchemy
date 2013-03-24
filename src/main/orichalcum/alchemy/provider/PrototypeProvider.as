@@ -5,7 +5,9 @@ package orichalcum.alchemy.provider
 
 	public class PrototypeProvider extends InstanceProvider
 	{
-		
+		/**
+		 * @param type The class of the prototype
+		 */
 		public function PrototypeProvider(type:Class)
 		{
 			super(type);

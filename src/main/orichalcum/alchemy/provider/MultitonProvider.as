@@ -8,6 +8,10 @@ package orichalcum.alchemy.provider
 		private var _pool:Array;
 		private var _poolIndex:int;
 		
+		/**
+		 * @param type The class of the multiton
+		 * @param poolSize The maximum number of instances allowed
+		 */
 		public function MultitonProvider(type:Class, poolSize:uint = 0) 
 		{
 			super(type);

@@ -8,6 +8,9 @@ package orichalcum.alchemy.provider
 	{
 		private var _reference:String;
 		
+		/**
+		 * @param reference The string ID of any mapped provision
+		 */
 		public function ReferenceProvider(reference:String) 
 		{
 			_reference = reference;

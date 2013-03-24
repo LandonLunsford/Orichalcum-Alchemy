@@ -5,7 +5,9 @@ package orichalcum.alchemy.provider
 
 	public class ForwardingProvider extends SingletonProvider
 	{
-		
+		/**
+		 * @param providerType The class of the custom provider
+		 */
 		public function ForwardingProvider(providerType:Class) 
 		{
 			super(providerType);

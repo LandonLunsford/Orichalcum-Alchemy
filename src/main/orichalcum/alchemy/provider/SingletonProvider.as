@@ -7,6 +7,9 @@ package orichalcum.alchemy.provider
 	{
 		private var _instance:Object;
 		
+		/**
+		 * @param type The class of the singleton
+		 */
 		public function SingletonProvider(type:Class) 
 		{
 			super(type);

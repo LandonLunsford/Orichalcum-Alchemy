@@ -8,6 +8,9 @@ package orichalcum.alchemy.provider
 	{
 		private var _value:*;
 		
+		/**
+		 * @param value The value the provider will provide
+		 */
 		public function ValueProvider(value:*) 
 		{
 			_value = value;
@@ -32,19 +35,6 @@ package orichalcum.alchemy.provider
 		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):*
 		{
 			return _value;
-			
-			/**
-			 * What I really want is _reflector.isPrimitive(_reflector.getTypeName(_value))
-			 * currently I am enabling type "Object" for testing purposes? I should rewrite the test
-			 * and disallow type Object I think.
-			 */
-			return !(_value is Object)
-				|| _value is Number
-				|| _value is String
-				|| _value is Class
-				|| _value is Function
-					? _value
-					: activeAlchemist.inject(_value, activeRecipe);
 		}
 		
 	}

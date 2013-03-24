@@ -20,6 +20,12 @@ package orichalcum.alchemy.alchemist
 		private var _reflector:IReflector;
 		private var _expressionQualifier:RegExp;
 		private var _expressionRemovals:RegExp;
+		
+		/**
+		 * The backward reference to the source of the this Alchemist
+		 * Used for finding fallback behavior in the parent alchemist
+		 * thisAlchemist = parentAlchemist.extend()
+		 */
 		private var _parent:Alchemist;
 		
 		/**
@@ -107,11 +113,6 @@ package orichalcum.alchemy.alchemist
 			return _conjure(qualify(id), recipe);
 		}
 		
-		/**
-		 * For better API do an evaluation here on provider
-		 * let _providers hold providerOrReferenceOrValue
-		 * This will allow for smaller data footprint because I wont need to wrap values/references in providers
-		 */
 		private function _conjure(id:String, recipe:Recipe = null):* 
 		{
 			const provider:* = getProvider(id);
@@ -126,6 +127,13 @@ package orichalcum.alchemy.alchemist
 			
 			var provision:* = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
 			recipe && (_recipesByInstance[provision] = recipe);
+			
+			/**
+			 * Add the following code to implement instance pooling.
+			 * 
+			 * provider is IPooledInstanceProvider && (_pooledProvidersByInstance ||= new Dictionary)[provision] = provider;
+			 */
+			
 			return provision;	
 		}
 		
@@ -153,6 +161,13 @@ package orichalcum.alchemy.alchemist
 		{
 			const instance:* = _instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
 			returnRecipeFlyweight();
+			
+			/**
+			 * Add the following code to implement pooled instance providers.
+			 * 
+			 * _pooledProvidersByInstance && _pooledProvidersByInstance[provision] && _pooledProvidersByInstance[provision].returnInstance(instance);
+			 */
+			
 			return instance;
 		}
 		
@@ -221,9 +236,6 @@ package orichalcum.alchemy.alchemist
 			return null;
 		}
 		
-		/**
-		 * It may be helpful to expose this ustility.
-		 */
 		private function getRecipeForClassOrInstance(classOrInstance:Object, recipeFlyweight:Recipe, runtimeConfiguredRecipe:Recipe = null):Recipe 
 		{
 			return getRecipeForClassName(getQualifiedClassName(classOrInstance), recipeFlyweight, runtimeConfiguredRecipe);
@@ -274,6 +286,10 @@ package orichalcum.alchemy.alchemist
 			return evaluateWithRecipe(providerReferenceOrValue, null);
 		}
 		
+		/**
+		 * Evaluating the contents of the provider map at "conjure-time" not only provides for a better user API
+		 * but also minimizes the libraries data footprint by avoiding excessive wrapping of values/references with providers
+		 */
 		private function evaluateWithRecipe(providerReferenceOrValue:*, recipe:Recipe = null):*
 		{
 			if (providerReferenceOrValue is IProvider)
@@ -353,6 +369,11 @@ package orichalcum.alchemy.alchemist
 		{
 			_recipePoolIndex--;
 		}
+		
+		//private function get pooledProvidersByInstance():Dictionary
+		//{
+			//return _pooledProvidersByInstance ||= new Dictionary;
+		//}
 		
 	}
 

@@ -31,22 +31,22 @@ package
 			core.addListener(new TraceListener);
 			core.run(
 				AlchemistTest
-				//,RecipeFactoryTest
-				//,EmptyRecipeTest
-				//,FullRecipeTest
-				//,CompoundRecipeTest
-				//,ValueMappingTest
-				//,ReferenceMappingTest
-				//,SingletonMappingTest
-				//,PrototypeMappingTest
-				//,MultitonMappingTest
-				//,FactoryMappingTest
-				//,ProviderMappingTest
-				//,ConstructorArgumentInjectionTest
-				//,VariableInjectionTest
-				//,SetterInjectionTest
-				//,PostConstructTest
-				//,PreDestroyTest
+				,RecipeFactoryTest
+				,EmptyRecipeTest
+				,FullRecipeTest
+				,CompoundRecipeTest
+				,ValueMappingTest
+				,ReferenceMappingTest
+				,SingletonMappingTest
+				,PrototypeMappingTest
+				,MultitonMappingTest
+				,FactoryMappingTest
+				,ProviderMappingTest
+				,ConstructorArgumentInjectionTest
+				,VariableInjectionTest
+				,SetterInjectionTest
+				,PostConstructTest
+				,PreDestroyTest
 				,EventHandlerTest
 				,AlchemistExtensionTest
 			);

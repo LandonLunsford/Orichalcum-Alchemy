@@ -134,13 +134,23 @@ package orichalcum.alchemy.mapper
 		
 		private function get recipe():Recipe
 		{
-			if (_recipe) return _recipe;
-			if (_recipes[_id])
+			if (_recipe)
+				return _recipe;
+			
+			if (_id in _recipes)
 			{
 				onRecipeOverwrite(_id);
 				return _recipe = _recipes[_id].empty();
 			}
-			return _recipe = _recipes[_id] = new Recipe;
+			return _recipes[_id] = _recipe = new Recipe;
+		}
+		
+		private function getClass(id:String):Class 
+		{
+			if (_reflector.isType(id))
+				return _reflector.getType(id);
+				
+			throw new AlchemyError('Argument "id" ({0}) passed to method "map" must represent a valid public class when using the "asPrototype|asSingleton|asMultiton" methods.', id);
 		}
 		
 		private function onProviderOverwrite(id:String):void
@@ -155,20 +165,15 @@ package orichalcum.alchemy.mapper
 		
 		private function throwWarning(message:String, ...substitutions):void
 		{
-			// could use central event dispatcher provided by the alchemist
-			// for now I am contempt with just tracing the information
-			// additional strict mode could listen for this and throw an error
+			/**
+			 * An option to control this centrally would be for the mapper to
+			 * escalate the issue up the responsibility chain with an event
+			 * dispatched on a provided eventDispatcher bus. Perhaps in a strict mode
+			 * I could throw an error when overwrites occur.
+			 */
 			trace(StringUtil.substitute(message, substitutions));
 		}
-		
-		private function getClass(id:String):Class 
-		{
-			if (_reflector.isType(id))
-				return _reflector.getType(id);
-				
-			throw new AlchemyError('Argument "id" ({0}) passed to method "map" must represent a valid public class when using the "asPrototype|asSingleton|asMultiton" methods.', id);
-		}
-		
+
 	}
 
 }

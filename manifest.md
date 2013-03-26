@@ -33,8 +33,8 @@ orichalcum.alchemist.metal.provider.factory.singleton
 orichalcum.alchemist.metal.provider.factory.multiton
 orichalcum.alchemist.metal.provider.factory.provider
 orichalcum.alchemist.metal.analysis.IElementAnalysis	// readonly aspect of spell
-orichalcum.alchemist.metal.analysis.IElementBuilder		// mutable aspect of spell
-orichalcum.alchemist.metal.analysis.ElementAlchemy		(IElementAnalysis/IElementBuilder)
+orichalcum.alchemist.metal.analysis.IElementBuilder	// mutable aspect of spell
+orichalcum.alchemist.metal.analysis.ElementAlchemy	(IElementAnalysis/IElementBuilder)
 orichalcum.alchemist.metal.analyzer.IElementAnalyzer	// creates ElementAlchemy based on type
 // spell factory is the only consumer of these, so how will it be configurable? -- pass alchemist, with config (should be user configurable)
 orichalcum.alchemist.metal.metatag.InjectionMetatag
@@ -49,9 +49,9 @@ orichalcum.alchemist.elemental.reactor.IReactor
 orichalcum.alchemist.elemental.reactor.Reactor
 
 // rewrite for orichalcum.alchemist.element.analysis.*
-orichalcum.alchemy.recipe.IRecipe           // readonly aspect of recipe [EXTENDS IRecipeBuilder]
-orichalcum.alchemy.recipe.IRecipeBuilder		// mutable aspect of recipe
-orichalcum.alchemy.recipe.Recipe        		(IElementAnalysis/IElementBuilder)
+orichalcum.alchemy.recipe.IRecipe          	 // readonly aspect of recipe [EXTENDS IRecipeBuilder]
+orichalcum.alchemy.recipe.IRecipeBuilder	// mutable aspect of recipe
+orichalcum.alchemy.recipe.Recipe        	(IElementAnalysis/IElementBuilder)
 orichalcum.alchemy.recipe.IRecipeFactory   	// creates Recipe based on type
 
 orichalcum.alchemy.alchemist
@@ -78,38 +78,3 @@ orichalcum.alchemy.alchemist.ExpressionEvaluator	-- needs AlchemistApprentice fo
 orichalcum.alchemy.alchemist.RecipeMapper		-- has recipes, needs RecipeFactory, needs IMetatagBundle
 orichalcum.alchemy.alchemist.ProviderMapper		-- has providers, needs RecipeFactory, needs IMetatagBundle
 orichalcum.alchemy.alchemist.MediatorMapper		-- has mediators, needs alchemist
-
-		
-		
-	in conjure()
-		/**
-		 * This will allow the display object to trigger its mediator when added to stage
-		 */
-		const mediator:* = getMediator(id);
-		if (mediator)
-		{
-			if (!(provision is DisplayObject))
-				throw new AlchemyError('"{0}" must be of type DisplayObject in order to be Mediated.', id);
-			
-			const view:DisplayObject = provision as DisplayObject;
-			view.addEventListener(Event.ADDED_TO_STAGE, activateMediator);
-			view.addEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
-			_mediatorsByView[view] = mediator;
-		}
-		
-		private function deactivateMediator(event:Event):void 
-		{
-			const view:DisplayObject = event.target as DisplayObject;
-			view.removeEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
-			const mediator:* = evaluate(_mediatorsByView[view]);
-			_activeMediators.push(mediator);
-		}
-		
-		private function activateMediator(event:Event):void 
-		{
-			const view:DisplayObject = event.target as DisplayObject;
-			view.removeEventListener(Event.ADDED_TO_STAGE, activateMediator);
-			const mediator:* = evaluate(_mediatorsByView[view]);
-			_activeMediators.splice(_activeMediators.indexOf(mediator), 1);
-		}
-		

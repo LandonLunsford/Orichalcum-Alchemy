@@ -54,10 +54,7 @@ package orichalcum.alchemy.alchemist
 			{
 				var target:IEventDispatcher = ObjectUtil.find(instance, eventHandler.targetPath) as IEventDispatcher;
 				
-				if (target == null && target is DisplayObjectContainer)
-					target = DisplayObjectUtil.getDescendantByName(target as DisplayObjectContainer, eventHandler.targetPath);
-				
-				if (target == null)
+				if (!target)
 					throw new AlchemyError('Variable or child named "{0}" could not be found on "{1}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
 					
 				if (!(eventHandler.listenerName in instance))

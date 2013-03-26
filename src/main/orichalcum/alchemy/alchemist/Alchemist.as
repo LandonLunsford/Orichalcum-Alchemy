@@ -17,14 +17,9 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
 	
-	/**
-	 * In order for mediator to work the user must conjure the view mapped to the mediator then destroy the view
-	 */
 	public class Alchemist implements IDisposable, IAlchemist
 	{
-		private var _activeMediators:Array = [];
-		
-		
+	
 		/**
 		 * @private
 		 */
@@ -78,21 +73,10 @@ package orichalcum.alchemy.alchemist
 		private var _recipes:Dictionary = new Dictionary;
 		
 		/**
-		 * Contains all mapped mediators
-		 */
-		private var _mediators:Dictionary = new Dictionary;
-		
-		/**
 		 * Used to facilitate unbinding and pre-destroy hooks for runtime configured instances
 		 * @private
 		 */
 		private var _recipesByInstance:Dictionary = new Dictionary;
-		
-		/**
-		 * Used to lookup the appropriate mediator mapped to a specific view instance
-		 * @private
-		 */
-		private var _mediatorsByView:Dictionary = new Dictionary;
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
@@ -188,21 +172,6 @@ package orichalcum.alchemy.alchemist
 			
 			const provision:* = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
 			recipe && (_recipesByInstance[provision] = recipe);
-			
-			/**
-			 * This will allow the display object to trigger its mediator when added to stage
-			 */
-			const mediator:* = getMediator(id);
-			if (mediator)
-			{
-				if (!(provision is DisplayObject))
-					throw new AlchemyError('"{0}" must be of type DisplayObject in order to be Mediated.', id);
-				
-				const view:DisplayObject = provision as DisplayObject;
-				view.addEventListener(Event.ADDED_TO_STAGE, activateMediator);
-				view.addEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
-				_mediatorsByView[view] = mediator;
-			}
 			
 			/**
 			 * Add the following code to implement pooled instance providers.
@@ -376,22 +345,6 @@ package orichalcum.alchemy.alchemist
 				return conjure((providerReferenceOrValue as String).replace(_expressionRemovals, ''));
 			
 			return providerReferenceOrValue;
-		}
-		
-		private function deactivateMediator(event:Event):void 
-		{
-			const view:DisplayObject = event.target as DisplayObject;
-			view.removeEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
-			const mediator:* = evaluate(_mediatorsByView[view]);
-			_activeMediators.push(mediator);
-		}
-		
-		private function activateMediator(event:Event):void 
-		{
-			const view:DisplayObject = event.target as DisplayObject;
-			view.removeEventListener(Event.ADDED_TO_STAGE, activateMediator);
-			const mediator:* = evaluate(_mediatorsByView[view]);
-			_activeMediators.splice(_activeMediators.indexOf(mediator), 1);
 		}
 		
 		/**

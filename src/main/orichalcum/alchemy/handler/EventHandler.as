@@ -146,7 +146,9 @@ package orichalcum.alchemy.handler
 		
 		public function toString():String
 		{
-			return StringUtil.substitute('<event-handler event="{0}" target="{1}" parameters="{2}" useCapture="{3}" stopPropagation="{4}" stopImmediatePropagation="{5}"/>', type, targetPath, parameters, useCapture, stopPropagation, stopImmediatePropagation)
+			return StringUtil.substitute(
+				'<event-handler event="{0}" target="{1}" parameters="{2}" useCapture="{3}" stopPropagation="{4}" stopImmediatePropagation="{5}"/>'
+				, type, targetPath, parameters, useCapture, stopPropagation, stopImmediatePropagation);
 		}
 		
 		public function handle(event:Event):void
@@ -166,31 +168,11 @@ package orichalcum.alchemy.handler
 			}
 			else if (listener.length > 0)
 			{
-				if (hasParameters)
-				{
-					listener.apply(null, getArguments(event));
-				}
-				else
-				{
-					listener(event);
-				}
+				hasParameters
+					? listener.apply(null, getArguments(event)) // should not be null, but the listener methods owner
+					: listener(event);
 			}
 		}
-		
-		//public function bind(event:Event, target:Object):void
-		//{
-			//target = ObjectUtil.find(target, targetPath);
-			//listener = mediator[listenerName];
-			//target.addEventListener(type, _handle, useCapture);
-			//if (type == event.type) _handle(event);
-		//}
-		//
-		//public function unbind(event:Event):void
-		//{
-			//target.removeEventListener(type, _handle);
-			//if (type == event.type) _handle(event);
-		//}
-		
 		
 		/* PRIVATE PARTS */
 		

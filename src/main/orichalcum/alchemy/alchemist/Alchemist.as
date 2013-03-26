@@ -202,8 +202,6 @@ package orichalcum.alchemy.alchemist
 			 * This will allow the display object to trigger its mediator when added to stage
 			 */
 			const mediator:* = getMediator(id);
-			trace('p', provision);
-			trace('m', mediator);
 			if (mediator)
 			{
 				if (!(provision is DisplayObject))

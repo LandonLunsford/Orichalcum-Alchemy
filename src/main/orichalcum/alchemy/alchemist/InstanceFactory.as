@@ -1,5 +1,6 @@
 package orichalcum.alchemy.alchemist 
 {
+	import flash.display.DisplayObjectContainer;
 	import flash.events.IEventDispatcher;
 	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.error.AlchemyError;
@@ -7,6 +8,7 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
+	import orichalcum.utility.DisplayObjectUtil;
 	import orichalcum.utility.ObjectUtil;
 	import orichalcum.utility.StringUtil;
 
@@ -52,8 +54,14 @@ package orichalcum.alchemy.alchemist
 			{
 				var target:IEventDispatcher = ObjectUtil.find(instance, eventHandler.targetPath) as IEventDispatcher;
 				
+				if (target == null && target is DisplayObjectContainer)
+					target = DisplayObjectUtil.getDescendantByName(target as DisplayObjectContainer, eventHandler.targetPath);
+				
+				if (target == null)
+					throw new AlchemyError('Variable or child named "{0}" could not be found on "{1}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
+					
 				if (!(eventHandler.listenerName in instance))
-					throw new AlchemyError('Unable to bind "{0}" to "{1}". Method named "{0}" not found on "{2}"', eventHandler.listenerName, eventHandler.type, getQualifiedClassName(instance));
+					throw new AlchemyError('Unable to bind method "{0}" to event type "{1}". Method "{0}" not found on "{2}".', eventHandler.listenerName, eventHandler.type, getQualifiedClassName(instance));
 				
 				eventHandler.listener = instance[eventHandler.listenerName];
 				target.addEventListener(eventHandler.type, eventHandler.handle, eventHandler.useCapture, eventHandler.priority);
@@ -68,7 +76,9 @@ package orichalcum.alchemy.alchemist
 			
 			for each(var eventHandler:IEventHandler in recipe.eventHandlers)
 			{
-				var target:IEventDispatcher = ObjectUtil.find(instance, eventHandler.targetPath) as IEventDispatcher;
+				var target:IEventDispatcher = (ObjectUtil.find(instance, eventHandler.targetPath)
+					|| DisplayObjectUtil.getDescendantByName(target as DisplayObjectContainer, eventHandler.targetPath)) as IEventDispatcher;
+					
 				if (target.hasEventListener(eventHandler.type))
 					target.removeEventListener(eventHandler.type, eventHandler.handle);
 			}

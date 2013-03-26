@@ -21,7 +21,7 @@ package subject
 			root.addChild(child);
 			
 			const grandchild:Sprite = new Sprite;
-			grandchild.name = 'child';
+			grandchild.name = 'grandchild';
 			child.addChild(grandchild);
 		}
 		
@@ -31,8 +31,8 @@ package subject
 		[EventHandler(event = 'complete', target = 'target')]
 		public function target_onComplete():void {}
 		
-		[EventHandler(event = 'complete', target = 'root.child.child')]
-		public function root_child_child_onComplete():void {}
+		[EventHandler(event = 'complete', target = 'root.child.grandchild')]
+		public function grandchild_onComplete():void {}
 		
 	}
 

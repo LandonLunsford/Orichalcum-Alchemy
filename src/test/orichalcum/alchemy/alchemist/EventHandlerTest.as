@@ -59,7 +59,7 @@ package orichalcum.alchemy.alchemist
 		public function testEventHandlerTargetRetrievedWithChildByName():void
 		{
 			const creation:ClassWithEventHandlerMetatags = _alchemist.create(ClassWithEventHandlerMetatags) as ClassWithEventHandlerMetatags;
-			assertThat((creation.root.getChildByName('child') as DisplayObjectContainer).getChildByName('child').hasEventListener(Event.COMPLETE));
+			assertThat((creation.root.getChildByName('child') as DisplayObjectContainer).getChildByName('grandchild').hasEventListener(Event.COMPLETE));
 		}
 		
 		[Test]
@@ -68,11 +68,11 @@ package orichalcum.alchemy.alchemist
 			const creation:ClassWithEventHandlerMetatags = _alchemist.create(ClassWithEventHandlerMetatags) as ClassWithEventHandlerMetatags;
 			assertThat(creation.hasEventListener(Event.COMPLETE));
 			assertThat(creation.target.hasEventListener(Event.COMPLETE));
-			assertThat((creation.root.getChildByName('child') as DisplayObjectContainer).getChildByName('child').hasEventListener(Event.COMPLETE));
+			assertThat((creation.root.getChildByName('child') as DisplayObjectContainer).getChildByName('grandchild').hasEventListener(Event.COMPLETE));
 			_alchemist.destroy(creation);
 			assertThat(creation.hasEventListener(Event.COMPLETE), isFalse());
 			assertThat(creation.target.hasEventListener(Event.COMPLETE), isFalse());
-			assertThat((creation.root.getChildByName('child') as DisplayObjectContainer).getChildByName('child').hasEventListener(Event.COMPLETE), isFalse());
+			assertThat((creation.root.getChildByName('child') as DisplayObjectContainer).getChildByName('grandchild').hasEventListener(Event.COMPLETE), isFalse());
 		}
 		
 	}

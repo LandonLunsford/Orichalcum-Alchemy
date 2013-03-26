@@ -37,9 +37,9 @@ package orichalcum.utility
 					{
 						return target.getChildByName(nextTargetName);
 					}
-					throw new ArgumentError(StringUtil.substitute('Variable or child named "{0}" could not be found on "{1}". Check to make sure that it is public and named correctly.', targetPath, targetRoot));
+					return null;
 				}
-				
+
 				nextTargetName = targetPath.substring(previousPeriodIndex, nextPeriodIndex)
 				if (nextTargetName in target)
 				{
@@ -51,7 +51,7 @@ package orichalcum.utility
 				}
 				else
 				{
-					throw new ArgumentError(StringUtil.substitute('Variable or child named "{0}" could not be found on "{1}". Check to make sure that it is public and named correctly.', targetPath, targetRoot));
+					return null;
 				}
 				previousPeriodIndex = nextPeriodIndex + 1;
 			}

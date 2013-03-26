@@ -9,7 +9,6 @@ package orichalcum.utility
 	 * @TODO change format of closure passing to (container, type, closure, args)... closure.apply(null, args.unshift(target));
 	 * that way the 'this' inside the closure will be the 'target'
 	 */
-	
 	public class DisplayObjectUtil
 	{
 		
@@ -47,7 +46,7 @@ package orichalcum.utility
 		
 		static public function childrenOf(container:DisplayObjectContainer, type:Class = null):Array
 		{
-			if (!container) return null; // should be UnmodifiableEmptyArray
+			if (!container) return [];
 			var children:Array = [];
 			var collector:Function = function(child:*):void { children.push(child); };
 			eachChild(container, collector, type);
@@ -56,13 +55,29 @@ package orichalcum.utility
 		
 		static public function descendantsOf(container:DisplayObjectContainer, type:Class = null):Array
 		{
-			if (!container) return null; // should be UnmodifiableEmptyArray
+			if (!container) return [];
 			var decendants:Array = [];
 			var collector:Function = function(child:*):void { decendants.push(child); };
 			eachDecendant(container, collector, type);
 			return decendants;
 		}
-
+		
+		static public function getDescendantByName(container:DisplayObjectContainer, descendantName:String):DisplayObject
+		{
+			var childIndex:int = container.numChildren;
+			while (--childIndex >= 0)
+			{
+				var child:DisplayObject = container.getChildAt(childIndex);
+				
+				if (child.name == descendantName)
+					return child;
+				
+				if (child is DisplayObjectContainer)
+					return getDescendantByName(child as DisplayObjectContainer, descendantName);
+			}
+			return null;
+		}
+		
 		/**
 		 * Room for optimization
 		 * Applies Reverse order iteration

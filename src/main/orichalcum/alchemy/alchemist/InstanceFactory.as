@@ -73,8 +73,7 @@ package orichalcum.alchemy.alchemist
 			
 			for each(var eventHandler:IEventHandler in recipe.eventHandlers)
 			{
-				var target:IEventDispatcher = (ObjectUtil.find(instance, eventHandler.targetPath)
-					|| DisplayObjectUtil.getDescendantByName(target as DisplayObjectContainer, eventHandler.targetPath)) as IEventDispatcher;
+				var target:IEventDispatcher = ObjectUtil.find(instance, eventHandler.targetPath) as IEventDispatcher;
 					
 				if (target.hasEventListener(eventHandler.type))
 					target.removeEventListener(eventHandler.type, eventHandler.handle);

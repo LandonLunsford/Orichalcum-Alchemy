@@ -79,16 +79,7 @@ orichalcum.alchemy.alchemist.RecipeMapper		-- has recipes, needs RecipeFactory, 
 orichalcum.alchemy.alchemist.ProviderMapper		-- has providers, needs RecipeFactory, needs IMetatagBundle
 orichalcum.alchemy.alchemist.MediatorMapper		-- has mediators, needs alchemist
 
-		private var _activeMediators:Array = [];
-		/**
-		 * Contains all mapped mediators
-		 */
-		private var _mediators:Dictionary = new Dictionary;
-		/**
-		 * Used to lookup the appropriate mediator mapped to a specific view instance
-		 * @private
-		 */
-		private var _mediatorsByView:Dictionary = new Dictionary;
+		
 		
 	in conjure()
 		/**

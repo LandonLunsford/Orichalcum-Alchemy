@@ -19,7 +19,24 @@ package orichalcum.alchemy.alchemist
 	
 	public class Alchemist implements IDisposable, IAlchemist
 	{
-	
+		/**
+		 * Contains all live mediators so they will not be garbage collected
+		 * @private
+		 */
+		private var _activeMediators:Array = [];
+		
+		/**
+		 * Contains all mapped mediators
+		 * @private
+		 */
+		private var _mediators:Dictionary = new Dictionary;
+		
+		/**
+		 * Used to lookup the appropriate mediator mapped to a specific view instance
+		 * @private
+		 */
+		private var _mediatorsByView:Dictionary = new Dictionary;
+		
 		/**
 		 * @private
 		 */

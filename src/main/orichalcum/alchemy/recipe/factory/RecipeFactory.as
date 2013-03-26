@@ -1,6 +1,5 @@
 package orichalcum.alchemy.recipe.factory 
 {
-
 	import flash.utils.describeType;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
@@ -16,6 +15,11 @@ package orichalcum.alchemy.recipe.factory
 
 	public class RecipeFactory implements IDisposable
 	{
+		static private const MULTIPLE_METATAGS_ERROR_MESSAGE:String = 'Multiple "[{0}]" metatags defined in class "{2}".';
+		static private const MULTIPLE_METATAGS_FOR_MEMBER_ERROR_MESSAGE:String = 'Multiple "[{0}]" metatags defined for member "{1}" of class "{2}".';
+		static private const MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE:String = 'Multiple "{0}" attributes found on "[{1}]" metatag for member "{2}" in class "{3}".';
+		static private const NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE:String = 'Required attribute "{0}" not found on "[{1}]" metatag for "{2}" in class "{3}".';
+		
 		private var _reflector:IReflector
 		private var _metatagBundle:IMetatagBundle;
 		private var _typeRecipes:Dictionary;
@@ -73,12 +77,6 @@ package orichalcum.alchemy.recipe.factory
 		
 		public function createRecipe(qualifiedClassName:String):Recipe
 		{
-			/**
-			 * Hotfix
-			 */
-			if (qualifiedClassName === 'Object')
-				return new Recipe;
-			
 			const typeDescription:XML = describeType(reflector.getType(qualifiedClassName));
 			const factory:XML = typeDescription.factory[0];
 			const superclass:String = factory.extendsClass.@type[0].toString();
@@ -91,14 +89,28 @@ package orichalcum.alchemy.recipe.factory
 		public function createRecipeFromFactory(typeName:String, typeFactory:XML):Recipe
 		{
 			const recipe:Recipe = new Recipe;
+
+			addConstructorArguments(recipe, typeName, typeFactory);
+			addProperties(recipe, typeName, typeFactory);
+			
 			const methods:XMLList = typeFactory.method;
+			if (methods.metadata.length() > 0)
+			{
+				addPostConstruct(recipe, typeName, methods);
+				addPreDestroy(recipe, typeName, methods);
+				addEventHandlers(recipe, typeName, methods);
+			}
+			
+			return recipe;
+		}
+		
+		private function addConstructorArguments(recipe:Recipe, typeName:String, typeFactory:XML):void 
+		{
 			const constructorParameterTypes:XMLList = typeFactory.constructor.parameter.@type;
 			const constructorArgumentInjections:XMLList = typeFactory.metadata.(@name == metatagBundle.injectionMetatag.name).arg.@value;
-			const propertyInjectees:XMLList = typeFactory.variable + typeFactory.accessor.(@access != 'readonly');
 			const totalArgumentInjections:int = constructorArgumentInjections.length();
 			const totalRequiredConstructorParameters:int = typeFactory.constructor.parameter.(@optional == 'false').length();
 			
-			// Constructor Injections
 			for (var i:int = 0; i < totalArgumentInjections; i++)
 			{
 				recipe.constructorArguments[i] = reference(constructorArgumentInjections[i].toString());
@@ -107,8 +119,12 @@ package orichalcum.alchemy.recipe.factory
 			{
 				recipe.constructorArguments[i] = reference(constructorParameterTypes[i].toString());
 			}
+		}
+		
+		private function addProperties(recipe:Recipe, typeName:String, typeFactory:XML):void 
+		{
+			const propertyInjectees:XMLList = typeFactory.variable + typeFactory.accessor.(@access != 'readonly');
 			
-			// Property Injections
 			for each (var propertyInjectee:XML in propertyInjectees)
 			{
 				var propertyInjections:XMLList = propertyInjectee.metadata.(@name == metatagBundle.injectionMetatag.name);
@@ -125,106 +141,98 @@ package orichalcum.alchemy.recipe.factory
 				{
 					recipe.properties[propertyName] = reference(propertyType);
 				}
-				if (propertyInjections.length() > 1)
+				if (propertyInjections.length() > 1 || propertyInjections.arg.length() > 1)
 				{
-					throw new AlchemyError('Multiple injections defined for "{0}.{1}"', typeName, propertyName);
-				}
-				if (propertyInjections.arg.length() > 1)
-				{
-					throw new AlchemyError('Multiple injections defined for "{0}.{1}"', typeName, propertyName);
+					throw new AlchemyError(MULTIPLE_METATAGS_ERROR_MESSAGE, metatagBundle.injectionMetatag.name, propertyName, typeName);
 				}
 			}
+		}
+		
+		private function addPostConstruct(recipe:Recipe, typeName:String, methods:XMLList):void 
+		{
+			const postConstructs:XMLList = methods.(@declaredBy == typeName).metadata.(@name == metatagBundle.postConstructMetatag.name);
 			
-			if (methods.metadata.length() > 0)
+			if (postConstructs.length() > 1)
+				throw new AlchemyError(MULTIPLE_METATAGS_ERROR_MESSAGE, metatagBundle.postConstructMetatag.name, typeName);
+				
+			if (postConstructs.length() > 0)
+				recipe.postConstruct = postConstructs[0].parent().@name;
+		}
+		
+		private function addPreDestroy(recipe:Recipe, typeName:String, methods:XMLList):void 
+		{
+			const preDestroys:XMLList = methods.(@declaredBy == typeName).metadata.(@name == metatagBundle.preDestroyMetatag.name);
+			
+			if (preDestroys.length() > 1)
+				throw new AlchemyError(MULTIPLE_METATAGS_ERROR_MESSAGE, metatagBundle.preDestroyMetatag.name, typeName);
+				
+			if (preDestroys.length() > 0)
+				recipe.preDestroy = preDestroys[0].parent().@name;
+		}
+			
+		private function addEventHandlers(recipe:Recipe, typeName:String, methods:XMLList):void 
+		{
+			const eventHandlerMetatags:XMLList = methods.metadata.(@name == metatagBundle.eventHandlerMetatag.name);
+			const totalEventHandlers:int = eventHandlerMetatags.length();
+			
+			for (var j:int = 0; j < totalEventHandlers; j++)
 			{
-				// Post Construct
-				const postConstructs:XMLList = methods.(@declaredBy == typeName).metadata.(@name == metatagBundle.postConstructMetatag.name);
-				if (postConstructs.length() > 1)
-				{
-					throw new AlchemyError('Multiple "[{0}]" methods found in "{1}"', metatagBundle.postConstructMetatag.name, typeName);
-				}
-				if (postConstructs.length() > 0)
-				{
-					recipe.postConstruct = postConstructs[0].parent().@name;
-				}
-					
-				// Pre Destroy
-				const preDestroys:XMLList = methods.(@declaredBy == typeName).metadata.(@name == metatagBundle.preDestroyMetatag.name);
-				if (preDestroys.length() > 1)
-				{
-					throw new AlchemyError('Multiple "[{0}]" methods found in "{1}"', metatagBundle.preDestroyMetatag.name, typeName);
-				}
-				if (preDestroys.length() > 0)
-				{
-					recipe.preDestroy = preDestroys[0].parent().@name;
-				}
+				var handler:EventHandler = new EventHandler;
+				var eventHandlerMetadata:XML = eventHandlerMetatags[j];
+				var method:XML = eventHandlerMetadata.parent();
+				var metatagArgs:XMLList = eventHandlerMetadata.arg;
+				var keylessArgs:XMLList = metatagArgs.(@key == '');
 				
-				// Event Handlers
-				const eventHandlerMetatags:XMLList = methods.metadata.(@name == metatagBundle.eventHandlerMetatag.name);
-				const totalEventHandlers:int = eventHandlerMetatags.length();
+				handler.listenerName = method.@name.toString();
 				
-				for (var j:int = 0; j < totalEventHandlers; j++)
-				{
-					var eventHandlerMetadata:XML = eventHandlerMetatags[j];
-					var metatagArgs:XMLList = eventHandlerMetadata.arg;
-					var eventArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.eventKey);
+				var eventArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.eventKey);
+				if (eventArgs.length() == 0) throw new AlchemyError(NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE, metatagBundle.eventHandlerMetatag.eventKey, metatagBundle.preDestroyMetatag.name, typeName);
+				if (eventArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, metatagBundle.eventHandlerMetatag.eventKey, metatagBundle.eventHandlerMetatag.name, handler.listenerName, typeName);
+				
+				var targetArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.targetKey);
+				if (targetArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, metatagBundle.eventHandlerMetatag.targetKey, metatagBundle.eventHandlerMetatag.name, handler.listenerName, typeName);
+				
+				var parameterArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.parametersKey);
+				if (parameterArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, metatagBundle.eventHandlerMetatag.parametersKey, metatagBundle.eventHandlerMetatag.name, handler.listenerName, typeName);
+				
+				var useCaptureArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.useCaptureKey);
+				if (useCaptureArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, metatagBundle.eventHandlerMetatag.useCaptureKey, metatagBundle.eventHandlerMetatag.name, handler.listenerName, typeName);
+				
+				var priorityArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.priorityKey);
+				if (priorityArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, metatagBundle.eventHandlerMetatag.priorityKey, metatagBundle.eventHandlerMetatag.name, handler.listenerName, typeName);
+				
+				var stopPropagationArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.stopPropagationKey);
+				if (stopPropagationArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, metatagBundle.eventHandlerMetatag.stopPropagationKey, metatagBundle.eventHandlerMetatag.name, handler.listenerName, typeName);
+				
+				var stopImmediatePropagationArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.stopImmediatePropagationKey);
+				if (stopImmediatePropagationArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, metatagBundle.eventHandlerMetatag.stopImmediatePropagationKey, metatagBundle.eventHandlerMetatag.name, handler.listenerName, typeName);
+				
+				if (eventArgs.length() > 0)
+					handler.type = eventArgs[0].@value[0].toString();
+				
+				if (targetArgs.length() > 0)
+					handler.targetPath = targetArgs[0].@value[0].toString();
+				
+				if (priorityArgs.length() > 0)
+					handler.priority = int(priorityArgs.@value[0]);
 					
-					// throw error? ignore? -- failfast -- ignore would drop a null in the handlers pool making it nullpointer exception prone
-					if (eventArgs.length() == 0) throw new SyntaxError(); 
-					if (eventArgs.length() > 1) throw new SyntaxError();
+				if (parameterArgs.length() > 0)
+					handler.parameters = parameterArgs[0].@value[0].toString().replace(new RegExp('\ ', 'g'), '').split(',');
+				
+				handler.useCapture = (keylessArgs.(@value == metatagBundle.eventHandlerMetatag.useCaptureKey)).length() > 0
+					|| useCaptureArgs.length() > 0
+					&& useCaptureArgs.@value.toString() == 'true';
 					
-					var targetArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.targetKey);
-					if (targetArgs.length() > 1) throw new SyntaxError();
+				handler.stopPropagation = (keylessArgs.(@value == metatagBundle.eventHandlerMetatag.stopPropagationKey)).length() > 0
+					|| stopPropagationArgs.length() > 0
+					&& stopPropagationArgs.@value.toString() == 'true';
 					
-					var parameterArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.parametersKey);
-					if (parameterArgs.length() > 1) throw new SyntaxError();
-					
-					var useCaptureArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.useCaptureKey);
-					if (useCaptureArgs.length() > 1) throw new SyntaxError();
-					
-					var priorityArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.priorityKey);
-					if (priorityArgs.length() > 1) throw new SyntaxError();
-					
-					var stopPropagationArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.stopPropagationKey);
-					if (stopPropagationArgs.length() > 1) throw new SyntaxError();
-					
-					var stopImmediatePropagationArgs:XMLList = metatagArgs.(@key == metatagBundle.eventHandlerMetatag.stopImmediatePropagationKey);
-					if (stopImmediatePropagationArgs.length() > 1) throw new SyntaxError();
-					
-					var keylessArgs:XMLList = metatagArgs.(@key == '');
-					var method:XML = eventHandlerMetadata.parent();
-					var handler:EventHandler = new EventHandler;
-					
-					if (eventArgs.length() > 0)
-						handler.type = eventArgs[0].@value[0].toString();
-					
-					if (targetArgs.length() > 0)
-						handler.targetPath = targetArgs[0].@value[0].toString();
-					
-					if (priorityArgs.length() > 0)
-						handler.priority = int(priorityArgs.@value[0]);
-						
-					if (parameterArgs.length() > 0)
-						handler.parameters = parameterArgs[0].@value[0].toString().replace(new RegExp('\ ', 'g'), '').split(',');
-					
-					handler.listenerName = method.@name.toString(); // last time this called the function...
-					
-					handler.useCapture = (keylessArgs.(@value == metatagBundle.eventHandlerMetatag.useCaptureKey)).length() > 0
-						|| useCaptureArgs.length() > 0
-						&& useCaptureArgs.@value.toString() == 'true';
-						
-					handler.stopPropagation = (keylessArgs.(@value == metatagBundle.eventHandlerMetatag.stopPropagationKey)).length() > 0
-						|| stopPropagationArgs.length() > 0
-						&& stopPropagationArgs.@value.toString() == 'true';
-						
-					handler.stopImmediatePropagation = (keylessArgs.(@value == metatagBundle.eventHandlerMetatag.stopImmediatePropagationKey)).length() > 0
-						|| stopImmediatePropagationArgs.length() > 0
-						&& stopImmediatePropagationArgs.@value.toString() == 'true';
-					
-					recipe.eventHandlers.push(handler);
-				}
+				handler.stopImmediatePropagation = (keylessArgs.(@value == metatagBundle.eventHandlerMetatag.stopImmediatePropagationKey)).length() > 0
+					|| stopImmediatePropagationArgs.length() > 0
+					&& stopImmediatePropagationArgs.@value.toString() == 'true';
+				
+				recipe.eventHandlers.push(handler);
 			}
-			return recipe;
 		}
 		
 	}

@@ -443,11 +443,15 @@ package orichalcum.alchemy.alchemist
 		
 		private function activateMediator(event:Event):void 
 		{
+			throw new Error('need to bind mediator here');
+			
 			_activeMediators.push(conjure(_mediatorsByView[event.target]));// With this implementation mediators cannot be values
 		}
 		
 		private function deactivateMediator(event:Event):void 
 		{
+			throw new Error('need to unbind mediator here');
+			
 			_activeMediators.splice(_activeMediators.indexOf(_mediatorsByView[event.target]), 1);
 		}
 		

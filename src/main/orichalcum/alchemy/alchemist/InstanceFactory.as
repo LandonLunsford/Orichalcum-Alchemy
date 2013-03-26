@@ -1,14 +1,11 @@
 package orichalcum.alchemy.alchemist 
 {
-	import flash.display.DisplayObjectContainer;
 	import flash.events.IEventDispatcher;
 	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.recipe.Recipe;
-	import orichalcum.lifecycle.IDisposable;
-	import orichalcum.utility.DisplayObjectUtil;
 	import orichalcum.utility.ObjectUtil;
 	import orichalcum.utility.StringUtil;
 

@@ -182,27 +182,33 @@ package orichalcum.alchemy.alchemist
 			id = getValidId(id);
 			
 			const provider:* = getProvider(id);
+			var provision:*;
 			
 			if (provider === NotFound)
 			{
 				if (!_reflector.isType(id))
 					throw new AlchemyError('Alchemist has no provider mapped to "{0}"', id);
 					
-				return conjureUnmappedType(id);
+				provision = conjureUnmappedType(id);
+			}
+			else
+			{
+				provision = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
 			}
 			
-			const provision:* = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
 			recipe && (_recipesByInstance[provision] = recipe);
 			
 			/**
 			 * This will allow the display object to trigger its mediator when added to stage
 			 */
 			const mediator:* = getMediator(id);
+			trace('p', provision);
+			trace('m', mediator);
 			if (mediator)
 			{
 				if (!(provision is DisplayObject))
-					throw new AlchemyError('"{0}" must be of type DisplayObject in order to be Mediated.', id);
-				
+					throw new AlchemyError('Alchemist cannot mediate "{0}". "{0}" must be of type "DisplayObject", not "{1}", in order to be Mediated.', id, getQualifiedClassName(provision));
+					
 				const view:DisplayObject = provision as DisplayObject;
 				view.addEventListener(Event.ADDED_TO_STAGE, activateMediator);
 				view.addEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
@@ -239,6 +245,14 @@ package orichalcum.alchemy.alchemist
 			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
 			_instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
 			returnRecipeFlyweight();
+			
+			const mediator:* = _mediatorsByView[instance]; // need to lookup chain
+			if (mediator)
+			{
+				const view:DisplayObject = instance as DisplayObject;
+				view.removeEventListener(Event.ADDED_TO_STAGE, activateMediator);
+				view.removeEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
+			}
 			
 			/**
 			 * Add the following code to implement pooled instance providers.
@@ -429,20 +443,14 @@ package orichalcum.alchemy.alchemist
 			_recipeFlyweightsIndex--;
 		}
 		
-		private function deactivateMediator(event:Event):void 
-		{
-			const view:DisplayObject = event.target as DisplayObject;
-			view.removeEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
-			const mediator:* = evaluate(_mediatorsByView[view]);
-			_activeMediators.push(mediator);
-		}
-		
 		private function activateMediator(event:Event):void 
 		{
-			const view:DisplayObject = event.target as DisplayObject;
-			view.removeEventListener(Event.ADDED_TO_STAGE, activateMediator);
-			const mediator:* = evaluate(_mediatorsByView[view]);
-			_activeMediators.splice(_activeMediators.indexOf(mediator), 1);
+			_activeMediators.push(conjure(_mediatorsByView[event.target]));// With this implementation mediators cannot be values
+		}
+		
+		private function deactivateMediator(event:Event):void 
+		{
+			_activeMediators.splice(_activeMediators.indexOf(_mediatorsByView[event.target]), 1);
 		}
 		
 	}

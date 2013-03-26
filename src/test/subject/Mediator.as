@@ -19,10 +19,10 @@ package subject
 			trace('onAddedToStage()');
 		}
 		
-		[EventHandler(event = "removedToStage", target = "view")]
-		public function onRemovedToStage():void
+		[EventHandler(event = "removedFromStage", target = "view")]
+		public function onRemovedFromStage():void
 		{
-			trace('onRemovedToStage()');
+			trace('onRemovedFromStage()');
 		}
 		
 	}

@@ -18,18 +18,16 @@ package orichalcum.alchemy.mapper
 		private var _id:String;
 		private var _providers:Dictionary;
 		private var _recipes:Dictionary;
-		private var _mediators:Dictionary;
 		private var _recipe:Recipe;
 		private var _constructorArgumentIndex:int;
 		
 		
-		public function Mapper(reflector:IReflector, id:String, providers:Dictionary, recipes:Dictionary, mediators:Dictionary) 
+		public function Mapper(reflector:IReflector, id:String, providers:Dictionary, recipes:Dictionary) 
 		{
 			_reflector = reflector;
 			_id = id;
 			_providers = providers;
 			_recipes = recipes;
-			_mediators = mediators;
 		}
 		
 		/* INTERFACE orichalcum.alchemy.mapper.IMapper */
@@ -128,13 +126,6 @@ package orichalcum.alchemy.mapper
 			return this;
 		}
 		
-		public function withMediator(mediatorInstanceClassOrId:*):IMapper 
-		{
-			_mediators[_id] && onMediatorOverwrite(_id);
-			_mediators[_id] = mediatorInstanceClassOrId;
-			return this;
-		}
-		
 		/* PRIVATE PARTS */
 		
 		private function get recipe():Recipe
@@ -166,11 +157,6 @@ package orichalcum.alchemy.mapper
 		private function onRecipeOverwrite(id:String):void
 		{
 			throwWarning('[WARNING] Recipe for "{0}" has been overwritten.', id);
-		}
-		
-		private function onMediatorOverwrite(id:String):void 
-		{
-			throwWarning('[WARNING] Mediator for "{0}" has been overwritten.', id);
 		}
 		
 		private function throwWarning(message:String, ...substitutions):void

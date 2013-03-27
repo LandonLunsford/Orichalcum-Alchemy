@@ -19,23 +19,6 @@ package orichalcum.alchemy.alchemist
 	
 	public class Alchemist implements IDisposable, IAlchemist
 	{
-		/**
-		 * Contains all live mediators so they will not be garbage collected
-		 * @private
-		 */
-		private var _activeMediators:Array = [];
-		
-		/**
-		 * Contains all mapped mediators
-		 * @private
-		 */
-		private var _mediators:Dictionary = new Dictionary;
-		
-		/**
-		 * Used to lookup the appropriate mediator mapped to a specific view instance
-		 * @private
-		 */
-		private var _mediatorsByView:Dictionary = new Dictionary;
 		
 		/**
 		 * @private
@@ -164,17 +147,13 @@ package orichalcum.alchemy.alchemist
 			_parent = null;
 			_providers = null;
 			_recipes = null;
-			
-			_activeMediators = null;
-			_mediators = null;
-			_mediatorsByView = null;
 		}
 		
 		/* INTERFACE orichalcum.alchemy.alchemist.IAlchemist */
 
 		public function map(id:*):IMapper
 		{
-			return new Mapper(_reflector, getValidId(id), _providers, _recipes, _mediators);
+			return new Mapper(_reflector, getValidId(id), _providers, _recipes);
 		}
 		
 		public function conjure(id:*, recipe:Recipe = null):*
@@ -197,21 +176,6 @@ package orichalcum.alchemy.alchemist
 			}
 			
 			recipe && (_recipesByInstance[provision] = recipe);
-			
-			/**
-			 * This will allow the display object to trigger its mediator when added to stage
-			 */
-			const mediator:* = getMediator(id);
-			if (mediator)
-			{
-				if (!(provision is DisplayObject))
-					throw new AlchemyError('Alchemist cannot mediate "{0}". "{0}" must be of type "DisplayObject", not "{1}", in order to be Mediated.', id, getQualifiedClassName(provision));
-					
-				const view:DisplayObject = provision as DisplayObject;
-				view.addEventListener(Event.ADDED_TO_STAGE, activateMediator);
-				view.addEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
-				_mediatorsByView[view] = mediator;
-			}
 			
 			/**
 			 * Add the following code to implement pooled instance providers.
@@ -243,14 +207,6 @@ package orichalcum.alchemy.alchemist
 			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
 			_instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
 			returnRecipeFlyweight();
-			
-			const mediator:* = _mediatorsByView[instance]; // need to lookup chain
-			if (mediator)
-			{
-				const view:DisplayObject = instance as DisplayObject;
-				view.removeEventListener(Event.ADDED_TO_STAGE, activateMediator);
-				view.removeEventListener(Event.REMOVED_FROM_STAGE, deactivateMediator);
-			}
 			
 			/**
 			 * Add the following code to implement pooled instance providers.
@@ -303,21 +259,6 @@ package orichalcum.alchemy.alchemist
 				
 			if (_parent)
 				return _parent.getRecipe(id);
-				
-			return null;
-		}
-		
-		/**
-		 * Recursively looks-up the mediator for the ID through this alchemist and its ancestor chain
-		 * @private
-		 */
-		private function getMediator(id:String):*
-		{
-			if (id in _mediators)
-				return _mediators[id];
-				
-			if (_parent)
-				return _parent.getMediator(id);
 				
 			return null;
 		}
@@ -439,20 +380,6 @@ package orichalcum.alchemy.alchemist
 		private function returnRecipeFlyweight():void
 		{
 			_recipeFlyweightsIndex--;
-		}
-		
-		private function activateMediator(event:Event):void 
-		{
-			throw new Error('need to bind mediator here');
-			
-			_activeMediators.push(conjure(_mediatorsByView[event.target]));// With this implementation mediators cannot be values
-		}
-		
-		private function deactivateMediator(event:Event):void 
-		{
-			throw new Error('need to unbind mediator here');
-			
-			_activeMediators.splice(_activeMediators.indexOf(_mediatorsByView[event.target]), 1);
 		}
 		
 	}

@@ -28,8 +28,6 @@ package orichalcum.alchemy.mapper
 			,stopPropagation:Boolean = false
 			,stopImmediatePropagation:Boolean = false
 			):IMapper;
-			
-		function withMediator(mediatorInstanceClassOrId:*):IMapper;
 	}
 
 }

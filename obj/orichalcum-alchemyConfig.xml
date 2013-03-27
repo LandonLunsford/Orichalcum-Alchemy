@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'3/25/2013'</value>
+      <value>'3/26/2013'</value>
     </define>
     <verbose-stacktraces>true</verbose-stacktraces>
     <source-path append="true">
@@ -31,7 +31,7 @@
     </library-path>
   </compiler>
   <file-specs>
-    <path-element>C:\Users\landon\Documents\GitHub\Orichalcum-Alchemy\src\test\orichalcum\alchemy\alchemist\MediatorsDemo.as</path-element>
+    <path-element>C:\Users\landon\Documents\GitHub\Orichalcum-Alchemy\src\test\TestRunner.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

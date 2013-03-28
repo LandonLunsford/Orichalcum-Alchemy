@@ -21,6 +21,7 @@ package orichalcum.alchemy.alchemist
 	{
 		
 		/**
+		 * Reflection utility
 		 * @private
 		 */
 		static private var _reflector:IReflector = Reflector.getInstance(ApplicationDomain.currentDomain);
@@ -234,7 +235,8 @@ package orichalcum.alchemy.alchemist
 		/* PRIVATE PARTS */
 		
 		/**
-		 * Recursively looks-up the provider for the ID through this alchemist and its ancestor chain
+		 * Recursively looks up any provider mapped to the id through this alchemist and its ancestor chain.
+		 * @param	id The custom name or qualified class name used to map the provider
 		 * @private
 		 */
 		private function getProvider(id:String):*
@@ -249,7 +251,8 @@ package orichalcum.alchemy.alchemist
 		}
 		
 		/**
-		 * Recursively looks-up the recipe for the ID through this alchemist and its ancestor chain
+		 * Recursively looks up any recipe mapped to the id through this alchemist and its ancestor chain.
+		 * @param	id The custom name or qualified class name used to map the recipe
 		 * @private
 		 */
 		private function getRecipe(id:String):Recipe
@@ -285,18 +288,9 @@ package orichalcum.alchemy.alchemist
 		private function getMergedRecipe(recipeFlyweight:Recipe, staticTypeRecipe:Recipe, runtimeTypeRecipe:Recipe, runtimeInstanceRecipe:Recipe):Recipe
 		{
 			/*
-			 * Flyweight POOL must be used
-			 * Because of recursive nature of the algorithm
-			 * each recursion clobbers the parent's recipe config
-			 * 
-			 * Hotfix -- generate a new recipe in this scope
-			 * Bestfix -- create recipe flyweight pool for efficiency
-			 * 
-			 * To implement flyweight pool, pass flyweight to this function
-			 * this function should get flyweights with counter that is reset
-			 * i.e. var scopedRecipe:Recipe = (_recipePool[i++] ||= new Recipe).empty();
-			 * 
-			 * Then the "getMergedRecipe()" caller must set "i" to 0 when the recursion has ended
+			 * Because of recursive nature of the algorithm a
+			 * flyweight *pool* must be used to compensate for
+			 * the function requiring a new recipe every recursive call.
 			 */
 			
 			const recipe:Recipe = recipeFlyweight ? recipeFlyweight.empty() : new Recipe;

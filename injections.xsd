@@ -23,9 +23,9 @@
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="value" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string"/>
-		<xs:attribute name="singleton" type="xs:string"/>
-		<xs:attribute name="total" type="xs:positiveInteger"/>
+		<xs:attribute name="maximum" type="xs:positiveInteger"/>
 		<xs:attribute name="provider" type="xs:string"/>
+		<xs:anyAttribute/>
 	</xs:complexType>
 
 	<xs:complexType name="injection-constructor-argument">
@@ -46,10 +46,29 @@
 	</xs:complexType>
 	
 	<xs:complexType name="injection-event-handler">
+	
+		<!-- functionName in target.addEventListener(eventType, functionName, useCapture, priority) -->
 		<xs:attribute name="name" type="xs:string" use="required"/>
+		
+		<!-- eventType in target.addEventListener(eventType, functionName, useCapture, priority) -->
 		<xs:attribute name="event" type="xs:string" use="required"/>
+		
+		<!-- target in target.addEventListener(eventType, functionName, useCapture, priority) -->
 		<xs:attribute name="target" type="xs:string"/>
+		
+		<!-- Comma separated list of event property names -->
+		<xs:attribute name="parameters" type="xs:string"/>
+		
+		<!-- priority in target.addEventListener(eventType, functionName, useCapture, priority) -->
 		<xs:attribute name="priority" type="xs:positiveInteger"/>
+		
+		<!--
+			XSD does not allow attributes without values.
+			The following fails schema validation but will be paresed correctly:
+			<event-handler event="click" useCapture stopPropagation stopImmediatePropagation/>
+			To pass schema validation use:
+			<event-handler event="click" useCapture="true" stopPropagation="true" stopImmediatePropagation="true"/>
+		-->
 		<xs:attribute name="useCapture" type="xs:boolean"/>
 		<xs:attribute name="stopPropagation" type="xs:boolean"/>
 		<xs:attribute name="stopImmediatePropagation" type="xs:boolean"/>

@@ -102,30 +102,37 @@
 		AS3:	alchemist.map(MainViewMediator) 
 				.withProperty('view', type(MainView))
 				.withEventHandler('complete', 'onComplete')
-				.withEventHandler('complete', 'onComplete;
+				.withEventHandler('click', 'view_onClick', 'view')
+				.withEventHandler('mouseover', 'view_onMouseOver', 'view')
 	-->
 	<injection type="orichalcum.example::MainViewMediator">
 		
 		<!-- Type-Reference Mapping -->
 		<property name="view" value="{orichalcum.example::MainView}"/>
 		
-		<!-- EventHandler Mapping -->
+		<!-- EventHandler Mapping (target == this) -->
 		<event-handler event="complete" name="onComplete"/>
 		
-		<!-- EventHandler Mapping with Target -->
-		<event-handler event="complete" name="view_onComplete" target="view"/>
+		<!-- EventHandler Mapping (target == view) -->
+		<event-handler event="click" name="view_onClick" target="view"/>
 		
 		<!--
 			EventHandler Mapping with Custom Parameters
-			AS3:	public function view_onClick(mouseX:Number, mouseY:Number):void
+			AS3:	public function view_onMouseOver(mouseX:Number, mouseY:Number):void
 		-->
-		<event-handler event="click" name="view_onClick" target="view" parameters="mouseX,mouseY"/>
+		<event-handler event="mouseover" name="view_mouseOverHandler" target="view" parameters="mouseX,mouseY"/>
 		
-		<!--
-			EventHandler Mapping with Custom Parameters
-			AS3:	public function view_onClick(mouseX:Number, mouseY:Number):void
-		-->
+		<!-- EventHandler Mapping with priority -->
+		<event-handler event="mouseout" name="view_mouseOutHandler" target="view" priority="5"/>
 		
+		<!-- EventHandler Mapping with useCapture -->
+		<event-handler event="mousedown" name="view_mouseDownHandler" target="view" useCapture/>
+		
+		<!-- EventHandler Mapping with stopPropagation -->
+		<event-handler event="mouseup" name="view_mouseUpHandler" target="view" stopPropagation/>
+		
+		<!-- EventHandler Mapping with stopImmediatePropagation -->
+		<event-handler event="mousewheel" name="view_mouseWheelHandler" target="view" stopImmediatePropagation/>
 		
 	</injection>
 	

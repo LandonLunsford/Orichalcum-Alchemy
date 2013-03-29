@@ -20,9 +20,9 @@
 	
 	<!-- 
 		Interface Mapping
-		AS3:	alchemist.map(ISomething).toPrototype(Something);
+		AS3:	alchemist.map(Interface).toPrototype(Implementation);
 	-->
-	<injection name="orichalcum.example::ISomething" type="orichalcum.example::Something"/>
+	<injection name="orichalcum.example::Interface" type="orichalcum.example::Implementation"/>
 	
 	<!-- 
 		Reference Mapping

@@ -1,28 +1,35 @@
 <?xml version="1.0"?>
+
+<!-- Injection configuration file example -->
+
 <injections xmlns="http://www.orichalcumstudios.com"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.orichalcumstudios.com mappings.xsd">
+	xsi:schemaLocation="http://www.orichalcumstudios.com injections.xsd">
 	
 	<!-- 
 		Value Mapping
 		AS3:	alchemist.map('orichalcum.example.value').to(3.14);
 	-->
 	<injection name="orichalcum.example.value" value="3.14"/>
+	
+	<!-- 
+		Reference Mapping
+		AS3:	alchemist.map('orichalcum.example.reference').toReference('orichalcum.example.value');
+	-->
+	<injection name="orichalcum.example.reference" value="{orichalcum.example.value}"/>
 
 	<!--
 		Prototype Mappings
-		Note:	type mappings default to scope="prototype"
+		Note:	type mappings default to prototype providers
 		AS3:	alchemist.map(Prototype).asPrototype();
 	-->
 	<injection name="orichalcum.example::Prototype"/>
-	<injection name="orichalcum.example::ExplicitePrototype" scope="prototype"/>
 
 	<!-- 
 		Singleton Mappings
 		AS3:	alchemist.map(Singleton).asSingleton();
 	-->
-	<injection name="orichalcum.example::Singleton" scope="singleton"/>
-	<injection name="orichalcum.example::Singleton" total="1"/>
+	<injection name="orichalcum.example::Singleton" singleton/>
 	
 	<!-- 
 		Multiton Mapping
@@ -49,13 +56,34 @@
 	<injection name="orichalcum.example.instance" type="orichalcum.example::TypeOfTheInstance">
 
 	<!-- 
-		Type Mapping with Recipe
-		AS3:	alchemist.map(Provision).toFactory(Factory.getProvision);
+		Mapping with Recipe
+		AS3:	alchemist.map(Matrix)
+				.withConstructorArgument(1)
+				.withConstructorArgument(reference('orichalcum.example.reference'))
+				.withProperty('c', 2)
+				.withProperty('d', reference('orichalcum.example.reference'))
+				.withPostConstruct('inverse')
+				.withPreDestroy('identity');
 	-->
 	<injection name="flash.geom::Matrix">
+	
+		<!-- Constructor Argument Value Mapping -->
 		<constructor-argument value="1"/>
+		
+		<!-- Constructor Argument Reference Mapping -->
+		<constructor-argument value="{orichalcum.example.reference}"/>
 
-		<property name="b" value="2"/>
+		<!-- Property Value Mapping -->
+		<property name="c" value="2"/>
+		
+		<!-- Property Reference Mapping -->
+		<property name="d" value="{orichalcum.example.reference}"/>
+		
+		<!-- PostConstruct Mapping -->
+		<post-construct name="inverse"/>
+		
+		<!-- PreDestroy Mapping -->
+		<pre-destroy name="identity"/>
 		
 	</injection>
 </injections>

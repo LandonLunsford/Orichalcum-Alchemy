@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<injections xmlns="http://www.orichalcumstudios.com"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.orichalcumstudios.com mappings.xsd">
+	
+	<!-- 
+		Value Mapping
+		AS3:	alchemist.map('orichalcum.example.value').to(3.14);
+	-->
+	<injection name="orichalcum.example.value" value="3.14"/>
+
+	<!--
+		Prototype Mappings
+		Note:	type mappings default to scope="prototype"
+		AS3:	alchemist.map(Prototype).asPrototype();
+	-->
+	<injection name="orichalcum.example::Prototype"/>
+	<injection name="orichalcum.example::ExplicitePrototype" scope="prototype"/>
+
+	<!-- 
+		Singleton Mappings
+		AS3:	alchemist.map(Singleton).asSingleton();
+	-->
+	<injection name="orichalcum.example::Singleton" scope="singleton"/>
+	<injection name="orichalcum.example::Singleton" total="1"/>
+	
+	<!-- 
+		Multiton Mapping
+		AS3:	alchemist.map(Multiton).asMultiton(50);
+	-->
+	<injection name="orichalcum.example::Multiton" total="50"/>
+
+	<!-- 
+		Provider Mapping
+		AS3:	alchemist.map(Provision).toProvider(Provider);
+	-->
+	<injection name="orichalcum.example::Provision" provider="orichalcum.example::Provider"/>
+	
+	<!-- 
+		Factory Mapping
+		AS3:	alchemist.map(Provision).toFactory(Factory.getProvision);
+	-->
+	<injection name="orichalcum.example::Provision" provider="orichalcum.example::Factory.getProvision"/>
+
+	<!-- 
+		Instance Mapping
+		AS3:	alchemist.map('orichalcum.example.instance').toType(TypeOfTheInstance);
+	-->
+	<injection name="orichalcum.example.instance" type="orichalcum.example::TypeOfTheInstance">
+
+	<!-- 
+		Type Mapping with Recipe
+		AS3:	alchemist.map(Provision).toFactory(Factory.getProvision);
+	-->
+	<injection name="flash.geom::Matrix">
+		<constructor-argument value="1"/>
+
+		<property name="b" value="2"/>
+		
+	</injection>
+</injections>

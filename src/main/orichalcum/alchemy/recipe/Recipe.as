@@ -15,7 +15,7 @@ package orichalcum.alchemy.recipe
 	 */
 	public class Recipe implements IDisposable
 	{
-		private var _constructorArguments:Array;
+		private var _constructorArguments:Array; //<ICollection>
 		private var _properties:Object;
 		private var _eventHandlers:Array;
 		private var _postConstruct:String;

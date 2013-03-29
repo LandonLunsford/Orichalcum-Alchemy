@@ -1,60 +1,62 @@
 package orichalcum.collection 
 {
-	
 
 	public class LinkedList implements ICollection
 	{
 		
+		private var _head:LinkedListNode;
+		private var _tail:LinkedListNode;
 		private var _length:int;
-		private var _head:Node;
-		private var _tail:Node;
 		
-		public function LinkedList()
+		public function LinkedList() 
 		{
-			
+			_head = new HeadNode;
+			_tail = new TailNode;
+			_head.next = _tail;
+			_tail.next = _head;
 		}
 		
 		/* INTERFACE orichalcum.collection.ICollection */
 		
 		public function add(...values):void 
 		{
+			/**
+			 * N
+			 */
 			for each(var value:* in values)
 			{
-				const node:Node = new Node;
-				node.value = value;
-				tail.add(node);
+				_tail.add(value);
 				_length++;
 			}
 		}
 		
 		public function remove(...values):void 
 		{
-			if (isEmpty) return;
-			
 			/**
-			 * N*N
+			 * N^2
 			 */
 			for each(var value:* in values)
 			{
-				head.remove(value) && _length--;
+				_head.remove(value) && _length--;
 			}
 		}
 		
 		public function contains(...values):Boolean 
 		{
-			if (isEmpty) return false;
-			
-			var containsEach:Boolean = true;
+			/**
+			 * N^2
+			 */
 			for each(var value:* in values)
 			{
-				containsEach = containsEach && head.contains(value);
+				if (!_head.contains(value))
+					return false;
 			}
-			return containsEach;
+			return !isEmpty;
 		}
 		
 		public function getValue(index:uint):* 
 		{
-			return head.getItem(index);
+			return _head.getValue(index);
 		}
 		
 		public function get length():uint 
@@ -62,57 +64,102 @@ package orichalcum.collection
 			return _length;
 		}
 		
-		public function get isEmpty():Boolean
+		public function get isEmpty():Boolean 
 		{
 			return _length == 0;
 		}
 		
-		private function get head():Node
-		{
-			return _head ||= (_tail = new Node);
-		}
-		
-		private function get tail():Node
-		{
-			return _tail ||= (_head = new Node);
-		}
-
 	}
 
 }
 
-internal class Node
+import flash.errors.IllegalOperationError;
+import orichalcum.utility.StringUtil;
+
+internal class LinkedListNode
 {
 	public var value:*;
-	public var next:Node;
+	public var next:LinkedListNode;
+	
+	public function LinkedListNode(value:* = null)
+	{
+		this.value = value;
+	}
 	
 	public function add(node:Node):void
 	{
-		next ? next.add(node) : next = node;
+		// only add to tail in Singly Linked List
+		throw new IllegalOperationError('Select tail node for insertion.');
 	}
 	
 	public function remove(value:*):Boolean
 	{
-		if (next)
+		if (this.value === value)
 		{
-			if (next.value == value)
-			{
-				next = next.next;
-				return true;
-			}
-			return next.remove(value);
+			
+			return true;
 		}
-		return false;
+		return
 	}
 	
 	public function contains(value:*):Boolean
 	{
-		return this.value == value || next.contains(value);
+		return this.value == value ? true : next.contains(value);
 	}
 	
-	public function getItem(index:uint):*
+	public function getValue(index:uint):*
 	{
-		return index == 0 ? value : next.value
+		return index == 0 ? value : next.getItem(index - 1);
 	}
 	
+}
+
+internal class HeadNode extends LinkedListNode
+{
+	override public function remove(value:*):Boolean 
+	{
+		return next.remove(value);
+	}
+	
+	override public function contains(value:*):Boolean 
+	{
+		return next.contains(value);
+	}
+	
+	override public function getValue(index:uint):* 
+	{
+		return next.getValue(index);
+	}
+}
+
+internal class TailNode extends LinkedListNode
+{
+	override public function getValue(index:uint):* 
+	{
+		throw new TypeError('Index is out of bounds.');
+	}
+	
+	override public function add(value:*):void 
+	{
+		/**
+		 * Tail node (since it is the end) uses the "next" container as a "previous container"
+		 * previous.next = node;
+		 * node.next = this;
+		 * this.previous = node;
+		 */
+		const node:LinkedListNode = new LinkedListNode(value);
+		next.next = node;
+		node.next = this;
+		next = node;
+	}
+	
+	override public function remove(value:*):Boolean 
+	{
+		return false;
+	}
+	
+	override public function contains(value:*):Boolean 
+	{
+		return false;
+	}
 }

@@ -21,8 +21,10 @@
 			<xs:element name="event-handler" type="injection-event-handler" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="value" type="xs:string"/>
 		<xs:attribute name="type" type="xs:string"/>
-		<xs:attribute name="scope" type="xs:string"/>
+		<xs:attribute name="singleton" type="xs:string"/>
+		<xs:attribute name="total" type="xs:positiveInteger"/>
 		<xs:attribute name="provider" type="xs:string"/>
 	</xs:complexType>
 

@@ -13,6 +13,18 @@
 	<injection name="orichalcum.example.value" value="3.14"/>
 	
 	<!-- 
+		AbstractClass Mapping
+		AS3:	alchemist.map(AbstractClass).toPrototype(ConcreteClass);
+	-->
+	<injection name="orichalcum.example::AbstractClass" type="orichalcum.example::ConcreteClass"/>
+	
+	<!-- 
+		Interface Mapping
+		AS3:	alchemist.map(ISomething).toPrototype(Something);
+	-->
+	<injection name="orichalcum.example::ISomething" type="orichalcum.example::Something"/>
+	
+	<!-- 
 		Reference Mapping
 		AS3:	alchemist.map('orichalcum.example.reference').toReference('orichalcum.example.value');
 	-->
@@ -24,18 +36,13 @@
 		AS3:	alchemist.map(Prototype).asPrototype();
 	-->
 	<injection name="orichalcum.example::Prototype"/>
+	<injection name="orichalcum.example::Prototype" maximum="0"/>
 
 	<!-- 
 		Singleton Mappings
 		AS3:	alchemist.map(Singleton).asSingleton();
 	-->
-	<injection name="orichalcum.example::Singleton" singleton/>
-	
-	<!-- 
-		Multiton Mapping
-		AS3:	alchemist.map(Multiton).asMultiton(50);
-	-->
-	<injection name="orichalcum.example::Multiton" total="50"/>
+	<injection name="orichalcum.example::Singleton" maximum="1"/>
 
 	<!-- 
 		Provider Mapping
@@ -86,4 +93,40 @@
 		<pre-destroy name="identity"/>
 		
 	</injection>
+	
+	<!-- 
+		Mapping with Event Handlers
+		(You probably wont find yourself using this much but it was made available anyway)
+		Note:	MainViewMediator implements IEventDispatcher
+			MainView extends Sprite
+		AS3:	alchemist.map(MainViewMediator) 
+				.withProperty('view', type(MainView))
+				.withEventHandler('complete', 'onComplete')
+				.withEventHandler('complete', 'onComplete;
+	-->
+	<injection type="orichalcum.example::MainViewMediator">
+		
+		<!-- Type-Reference Mapping -->
+		<property name="view" value="{orichalcum.example::MainView}"/>
+		
+		<!-- EventHandler Mapping -->
+		<event-handler event="complete" name="onComplete"/>
+		
+		<!-- EventHandler Mapping with Target -->
+		<event-handler event="complete" name="view_onComplete" target="view"/>
+		
+		<!--
+			EventHandler Mapping with Custom Parameters
+			AS3:	public function view_onClick(mouseX:Number, mouseY:Number):void
+		-->
+		<event-handler event="click" name="view_onClick" target="view" parameters="mouseX,mouseY"/>
+		
+		<!--
+			EventHandler Mapping with Custom Parameters
+			AS3:	public function view_onClick(mouseX:Number, mouseY:Number):void
+		-->
+		
+		
+	</injection>
+	
 </injections>

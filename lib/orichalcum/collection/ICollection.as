@@ -7,6 +7,8 @@ package orichalcum.collection
 		function remove(...values):void;
 		function contains(...values):Boolean;
 		function getValue(index:uint):*;
+		function setValue(index:uint, value:*):void;
+		function clear():void;
 		function get length():uint;
 		function get isEmpty():Boolean;
 	}

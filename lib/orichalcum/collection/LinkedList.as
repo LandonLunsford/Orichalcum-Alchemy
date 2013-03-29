@@ -3,26 +3,23 @@ package orichalcum.collection
 
 	public class LinkedList implements ICollection
 	{
-		
-		private var _head:LinkedListNode;
-		private var _tail:LinkedListNode;
+		private var _head:LinkedListNode = new HeadNode;
+		private var _tail:LinkedListNode = new TailNode;
 		private var _length:int;
 		
 		public function LinkedList() 
 		{
-			_head = new HeadNode;
-			_tail = new TailNode;
-			_head.next = _tail;
-			_tail.next = _head;
+			clear();
 		}
 		
 		/* INTERFACE orichalcum.collection.ICollection */
 		
+		/**
+		 * O(N) (values.length)
+		 */
 		public function add(...values):void 
 		{
-			/**
-			 * N
-			 */
+			
 			for each(var value:* in values)
 			{
 				_tail.add(value);
@@ -30,22 +27,22 @@ package orichalcum.collection
 			}
 		}
 		
+		/**
+		 * O(N^2) (values.length * length)
+		 */
 		public function remove(...values):void 
 		{
-			/**
-			 * N^2
-			 */
 			for each(var value:* in values)
 			{
 				_head.remove(value) && _length--;
 			}
 		}
 		
+		/**
+		 * O(values.length * length)
+		 */
 		public function contains(...values):Boolean 
 		{
-			/**
-			 * N^2
-			 */
 			for each(var value:* in values)
 			{
 				if (!_head.contains(value))
@@ -54,16 +51,43 @@ package orichalcum.collection
 			return !isEmpty;
 		}
 		
+		/**
+		 * O(c)
+		 */
+		public function clear():void
+		{
+			_head.next = _tail;
+			_tail.next = _head;
+			_length = 0;
+		}
+		
+		/**
+		 * O(N)
+		 */
 		public function getValue(index:uint):* 
 		{
 			return _head.getValue(index);
 		}
 		
+		/**
+		 * O(N)
+		 */
+		public function setValue(index:uint, value:*):void
+		{
+			_head.setValue(index, value);
+		}
+		
+		/**
+		 * O(c)
+		 */
 		public function get length():uint 
 		{
 			return _length;
 		}
 		
+		/**
+		 * O(c)
+		 */
 		public function get isEmpty():Boolean 
 		{
 			return _length == 0;
@@ -78,6 +102,7 @@ import orichalcum.utility.StringUtil;
 
 internal class LinkedListNode
 {
+	
 	public var value:*;
 	public var next:LinkedListNode;
 	
@@ -88,8 +113,7 @@ internal class LinkedListNode
 	
 	public function add(node:Node):void
 	{
-		// only add to tail in Singly Linked List
-		throw new IllegalOperationError('Select tail node for insertion.');
+		throw new IllegalOperationError('Select tail node for addition.');
 	}
 	
 	public function remove(value:*):Boolean
@@ -112,6 +136,18 @@ internal class LinkedListNode
 		return index == 0 ? value : next.getItem(index - 1);
 	}
 	
+	public function setValue(index:uint, value:*):void
+	{
+		if (index == 0)
+		{
+			this.value = value;
+		}
+		else
+		{
+			next.setValue(index - 1);
+		}
+	}
+	
 }
 
 internal class HeadNode extends LinkedListNode
@@ -130,14 +166,15 @@ internal class HeadNode extends LinkedListNode
 	{
 		return next.getValue(index);
 	}
+	
+	override public function setValue(index:uint, value:*):void 
+	{
+		next.setValue(index, value);
+	}
 }
 
 internal class TailNode extends LinkedListNode
 {
-	override public function getValue(index:uint):* 
-	{
-		throw new TypeError('Index is out of bounds.');
-	}
 	
 	override public function add(value:*):void 
 	{
@@ -161,5 +198,15 @@ internal class TailNode extends LinkedListNode
 	override public function contains(value:*):Boolean 
 	{
 		return false;
+	}
+	
+	override public function getValue(index:uint):* 
+	{
+		throw new TypeError('Index is out of bounds.');
+	}
+	
+	override public function setValue(index:uint, value:*):void 
+	{
+		throw new TypeError('Index is out of bounds.');
 	}
 }

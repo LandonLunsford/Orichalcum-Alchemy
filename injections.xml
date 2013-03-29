@@ -53,7 +53,7 @@
 		Instance Mapping
 		AS3:	alchemist.map('orichalcum.example.instance').toType(TypeOfTheInstance);
 	-->
-	<injection name="orichalcum.example.instance" type="orichalcum.example::TypeOfTheInstance">
+	<injection name="orichalcum.example.instance" type="orichalcum.example::TypeOfTheInstance"/>
 
 	<!-- 
 		Mapping with Recipe

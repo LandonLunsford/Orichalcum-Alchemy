@@ -9,7 +9,7 @@ package orichalcum.collection
 	public interface IIterator
 	{
 		function start():void;
-		function next():*;
+		function step():void;
 		function hasNext():Boolean;
 		function get value():*;
 		function set value(value:*):void;

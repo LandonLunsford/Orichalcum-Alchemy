@@ -5,11 +5,12 @@ package orichalcum.collection
 	
 	use namespace flash_proxy;
 	
-	public class LinkedList extends ACollection implements IIterator
+	public class LinkedList extends ACollection
 	{
 		private var _head:LinkedListNode;
 		private var _tail:LinkedListNode;
 		private var _length:uint;
+		private var _current:LinkedListNode;
 		
 		public function LinkedList(...values) 
 		{
@@ -53,7 +54,8 @@ package orichalcum.collection
 			}
 			else
 			{
-				for (var i:int = 0, _tail = _head; i < _length; i++)
+				_tail = _head;
+				for (var i:int = 0; i < _length; i++)
 					_tail = _tail.next;
 			}
 			return value;
@@ -175,44 +177,12 @@ package orichalcum.collection
 			return _length;
 		}
 		
-		override public function get iterator():IIterator 
-		{
-			return this as IIterator;
-		}
-		
 		override protected function get newInstance():ICollection
 		{
 			return new LinkedList;
 		}
 		
-		/* INTERFACE orichalcum.collection.IIterator */
-		
-		private var _current:LinkedListNode;
-		
-		public function start():void 
-		{
-			_current = _head;
-		}
-		
-		public function step():void 
-		{
-			_current = _current.next;
-		}
-		
-		public function hasNext():Boolean 
-		{
-			return _current != null;
-		}
-		
-		public function get value():* 
-		{
-			return _current.value;
-		}
-		
-		public function set value(value:*):void 
-		{
-			_current.value = value;
-		}
+		/* OVERRIDE flash_proxy */
 		
 		override flash_proxy function getProperty(name:*):*
 		{
@@ -221,7 +191,7 @@ package orichalcum.collection
 		
 		override flash_proxy function setProperty(name:*, value:*):void
 		{
-			return setValue(name, value);
+			setValue(name, value);
 		}
 		
 		override flash_proxy function nextNameIndex(index:int):int
@@ -236,9 +206,6 @@ package orichalcum.collection
 			
 			if (index == 1)
 			{
-				/**
-				 * Assuming the iteration process was just started
-				 */
 				_current = _head;
 				return _head.value;
 			}

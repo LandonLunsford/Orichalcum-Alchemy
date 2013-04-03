@@ -33,9 +33,8 @@ package orichalcum.collection
 			if (isEmpty)
 				return false;
 			
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
-				if (!closure.call(thisObject, iterator.value))
+			for each(var value:* in this)
+				if (!closure.call(thisObject, value))
 					return false;
 					
 			return true;
@@ -46,9 +45,8 @@ package orichalcum.collection
 			if (isEmpty)
 				return false;
 			
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
-				if (closure.call(thisObject, iterator.value))
+			for each(var value:* in this)
+				if (closure.call(thisObject, value))
 					return true;
 					
 			return false;
@@ -56,26 +54,23 @@ package orichalcum.collection
 		
 		public function forEach(closure:Function, thisObject:Object = null):void 
 		{
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
-				closure.call(thisObject, iterator.value);
+			for each(var value:* in this)
+				closure.call(thisObject, value);
 		}
 		
 		public function map(closure:Function, thisObject:Object = null):ICollection 
 		{
 			const collection:ICollection = newInstance;
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
-				collection.push(closure.call(thisObject, iterator.value));
+			for each(var value:* in this)
+				collection.push(closure.call(thisObject, value));
 			return collection;
 		}
 		
 		public function filter(closure:Function, thisObject:Object = null):ICollection
 		{
 			const collection:ICollection = newInstance;
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
-				closure.call(thisObject, iterator.value) && collection.push(iterator.value);
+			for each(var value:* in this)
+				closure.call(thisObject, value) && collection.push(value);
 			return collection;
 		}
 		
@@ -89,12 +84,11 @@ package orichalcum.collection
 			if (isEmpty) return false;
 			
 			var containsAllValues:Boolean = true;
-			var iterator:IIterator = iterator;
 			for each(var value:* in values)
 			{
 				var containsValue:Boolean;
-				for (iterator.start(); iterator.hasNext(); iterator.step())
-					iterator.value === value && (containsValue = true);
+				for each(var nestedValue:* in this)
+					nestedValue === value && (containsValue = true);
 				containsAllValues = containsAllValues && containsValue;
 			}
 			return containsAllValues;
@@ -119,10 +113,9 @@ package orichalcum.collection
 		{
 			const newCollection:ICollection = newInstance;
 
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
+			for each(var value:* in this)
 			{
-				newCollection.push(iterator.value);
+				newCollection.push(value);
 			}
 			
 			if (collection != null)
@@ -145,9 +138,8 @@ package orichalcum.collection
 			if (isEmpty) return '';
 			
 			var string:String = '';
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
-				string += iterator.value + delimiter;
+			for each(var value:* in this)
+				string += value + delimiter;
 				
 			return string.substr(0, delimiter.length) + '';
 		}
@@ -155,9 +147,8 @@ package orichalcum.collection
 		public function toArray():Array 
 		{
 			const array:Array = [];
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
-				array[array.length] = iterator.value;
+			for each(var value:* in this)
+				array[array.length] = value;
 			return array;
 		}
 		
@@ -171,11 +162,6 @@ package orichalcum.collection
 			return length == 0;
 		}
 		
-		public function get iterator():IIterator 
-		{
-			throw new IllegalOperationError('ACollection.iterator is abstract and must be overriden.');
-		}
-		
 		protected function get newInstance():ICollection
 		{
 			throw new IllegalOperationError('ACollection.newInstance is abstract and must be overriden.');
@@ -186,9 +172,8 @@ package orichalcum.collection
 			if (isEmpty) return '( empty )';
 			
 			var string:String = '( ';
-			const iterator:IIterator = iterator;
-			for (iterator.start(); iterator.hasNext(); iterator.step())
-				string += iterator.value + ', ';
+			for each(var value:* in this)
+				string += value + ', ';
 				
 			return string.substr(0, string.length - 2) + ' )';
 		}

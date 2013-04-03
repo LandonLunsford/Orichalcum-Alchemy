@@ -36,7 +36,6 @@ package orichalcum.collection
 		 */
 		
 		function get isEmpty():Boolean;
-		function get iterator():IIterator;
 		function remove(...values):void;
 		function contains(...values):Boolean;
 		function getValue(index:uint):*;

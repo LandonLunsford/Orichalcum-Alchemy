@@ -1,8 +1,11 @@
 package orichalcum.collection 
 {
+	import flash.utils.flash_proxy;
 	import orichalcum.utility.StringUtil;
+	
+	use namespace flash_proxy;
 
-	public class ArrayCollection extends ACollection implements IIterator
+	public class ArrayCollection extends ACollection
 	{
 		private var _array:Array;
 		
@@ -77,43 +80,36 @@ package orichalcum.collection
 			return _array.length;
 		}
 		
-		override public function get iterator():IIterator 
-		{
-			return this as IIterator;
-		}
-		
 		override protected function get newInstance():ICollection 
 		{
 			return new ArrayCollection;
 		}
 		
-		/* INTERFACE orichalcum.collection.IIterator */
+		/* OVERRIDE flash_proxy */
 		
-		private var _index:int;
-		
-		public function start():void 
+		override flash_proxy function hasProperty(name:*):Boolean 
 		{
-			_index = 0;
+			return name in _array;
 		}
 		
-		public function step():void 
+		override flash_proxy function getProperty(name:*):*
 		{
-			_index++;
+			return _array[name];
 		}
 		
-		public function hasNext():Boolean 
+		override flash_proxy function setProperty(name:*, value:*):void
 		{
-			return _index < _array.length;
+			_array[name] = value;
 		}
 		
-		public function get value():* 
+		override flash_proxy function nextNameIndex(index:int):int
 		{
-			return _array[_index];
+			return index < length ? index + 1 : 0;
 		}
 		
-		public function set value(value:*):void 
+		override flash_proxy function nextValue(index:int):*
 		{
-			_array[_index] = value;
+			return _array[index - 1];
 		}
 		
 	}

@@ -210,6 +210,38 @@ package orichalcum.collection
 		{
 			_current.value = value;
 		}
+
+		override flash_proxy function getProperty(name:*):*
+		{
+			return getValue(name);
+		}
+
+		/* Removes necessity for iterator */
+		
+		override flash_proxy function setProperty(name:*, value:*):void
+		{
+			return setValue(name, value);
+		}
+		
+		override flash_proxy function nextNameIndex(index:int):int
+		{
+			return index < length ? index + 1 : 0;
+		}
+		
+		override flash_proxy function nextValue(index:int):*
+		{
+			if (index > _length)
+				return undefined;
+			
+			if (index == 1)
+			{
+				_current = _head;
+				return _head.value;
+			}
+			
+			_current = _current.next;
+			return _current.value;
+		}
 		
 	}
 

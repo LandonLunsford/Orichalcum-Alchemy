@@ -94,12 +94,12 @@ package orichalcum.collection
 			return containsAllValues;
 		}
 		
-		public function getValue(index:uint):* 
+		protected function getValue(index:uint):* 
 		{
 			throw new IllegalOperationError('ACollection.getValue() is abstract and must be overriden.');
 		}
 		
-		public function setValue(index:uint, value:*):void 
+		protected function setValue(index:uint, value:*):void 
 		{
 			throw new IllegalOperationError('ACollection.setValue() is abstract and must be overriden.');
 		}
@@ -122,7 +122,7 @@ package orichalcum.collection
 			{
 				for (var i:int = 0; i < collection.length; i++)
 				{
-					newCollection.push(collection.getValue(i));
+					newCollection.push(collection[i]);
 				}
 			}
 			return newCollection;

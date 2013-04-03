@@ -95,74 +95,59 @@ package orichalcum.collection
 		[Test]
 		public function testGetValueOutOfBounds():void
 		{
-			assertThat(_empty.getValue(0), equalTo(undefined));
+			assertThat(_empty[0], equalTo(undefined));
 		}
 		
-		[Test(expects = "Error")]
+		[Test]
 		public function testSetValueOutOfBounds():void
 		{
-			_empty.setValue(4, 0);
+			_empty[4] = 0;
 			assertThat(_empty.length, equalTo(5));
 		}
 		
 		[Test]
 		public function testGetValue():void
 		{
-			assertThat(_filled.getValue(0), equalTo(0));
-			assertThat(_filled.getValue(1), equalTo(1));
-			assertThat(_filled.getValue(2), equalTo(2));
+			assertThat(_filled[0], equalTo(0));
+			assertThat(_filled[1], equalTo(1));
+			assertThat(_filled[2], equalTo(2));
 		}
 		
 		[Test]
 		public function testGetValueAfterRemoval():void
 		{
 			_filled.remove(1);
-			assertThat(_filled.getValue(1), equalTo(2));
+			assertThat(_filled[1], equalTo(2));
 		}
 		
 		[Test]
 		public function testSetValue():void
 		{
 			const value:int = 999;
-			_filled.setValue(0, value);
-			assertThat(_filled.getValue(0), equalTo(value));
+			_filled[0] = value;
+			assertThat(_filled[0], equalTo(value));
 		}
 		
 		[Test]
 		public function testThatValuesCanBeAnything():void
 		{
-			const undefinedValue:* = undefined;
-			const nullValue:Object = null;
-			const intValue:int = -99;
-			const uintValue:uint = 99;
-			const numberValue:Number = 0.99;
-			const booleanValue:Boolean = false;
-			const stringValue:String = 'string';
-			const objectValue:Object = { };
-			const classValue:Class = Array;
-			const functionValue:Function = function():void { };
+			const values:Array = [
+				undefined
+				,null
+				,int( -99)
+				,uint(99)
+				,Number(1.11)
+				,false
+				,true
+				,'string'
+				,{}
+				,Array
+				,function():void{}
+			];
 			
-			_empty.push(
-				undefinedValue
-				,nullValue
-				,intValue
-				,uintValue
-				,booleanValue
-				,stringValue
-				,objectValue
-				,classValue
-				,functionValue
-			);
+			_empty.push.apply(null, values);
 			
-			assertThat(_empty.getValue(0), strictlyEqualTo(undefinedValue));
-			assertThat(_empty.getValue(1), strictlyEqualTo(nullValue));
-			assertThat(_empty.getValue(2), strictlyEqualTo(intValue));
-			assertThat(_empty.getValue(3), strictlyEqualTo(uintValue));
-			assertThat(_empty.getValue(4), strictlyEqualTo(booleanValue));
-			assertThat(_empty.getValue(5), strictlyEqualTo(stringValue));
-			assertThat(_empty.getValue(6), strictlyEqualTo(objectValue));
-			assertThat(_empty.getValue(7), strictlyEqualTo(classValue));
-			assertThat(_empty.getValue(8), strictlyEqualTo(functionValue));
+			assertThat(_empty.toArray(), equalTo(values));
 		}
 		
 		[Test]

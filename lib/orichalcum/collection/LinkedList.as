@@ -142,7 +142,7 @@ package orichalcum.collection
 			return this;
 		}
 		
-		override public function getValue(index:uint):* 
+		override protected function getValue(index:uint):* 
 		{
 			if (index >= length)
 				return undefined;
@@ -153,7 +153,7 @@ package orichalcum.collection
 			return node.value;
 		}
 		
-		override public function setValue(index:uint, value:*):void 
+		override protected function setValue(index:uint, value:*):void 
 		{
 			if (index >= length)
 				throw new ArgumentError(StringUtil.substitute('Argument "{0}" ({1}) is out of bounds{2}.', 'index', index, length == 0 ? '' : ' (0 to ' + (length - 1) + ')'));

@@ -46,12 +46,12 @@ package orichalcum.collection
 			}
 		}
 		
-		override public function getValue(index:uint):* 
+		override protected function getValue(index:uint):* 
 		{
 			return _array[index];
 		}
 		
-		override public function setValue(index:uint, value:*):void 
+		override protected function setValue(index:uint, value:*):void 
 		{
 			if (index >= length)
 				throw new ArgumentError(StringUtil.substitute('Argument "{0}" ({1}) is out of bounds{2}.', 'index', index, length == 0 ? '' : ' (0 to ' + (length - 1) + ')'));

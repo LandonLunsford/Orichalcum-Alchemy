@@ -1,7 +1,10 @@
 package orichalcum.collection 
 {
+	import flash.utils.flash_proxy;
 	import orichalcum.utility.StringUtil;
-
+	
+	use namespace flash_proxy;
+	
 	public class LinkedList extends ACollection implements IIterator
 	{
 		private var _head:LinkedListNode;
@@ -210,13 +213,11 @@ package orichalcum.collection
 		{
 			_current.value = value;
 		}
-
+		
 		override flash_proxy function getProperty(name:*):*
 		{
 			return getValue(name);
 		}
-
-		/* Removes necessity for iterator */
 		
 		override flash_proxy function setProperty(name:*, value:*):void
 		{
@@ -235,6 +236,9 @@ package orichalcum.collection
 			
 			if (index == 1)
 			{
+				/**
+				 * Assuming the iteration process was just started
+				 */
 				_current = _head;
 				return _head.value;
 			}

@@ -1,16 +1,10 @@
 package orichalcum.collection 
 {
 	import flash.errors.IllegalOperationError;
-	import flash.system.ApplicationDomain;
-	import flash.utils.getQualifiedClassName;
+	import flash.utils.Proxy;
 
-	public class ACollection implements ICollection
+	public class ACollection extends Proxy implements ICollection
 	{
-		
-		public function ACollection() 
-		{
-			
-		}
 		
 		/* INTERFACE orichalcum.collection.ICollection */
 		

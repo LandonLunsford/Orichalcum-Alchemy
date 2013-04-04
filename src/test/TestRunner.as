@@ -22,8 +22,8 @@ package
 	import orichalcum.alchemy.recipe.EmptyRecipeTest;
 	import orichalcum.alchemy.recipe.factory.RecipeFactoryTest;
 	import orichalcum.alchemy.recipe.FullRecipeTest;
-	import orichalcum.collection.AbstractCollectionTest;
-	import orichalcum.collection.ArraySequenceTest;
+	import orichalcum.collection.ArrayListTest;
+	import orichalcum.collection.LinkedListTest;
 
 	public class TestRunner extends Sprite
 	{
@@ -52,7 +52,8 @@ package
 				,EventHandlerTest
 				,AlchemistExtensionTest
 				
-				,ArraySequenceTest
+				,LinkedListTest
+				,ArrayListTest
 			);
 		}
 		

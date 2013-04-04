@@ -5,7 +5,7 @@ package orichalcum.collection
 	
 	use namespace flash_proxy;
 	
-	public class LinkedList extends ACollection
+	public class LinkedList extends AbstractList implements IList
 	{
 		private var _head:LinkedListNode;
 		private var _tail:LinkedListNode;
@@ -17,7 +17,7 @@ package orichalcum.collection
 			push.apply(this, values);
 		}
 		
-		/* INTERFACE orichalcum.collection.ICollection */
+		/* INTERFACE orichalcum.collection.IList */
 		
 		override public function push(...values):uint 
 		{
@@ -120,7 +120,7 @@ package orichalcum.collection
 			}
 		}
 		
-		override public function reverse():ICollection 
+		override public function reverse():IList 
 		{
 			if (length < 2)
 				return this;
@@ -142,6 +142,8 @@ package orichalcum.collection
 			return this;
 		}
 		
+		/* OVERRIDE ICollection */
+		
 		override protected function getValue(index:uint):* 
 		{
 			if (index >= length)
@@ -159,10 +161,8 @@ package orichalcum.collection
 				throw new ArgumentError(StringUtil.substitute('Argument "{0}" ({1}) is out of bounds{2}.', 'index', index, length == 0 ? '' : ' (0 to ' + (length - 1) + ')'));
 			
 			for (var node:LinkedListNode = _head; index > 0; index--)
-			{
-				node || push(undefined);
 				node = node.next;
-			}
+			
 			node.value = value;
 		}
 		

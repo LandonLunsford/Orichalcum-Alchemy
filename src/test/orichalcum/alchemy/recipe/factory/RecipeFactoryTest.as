@@ -47,13 +47,13 @@ package orichalcum.alchemy.recipe.factory
 		}
 		
 		[Test]
-		public function testHasBindings():void
+		public function testHasEventHandlers():void
 		{
 			assertTrue(_hasEverything.hasEventHandlers);
 		}
 		
 		[Test]
-		public function testHasNoBindings():void
+		public function testHasNoEventHandlers():void
 		{
 			assertFalse(_hasNothing.hasEventHandlers);
 		}

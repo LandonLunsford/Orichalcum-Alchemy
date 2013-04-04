@@ -5,17 +5,17 @@ package orichalcum.collection
 	
 	use namespace flash_proxy;
 
-	public class ArrayCollection extends ACollection
+	public class ArrayList extends AbstractList implements IList
 	{
 		private var _array:Array;
 		
-		public function ArrayCollection(...values) 
+		public function ArrayList(...values) 
 		{
 			_array = [];
 			_array.push.apply(_array, values);
 		}
 		
-		/* INTERFACE orichalcum.collection.ICollection */
+		/* INTERFACE orichalcum.collection.IList */
 		
 		override public function push(...values):uint 
 		{
@@ -59,11 +59,13 @@ package orichalcum.collection
 			_array[index] = value;
 		}
 		
-		override public function reverse():ICollection 
+		override public function reverse():IList 
 		{
 			_array.reverse();
 			return this;
 		}
+		
+		/* OVERRIDE ICollection */
 		
 		override public function clear():void 
 		{
@@ -82,7 +84,7 @@ package orichalcum.collection
 		
 		override protected function get newInstance():ICollection 
 		{
-			return new ArrayCollection;
+			return new ArrayList;
 		}
 		
 		/* OVERRIDE flash_proxy */

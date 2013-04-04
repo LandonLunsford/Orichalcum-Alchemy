@@ -1,6 +1,11 @@
 package orichalcum.alchemy.recipe 
 {
+	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.provider.factory.value;
+	import orichalcum.collection.ArrayList;
+	import orichalcum.collection.ICollection;
+	import orichalcum.collection.IList;
+	import orichalcum.collection.LinkedList;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.utility.ObjectUtil;
 
@@ -15,9 +20,9 @@ package orichalcum.alchemy.recipe
 	 */
 	public class Recipe implements IDisposable
 	{
-		private var _constructorArguments:Array; //<ICollection>
+		private var _constructorArguments:IList;
 		private var _properties:Object;
-		private var _eventHandlers:Array;
+		private var _eventHandlers:IList;
 		private var _postConstruct:String;
 		private var _preDestroy:String;
 		
@@ -54,8 +59,8 @@ package orichalcum.alchemy.recipe
 		
 		public function empty():Recipe
 		{
-			if (hasConstructorArguments) _constructorArguments.length = 0;
-			if (hasEventHandlers) _eventHandlers.length = 0;
+			if (hasConstructorArguments) _constructorArguments.clear();
+			if (hasEventHandlers) _eventHandlers.clear();
 			if (hasProperties) ObjectUtil.empty(_properties);
 			_postConstruct = null;
 			_preDestroy = null;
@@ -64,9 +69,9 @@ package orichalcum.alchemy.recipe
 		
 		public function extend(recipe:Recipe):Recipe
 		{
-			if (recipe.hasConstructorArguments) for (var i:int = 0; i < recipe.constructorArguments.length; i++) constructorArguments[i] = recipe.constructorArguments[i];
+			if (recipe.hasConstructorArguments) for (var i:int = 0; i < recipe.constructorArguments.length; i++) constructorArguments[i] = recipe.constructorArguments[i]; // expensive with LinkedList
 			if (recipe.hasProperties) ObjectUtil.extend(properties, recipe.properties);
-			if (recipe.hasEventHandlers) eventHandlers.push.apply(null, recipe.eventHandlers);
+			if (recipe.hasEventHandlers) for each(var eventHandler:IEventHandler in recipe.eventHandlers) eventHandlers.add(eventHandler);
 			if (recipe.hasComposer) postConstruct = recipe.postConstruct;
 			if (recipe.hasDisposer) preDestroy = recipe.preDestroy;
 			return this;
@@ -97,12 +102,12 @@ package orichalcum.alchemy.recipe
 			return _eventHandlers != null && _eventHandlers.length;
 		}
 		
-		public function get constructorArguments():Array 
+		public function get constructorArguments():IList 
 		{
-			return _constructorArguments ||= [];
+			return _constructorArguments ||= new ArrayList; // fails with linked list
 		}
 		
-		public function set constructorArguments(value:Array):void 
+		public function set constructorArguments(value:IList):void 
 		{
 			_constructorArguments = value;
 		}
@@ -117,12 +122,12 @@ package orichalcum.alchemy.recipe
 			_properties = value;
 		}
 		
-		public function get eventHandlers():Array
+		public function get eventHandlers():IList
 		{
-			return _eventHandlers ||= [];
+			return _eventHandlers ||= new LinkedList;
 		}
 		
-		public function set eventHandlers(value:Array):void 
+		public function set eventHandlers(value:IList):void 
 		{
 			_eventHandlers = value;
 		}

@@ -6,6 +6,7 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.recipe.Recipe;
+	import orichalcum.collection.IList;
 	import orichalcum.utility.ObjectUtil;
 	import orichalcum.utility.StringUtil;
 
@@ -93,7 +94,7 @@ package orichalcum.alchemy.alchemist
 			
 			if (recipe.hasConstructorArguments)
 			{
-				const a:Array = recipe.constructorArguments;
+				const a:IList = recipe.constructorArguments;
 				switch(a.length)
 				{
 					case 1:	return new type(

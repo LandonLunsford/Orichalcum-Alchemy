@@ -8,18 +8,18 @@ package orichalcum.collection
 	import org.hamcrest.object.isTrue;
 	import org.hamcrest.object.strictlyEqualTo;
 	
-	public class AbstractCollectionTest 
+	public class AbstractListTest 
 	{
 		
-		private var _empty:ICollection;
-		private var _filled:ICollection;
+		private var _empty:IList;
+		private var _filled:IList;
 		
-		protected function get newEmptyCollection():ICollection
+		protected function get newEmptyCollection():IList
 		{
 			throw new IllegalOperationError('AbstractCollectionTest.newEmptyCollection() is abstract and must be overriden.');
 		}
 		
-		protected function get newFilledCollection():ICollection
+		protected function get newFilledCollection():IList
 		{
 			throw new IllegalOperationError('AbstractCollectionTest.newFilledCollection() is abstract and must be overriden.');
 		}
@@ -50,9 +50,9 @@ package orichalcum.collection
 		}
 		
 		[Test]
-		public function testPush():void
+		public function testAdd():void
 		{
-			_empty.push(5, 6, 7);
+			_empty.add(5, 6, 7);
 			assertThat(_empty.contains(5, 6, 7), isTrue());
 		}
 		
@@ -98,7 +98,7 @@ package orichalcum.collection
 			assertThat(_empty[0], equalTo(undefined));
 		}
 		
-		[Test]
+		[Test(expects = "Error")]
 		public function testSetValueOutOfBounds():void
 		{
 			_empty[4] = 0;
@@ -145,7 +145,7 @@ package orichalcum.collection
 				,function():void{}
 			];
 			
-			_empty.push.apply(null, values);
+			_empty.add.apply(null, values);
 			
 			assertThat(_empty.toArray(), equalTo(values));
 		}
@@ -160,11 +160,9 @@ package orichalcum.collection
 		[Test]
 		public function testIterable():void
 		{
-			//var iterator:IIterator = _empty.iterator;
-			//for (iterator.start(); iterator.hasNext(); iterator.step()) fail();
-			//iterator = _filled.iterator;
-			//for (iterator.start(); iterator.hasNext(); iterator.step()) iterator.value = 99;
-			//assertThat(_filled.toArray(), equalTo([99, 99, 99]));
+			for each(var nothing:* in _empty) fail();
+			for (var i:int = 0; i < _filled.length; i++) _filled[i] = 99;
+			assertThat(_filled.toArray(), equalTo([99, 99, 99]));
 		}
 		
 		[Test]
@@ -210,7 +208,7 @@ package orichalcum.collection
 			assertThat(_filled.filter(closure).toArray(), equalTo([0, 1]));
 		}
 		
-		[Test]
+		//[Test]
 		public function testShit():void
 		{
 			//var cc:CustomCollection = new CustomCollection;

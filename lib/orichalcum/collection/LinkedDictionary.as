@@ -1,5 +1,6 @@
 package orichalcum.collection 
 {
+	import flash.errors.IllegalOperationError;
 	import flash.utils.flash_proxy;
 	import orichalcum.utility.StringUtil;
 	
@@ -85,87 +86,62 @@ package orichalcum.collection
 			return _length;
 		}
 		
-		//public function push(...values):uint 
-		//{
-			//
-		//}
-		//
-		//public function pop():* 
-		//{
-			//
-		//}
-		//
-		//public function unshift(...values):uint 
-		//{
-			//
-		//}
-		//
-		//public function shift():* 
-		//{
-			//
-		//}
-		
 		public function forEach(closure:Function, thisObject:Object = null):void 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function every(closure:Function, thisObject:Object = null):Boolean 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function some(closure:Function, thisObject:Object = null):Boolean 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function map(closure:Function, thisObject:Object = null):ICollection 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function filter(closure:Function, thisObject:Object = null):ICollection 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function concat(collection:ICollection = null):ICollection 
 		{
-			
-		}
-		
-		public function reverse():ICollection 
-		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function toString():String 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function join(delimiter:String = null):String 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function remove(...values):void 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function contains(...values):Boolean 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
 		public function toArray():Array 
 		{
-			
+			throw new IllegalOperationError('TODO: unimplemented.');
 		}
 		
-		override public function get isEmpty():Boolean 
+		public function get isEmpty():Boolean 
 		{
 			return _head == null;
 		}

@@ -104,7 +104,7 @@ package orichalcum.alchemy.recipe
 		
 		public function get constructorArguments():IList 
 		{
-			return _constructorArguments ||= new ArrayList; // fails with linked list
+			return _constructorArguments ||= new LinkedList;
 		}
 		
 		public function set constructorArguments(value:IList):void 

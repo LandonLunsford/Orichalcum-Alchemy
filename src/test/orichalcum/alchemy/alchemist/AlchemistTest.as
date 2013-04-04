@@ -168,8 +168,6 @@ package orichalcum.alchemy.alchemist
 			const creation:ClassWithPreDestroyMetatag = _alchemist.conjure(ClassWithPreDestroyMetatag) as ClassWithPreDestroyMetatag;
 			_alchemist.map(ClassWithPreDestroyMetatag).withPreDestroy('otherPreDestroy');
 			_alchemist.destroy(creation);
-			trace('1st', creation.preDestroyCalled);
-			trace('other',creation.otherPreDestroyCalled);
 		}
 		
 	}

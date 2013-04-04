@@ -157,11 +157,15 @@ package orichalcum.collection
 		
 		override protected function setValue(index:uint, value:*):void 
 		{
-			if (index >= length)
-				throw new ArgumentError(StringUtil.substitute('Argument "{0}" ({1}) is out of bounds{2}.', 'index', index, length == 0 ? '' : ' (0 to ' + (length - 1) + ')'));
+			/**
+			 * Ugly redundant impl
+			 */
+			
+			index >= _length && (_length = index + 1);
+			_head ||= new LinkedListNode(undefined);
 			
 			for (var node:LinkedListNode = _head; index > 0; index--)
-				node = node.next;
+				node = (node.next ||= new LinkedListNode(undefined));
 			
 			node.value = value;
 		}
@@ -196,7 +200,7 @@ package orichalcum.collection
 		
 		override flash_proxy function nextNameIndex(index:int):int
 		{
-			return index < length ? index + 1 : 0;
+			return index < _length ? index + 1 : 0;
 		}
 		
 		override flash_proxy function nextValue(index:int):*

@@ -98,7 +98,7 @@ package orichalcum.collection
 			assertThat(_empty[0], equalTo(undefined));
 		}
 		
-		[Test(expects = "Error")]
+		[Test]
 		public function testSetValueOutOfBounds():void
 		{
 			_empty[4] = 0;
@@ -125,7 +125,9 @@ package orichalcum.collection
 		{
 			const value:int = 999;
 			_filled[0] = value;
-			assertThat(_filled[0], equalTo(value));
+			_filled[1] = value;
+			_filled[2] = value;
+			assertThat(_filled.toArray(), equalTo([value, value, value]));
 		}
 		
 		[Test]

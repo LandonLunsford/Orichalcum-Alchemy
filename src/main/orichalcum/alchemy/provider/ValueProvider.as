@@ -37,6 +37,12 @@ package orichalcum.alchemy.provider
 			return _value;
 		}
 		
+		public function destroy(provision:*):* 
+		{
+			return provision;
+		}
+		
+		
 	}
 
 }

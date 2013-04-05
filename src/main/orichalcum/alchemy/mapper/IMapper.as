@@ -8,10 +8,10 @@ package orichalcum.alchemy.mapper
 		function toReference(id:String):IMapper;
 		function toPrototype(type:Class):IMapper;
 		function toSingleton(type:Class):IMapper;
-		function toMultiton(type:Class, poolSize:uint):IMapper;
+		function toPool(type:Class):IMapper;
 		function asPrototype():IMapper;
 		function asSingleton():IMapper;
-		function asMultiton(poolSize:uint):IMapper;
+		function asPool():IMapper;
 		
 		function withConstructorArguments(...args):IMapper;
 		function withConstructorArgument(value:*, index:int = -1):IMapper;

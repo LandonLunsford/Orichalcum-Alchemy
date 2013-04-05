@@ -4,6 +4,8 @@ package orichalcum.alchemy.provider.factory
 	import orichalcum.alchemy.provider.IProvider;
 
 	/**
+	 * @deprecated
+	 * 
 	 * Convenience method for "new ForwardingProvider()"
 	 * @param	providerType The class of the custom provider
 	 * @return	new ForwardingProvider

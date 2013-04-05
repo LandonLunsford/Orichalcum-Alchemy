@@ -42,6 +42,14 @@ package orichalcum.alchemy.provider
 			}
 		}
 		
+		/**
+		 * Need to pass a new function to constructor to delegate to
+		 */
+		public function destroy(provision:*):* 
+		{
+			return provision;
+		}
+		
 	}
 
 }

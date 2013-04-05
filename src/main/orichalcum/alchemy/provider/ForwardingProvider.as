@@ -3,6 +3,9 @@ package orichalcum.alchemy.provider
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.recipe.Recipe;
 
+	/**
+	 * @deprecated
+	 */
 	public class ForwardingProvider extends SingletonProvider
 	{
 		/**

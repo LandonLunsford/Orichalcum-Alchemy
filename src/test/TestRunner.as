@@ -8,7 +8,6 @@ package
 	import orichalcum.alchemy.alchemist.ConstructorArgumentInjectionTest;
 	import orichalcum.alchemy.alchemist.EventHandlerTest;
 	import orichalcum.alchemy.alchemist.FactoryMappingTest;
-	import orichalcum.alchemy.alchemist.MultitonMappingTest;
 	import orichalcum.alchemy.alchemist.PostConstructTest;
 	import orichalcum.alchemy.alchemist.PreDestroyTest;
 	import orichalcum.alchemy.alchemist.PrototypeMappingTest;
@@ -41,7 +40,6 @@ package
 				,ReferenceMappingTest
 				,SingletonMappingTest
 				,PrototypeMappingTest
-				,MultitonMappingTest
 				,FactoryMappingTest
 				,ProviderMappingTest
 				,ConstructorArgumentInjectionTest

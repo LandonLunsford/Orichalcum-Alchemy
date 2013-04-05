@@ -3,7 +3,7 @@ package orichalcum.alchemy.mapper
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.handler.EventHandler;
-	import orichalcum.alchemy.provider.factory.multiton;
+	import orichalcum.alchemy.provider.factory.pool;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.singleton;
 	import orichalcum.alchemy.provider.factory.type;
@@ -69,14 +69,14 @@ package orichalcum.alchemy.mapper
 			return to(singleton(type));
 		}
 		
-		public function asMultiton(poolSize:uint):IMapper
+		public function asPool():IMapper
 		{
-			return toMultiton(getClass(_id), poolSize);
+			return toPool(getClass(_id));
 		}
 		
-		public function toMultiton(type:Class, poolSize:uint):IMapper
+		public function toPool(type:Class):IMapper
 		{
-			return to(multiton(type, poolSize));
+			return to(pool(type));
 		}
 		
 		public function withConstructorArguments(...args):IMapper 

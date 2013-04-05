@@ -1,6 +1,7 @@
 package orichalcum.alchemy.alchemist 
 {
 	import org.hamcrest.assertThat;
+	import org.hamcrest.object.isTrue;
 	import org.hamcrest.object.strictlyEqualTo;
 	import orichalcum.alchemy.provider.factory.provider;
 	import orichalcum.alchemy.provider.IProvider;
@@ -8,23 +9,30 @@ package orichalcum.alchemy.alchemist
 
 	public class ProviderMappingTest implements IProvider
 	{
-		
+		static private var _provision:* = {};
 		private var _alchemist:Alchemist;
 		private var _id:String = 'id';
-		private var _provision:* = 0;
-		
+		static private var _destroyed:Boolean;
 		
 		[Before]
 		public function setup():void
 		{
 			_alchemist = new Alchemist;
+			_alchemist.map(_id).to(this);
+			_destroyed = false;
 		}
 		
 		[Test]
-		public function test():void
+		public function testProvide():void
 		{
-			_alchemist.map(_id).to(provider(ProviderMappingTest));
 			assertThat(_alchemist.conjure(_id), strictlyEqualTo(_provision));
+		}
+		
+		[Test]
+		public function testDestroy():void
+		{
+			_alchemist.destroy(_alchemist.conjure(_id));
+			assertThat(_destroyed, isTrue());
 		}
 		
 		/* INTERFACE orichalcum.alchemy.provider.IProvider */
@@ -32,6 +40,12 @@ package orichalcum.alchemy.alchemist
 		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
 			return _provision;
+		}
+		
+		public function destroy(provision:*):* 
+		{
+			_destroyed = true;
+			return provision;
 		}
 		
 	}

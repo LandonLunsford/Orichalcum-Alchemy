@@ -1,19 +1,23 @@
 package orichalcum.alchemy.provider 
 {
+	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 
+	/**
+	 * @todo add better id validation
+	 */
 	public class ReferenceProvider implements IProvider, IDisposable
 	{
 		private var _reference:String;
 		
 		/**
-		 * @param reference The string ID of any mapped provision
+		 * @param id Custom name, class or qualified class name
 		 */
-		public function ReferenceProvider(reference:String) 
+		public function ReferenceProvider(id:*) 
 		{
-			_reference = reference;
+			_reference = getValidId(id);
 		}
 		
 		/* INTERFACE orichalcum.lifecycle.IDisposable */
@@ -27,17 +31,27 @@ package orichalcum.alchemy.provider
 		
 		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):*
 		{
-			/*
-			 * not sure where this is useful but I provide it
-			 * use case:
-			 * 
-			 * alchemist.provide('a').using(type(Point));
-			 * alchemist.provide('b').using('{a}').withProperty('x',1);
-			 * 
-			 * now requests for a will have x=1 while those for b will have x=0
-			 */
 			return activeAlchemist.conjure(_reference, activeRecipe);
 		}
+		
+		public function destroy(provision:*):* 
+		{
+			return provision;
+		}
+		
+		/* PRIVATE PARTS */
+		
+		private function getValidId(id:*):String 
+		{
+			if (id is String)
+				return id as String;
+				
+			if (id is Class)
+				return getQualifiedClassName(id as Class);
+				
+			throw new ArgumentError;
+		}
+		
 		
 	}
 

@@ -29,6 +29,11 @@ package orichalcum.alchemy.provider
 			throw new IllegalOperationError('InstanceProvider.provide() is an abstract method and must be overriden.');
 		}
 		
+		public function destroy(provision:*):* 
+		{
+			return provision;
+		}
+		
 		/* INTERFACE orichalcum.alchemist.guise.IInstanceProvider */
 		
 		public function get type():Class

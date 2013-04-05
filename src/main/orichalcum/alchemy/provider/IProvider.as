@@ -19,7 +19,7 @@ package orichalcum.alchemy.provider
 		 * @return	The provision
 		 * @see #provide
 		 */
-		function destroy(provision:Object):*;
+		function destroy(provision:*):*;
 	}
 
 }

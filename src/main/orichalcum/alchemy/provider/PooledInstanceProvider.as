@@ -7,7 +7,7 @@ package orichalcum.alchemy.provider
 	 * This class will require the Alchemist to keep a conjuredInstance to Provider map in order to
 	 * Track if the instance was generated from this provider so that it may return it upon destruction
 	 */
-	public class PooledInstanceProvider extends InstanceProvider implements IPooledInstanceProvider
+	public class PooledInstanceProvider extends InstanceProvider
 	{
 		
 		private var _pool:Array;
@@ -17,18 +17,16 @@ package orichalcum.alchemy.provider
 			super(type);
 		}
 		
-		/* INTERFACE orichalcum.alchemy.provider.IPooledInstanceProvider */
-		
-		public function returnInstance(instance:*):void 
-		{
-			pool[pool.length] = instance;
-		}
-		
 		override public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
 			return pool.length
 				? activeAlchemist.inject(pool.pop())
 				: super.provide(activeAlchemist, activeRecipe);
+		}
+		
+		override public function destroy(provision:*):*
+		{
+			return pool[pool.length] = provision;
 		}
 		
 		/* PRIVATE PARTS */

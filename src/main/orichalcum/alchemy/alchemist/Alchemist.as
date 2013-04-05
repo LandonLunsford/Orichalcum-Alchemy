@@ -68,6 +68,12 @@ package orichalcum.alchemy.alchemist
 		private var _providers:Dictionary = new Dictionary;
 		
 		/**
+		 * Used to facilitate providers' provision destruction hook
+		 * @private
+		 */
+		private var _providersByInstance:Dictionary = new Dictionary;
+		
+		/**
 		 * Contains all mapped recipes
 		 * @private
 		 */
@@ -174,15 +180,10 @@ package orichalcum.alchemy.alchemist
 			else
 			{
 				provision = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
+				provider && (_providersByInstance[provision] = provider);
 			}
 			
 			recipe && (_recipesByInstance[provision] = recipe);
-			
-			/**
-			 * Add the following code to implement pooled instance providers.
-			 * 
-			 * provider is IPooledInstanceProvider && (_pooledProvidersByInstance ||= new Dictionary)[provision] = provider;
-			 */
 			
 			return provision;	
 		}
@@ -206,15 +207,9 @@ package orichalcum.alchemy.alchemist
 		public function destroy(instance:Object):Object
 		{
 			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
+			_providersByInstance[instance] && (_providersByInstance[instance] as IProvider).destroy(instance);
 			_instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
 			returnRecipeFlyweight();
-			
-			/**
-			 * Add the following code to implement pooled instance providers.
-			 * 
-			 * _pooledProvidersByInstance && _pooledProvidersByInstance[provision] && _pooledProvidersByInstance[provision].returnInstance(instance);
-			 */
-			
 			return instance;
 		}
 		
@@ -294,7 +289,7 @@ package orichalcum.alchemy.alchemist
 			 */
 			
 			const recipe:Recipe = recipeFlyweight ? recipeFlyweight.empty() : new Recipe;
-			recipe.extend(staticTypeRecipe);
+			staticTypeRecipe && recipe.extend(staticTypeRecipe);
 			runtimeTypeRecipe && recipe.extend(runtimeTypeRecipe);
 			runtimeInstanceRecipe && recipe.extend(runtimeInstanceRecipe);
 			return recipe;

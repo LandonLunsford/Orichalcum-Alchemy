@@ -29,6 +29,11 @@ package orichalcum.alchemy.recipe.factory
 			_reflector = reflector || Reflector.getInstance();
 			_metatagBundle = metatagBundle;
 			_typeRecipes = new Dictionary;
+			
+			/**
+			 * Defensively priming cache
+			 */
+			_typeRecipes['Object'] = new Recipe;
 		}
 		
 		/* INTERFACE orichalcum.lifecycle.IDisposable */

@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+
+<!-- Injection configuration file example -->
+
+<injections xmlns="http://www.orichalcumstudios.com"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.orichalcumstudios.com injections.xsd">
+	
+	<!-- 
+		Value Mapping
+		AS3:	alchemist.map('orichalcum.example.value').to(3.14);
+	-->
+	<injection name="orichalcum.example.value" value="3.14"/>
+	
+	<!-- 
+		Reference Mapping
+		AS3:	alchemist.map('orichalcum.example.reference').toReference('orichalcum.example.value');
+	-->
+	<injection name="orichalcum.example.reference" value="{orichalcum.example.value}"/>
+	
+	<!-- 
+		AbstractClass Mapping
+		AS3:	alchemist.map(AbstractClass).toPrototype(ConcreteClass);
+	-->
+	<injection name="orichalcum.example::AbstractClass" type="orichalcum.example::ConcreteClass"/>
+	
+	<!-- 
+		Interface Mapping
+		AS3:	alchemist.map(Interface).toPrototype(Implementation);
+	-->
+	<injection name="orichalcum.example::Interface" type="orichalcum.example::Implementation"/>
+	
+	<!-- 
+		Singleton Mappings
+		AS3:	alchemist.map(Singleton).asSingleton();
+	-->
+	<injection name="orichalcum.example::Singleton"/>
+	<injection name="orichalcum.example::Singleton" scope="singleton"/>
+	
+	<!--
+		Prototype Mappings
+		Note:	type mappings default to prototype providers
+		AS3:	alchemist.map(Prototype).asPrototype();
+	-->
+	<injection name="orichalcum.example::Prototype" scope="prototype"/>
+	
+	<!--
+		Pool Mappings
+		Note:	type mappings default to prototype providers
+		AS3:	alchemist.map(Prototype).asPrototype();
+	-->
+	<injection name="orichalcum.example::PooledClass" scope="pool"/>
+
+	<!-- 
+		Provider Mapping
+		AS3:	alchemist.map(Provision).toProvider(Provider);
+	-->
+	<injection name="orichalcum.example::Provision" provider="orichalcum.example::Provider"/>
+	
+	<!-- 
+		Factory Mapping
+		AS3:	alchemist.map(Provision).toFactory(Factory.getProvision);
+	-->
+	<injection name="orichalcum.example::Provision" provider="orichalcum.example::Factory.getProvision"/>
+
+	<!-- 
+		Instance Mapping
+		AS3:	alchemist.map('orichalcum.example.instance').toType(TypeOfTheInstance);
+	-->
+	<injection name="orichalcum.example.instance" type="orichalcum.example::TypeOfTheInstance"/>
+
+	<!-- 
+		Mapping with Recipe
+		AS3:	alchemist.map(Matrix)
+				.withConstructorArgument(1)
+				.withConstructorArgument(reference('orichalcum.example.reference'))
+				.withProperty('c', 2)
+				.withProperty('d', reference('orichalcum.example.reference'))
+				.withPostConstruct('inverse')
+				.withPreDestroy('identity');
+	-->
+	<injection name="flash.geom::Matrix">
+	
+		<!-- Constructor Argument Value Mapping -->
+		<constructor-argument value="1"/>
+		
+		<!-- Constructor Argument Reference Mapping -->
+		<constructor-argument value="{orichalcum.example.reference}"/>
+
+		<!-- Property Value Mapping -->
+		<property name="c" value="2"/>
+		
+		<!-- Property Reference Mapping -->
+		<property name="d" value="{orichalcum.example.reference}"/>
+		
+		<!-- PostConstruct Mapping -->
+		<post-construct name="inverse"/>
+		
+		<!-- PreDestroy Mapping -->
+		<pre-destroy name="identity"/>
+		
+	</injection>
+	
+	<!-- 
+		Mapping with Event Handlers
+		(You probably wont find yourself using this much but it was made available anyway)
+		Note:	MainViewMediator implements IEventDispatcher
+			MainView extends Sprite
+		AS3:	alchemist.map(MainViewMediator) 
+				.withProperty('view', type(MainView))
+				.withEventHandler('complete', 'onComplete')
+				.withEventHandler('click', 'view_onClick', 'view')
+				.withEventHandler('mouseover', 'view_onMouseOver', 'view')
+	-->
+	<injection type="orichalcum.example::MainViewMediator">
+		
+		<!-- Type-Reference Mapping -->
+		<property name="view" value="{orichalcum.example::MainView}"/>
+		
+		<!-- EventHandler Mapping (target == this) -->
+		<event-handler event="complete" name="onComplete"/>
+		
+		<!-- EventHandler Mapping (target == view) -->
+		<event-handler event="click" name="view_onClick" target="view"/>
+		
+		<!--
+			EventHandler Mapping with Custom Parameters
+			AS3:	public function view_onMouseOver(mouseX:Number, mouseY:Number):void
+		-->
+		<event-handler event="mouseover" name="view_mouseOverHandler" target="view" parameters="mouseX,mouseY"/>
+		
+		<!-- EventHandler Mapping with priority -->
+		<event-handler event="mouseout" name="view_mouseOutHandler" target="view" priority="5"/>
+		
+		<!-- EventHandler Mapping with useCapture -->
+		<event-handler event="mousedown" name="view_mouseDownHandler" target="view" useCapture/>
+		
+		<!-- EventHandler Mapping with stopPropagation -->
+		<event-handler event="mouseup" name="view_mouseUpHandler" target="view" stopPropagation/>
+		
+		<!-- EventHandler Mapping with stopImmediatePropagation -->
+		<event-handler event="mousewheel" name="view_mouseWheelHandler" target="view" stopImmediatePropagation/>
+		
+	</injection>
+	
+</injections>

@@ -3,24 +3,28 @@ package orichalcum.alchemy.provider
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.recipe.Recipe;
 
-	/**
-	 * @deprecated
-	 */
-	public class ForwardingProvider extends SingletonProvider
+	public class ForwardingProvider implements IProvider
 	{
+		private var _providerId:*;
+		
 		/**
-		 * @param providerType The class of the custom provider
+		 * @param providerId The custom ID, Class or qualifiedClassName of the custom provider
 		 */
-		public function ForwardingProvider(providerType:Class) 
+		public function ForwardingProvider(providerId:*) 
 		{
-			super(providerType);
+			_providerId = providerId;
 		}
 		
 		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
-		override public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
-			return super.provide(activeAlchemist, activeRecipe).provide(activeAlchemist, activeRecipe);
+			return activeAlchemist.conjure(_providerId, activeRecipe).provide(activeAlchemist, activeRecipe);
+		}
+		
+		public function destroy(provision:*):* 
+		{
+			return activeAlchemist.conjure(_providerId, activeRecipe).destroy(provision);
 		}
 		
 	}

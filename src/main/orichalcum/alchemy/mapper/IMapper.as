@@ -5,7 +5,7 @@ package orichalcum.alchemy.mapper
 	{
 		function to(providerValueOrReference:*):IMapper;
 		function toValue(value:*):IMapper;
-		function toReference(id:String):IMapper;
+		function toReference(id:*):IMapper;
 		function toPrototype(type:Class):IMapper;
 		function toSingleton(type:Class):IMapper;
 		function toPool(type:Class):IMapper;

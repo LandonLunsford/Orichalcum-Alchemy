@@ -44,7 +44,7 @@ package orichalcum.alchemy.mapper
 			return to(value(any));
 		}
 		
-		public function toReference(id:String):IMapper
+		public function toReference(id:*):IMapper
 		{
 			return to(reference(id));
 		}

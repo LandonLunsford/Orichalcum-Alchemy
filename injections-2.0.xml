@@ -20,15 +20,15 @@
 	
 	<!-- 
 		AbstractClass Mapping
-		AS3:	alchemist.map(AbstractClass).toPrototype(ConcreteClass);
+		AS3:	alchemist.map(AbstractClass).toReference(ConcreteClass);
 	-->
-	<injection name="orichalcum.example::AbstractClass" type="orichalcum.example::ConcreteClass"/>
+	<injection name="orichalcum.example::AbstractClass" value="{orichalcum.example::ConcreteClass}"/>
 	
 	<!-- 
 		Interface Mapping
-		AS3:	alchemist.map(Interface).toPrototype(Implementation);
+		AS3:	alchemist.map(Interface).toReference(Implementation);
 	-->
-	<injection name="orichalcum.example::Interface" type="orichalcum.example::Implementation"/>
+	<injection name="orichalcum.example::Interface" value="{orichalcum.example::Implementation}"/>
 	
 	<!-- 
 		Singleton Mappings
@@ -65,13 +65,13 @@
 
 	<!-- 
 		Instance Mapping
-		AS3:	alchemist.map('orichalcum.example.instance').toType(TypeOfTheInstance);
+		AS3:	alchemist.map('orichalcum.example.instance').toSingleton(TypeOfTheInstance);
 	-->
 	<injection name="orichalcum.example.instance" type="orichalcum.example::TypeOfTheInstance"/>
 
 	<!-- 
 		Mapping with Recipe
-		AS3:	alchemist.map(Matrix)
+		AS3:	alchemist.map(Matrix).asSingleton()
 				.withConstructorArgument(1)
 				.withConstructorArgument(reference('orichalcum.example.reference'))
 				.withProperty('c', 2)
@@ -106,7 +106,7 @@
 		(You probably wont find yourself using this much but it was made available anyway)
 		Note:	MainViewMediator implements IEventDispatcher
 			MainView extends Sprite
-		AS3:	alchemist.map(MainViewMediator) 
+		AS3:	alchemist.map(MainViewMediator).asSingleton()
 				.withProperty('view', type(MainView))
 				.withEventHandler('complete', 'onComplete')
 				.withEventHandler('click', 'view_onClick', 'view')

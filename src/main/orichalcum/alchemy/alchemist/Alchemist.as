@@ -6,8 +6,8 @@ package orichalcum.alchemy.alchemist
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.mapper.IMapper;
-	import orichalcum.alchemy.mapper.Mapper;
+	import orichalcum.alchemy.mapper.AlchemyMapper;
+	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.metatag.bundle.IMetatagBundle;
 	import orichalcum.alchemy.metatag.bundle.StandardMetatagBundle;
 	import orichalcum.alchemy.provider.IProvider;
@@ -158,9 +158,9 @@ package orichalcum.alchemy.alchemist
 		
 		/* INTERFACE orichalcum.alchemy.alchemist.IAlchemist */
 
-		public function map(id:*):IMapper
+		public function map(id:*):IAlchemyMapper
 		{
-			return new Mapper(_reflector, getValidId(id), _providers, _recipes);
+			return new AlchemyMapper(_reflector, getValidId(id), _providers, _recipes);
 		}
 		
 		public function conjure(id:*, recipe:Recipe = null):*

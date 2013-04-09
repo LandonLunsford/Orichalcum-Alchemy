@@ -3,7 +3,6 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.isTrue;
 	import org.hamcrest.object.strictlyEqualTo;
-	import orichalcum.alchemy.provider.factory.provider;
 	import orichalcum.alchemy.provider.IProvider;
 	import orichalcum.alchemy.recipe.Recipe;
 

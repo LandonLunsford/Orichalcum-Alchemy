@@ -67,12 +67,12 @@
 	<!--
 		Recipe Mapping
 		AS3:	alchemist.map(Matrix)
-			.withConstructorArgument(1)
-			.withConstructorArgument(reference('orichalcum.example.reference'))
-			.withProperty('c', 2)
-			.withProperty('d', reference('orichalcum.example.reference'))
-			.withPostConstruct('inverse')
-			.withPreDestroy('identity');
+				.withConstructorArgument(1)
+				.withConstructorArgument(reference('orichalcum.example.reference'))
+				.withProperty('c', 2)
+				.withProperty('d', reference('orichalcum.example.reference'))
+				.withPostConstruct('inverse')
+				.withPreDestroy('identity')
 	-->
 	<map id="flash.geom::Matrix">
 		
@@ -116,7 +116,7 @@
 		
 		<!-- EventHandler Mapping (target == view) -->
 		<event-handler name="view_onClick" event="click" target="view"/>
-
+		
 		<!--
 			EventHandler Mapping with Custom Parameters
 			AS3 event handler:	public function view_onMouseOver(mouseX:Number, mouseY:Number):void

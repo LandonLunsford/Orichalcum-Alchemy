@@ -12,7 +12,7 @@ package orichalcum.alchemy.mapper
 	import orichalcum.reflection.IReflector;
 	import orichalcum.utility.StringUtil;
 
-	public class Mapper implements IMapper
+	public class AlchemyMapper implements IAlchemyMapper
 	{
 		private var _reflector:IReflector;
 		private var _id:String;
@@ -22,7 +22,7 @@ package orichalcum.alchemy.mapper
 		private var _constructorArgumentIndex:int;
 		
 		
-		public function Mapper(reflector:IReflector, id:String, providers:Dictionary, recipes:Dictionary) 
+		public function AlchemyMapper(reflector:IReflector, id:String, providers:Dictionary, recipes:Dictionary) 
 		{
 			_reflector = reflector;
 			_id = id;
@@ -32,61 +32,61 @@ package orichalcum.alchemy.mapper
 		
 		/* INTERFACE orichalcum.alchemy.mapper.IMapper */
 		
-		public function to(providerValueOrReference:*):IMapper
+		public function to(providerValueOrReference:*):IAlchemyMapper
 		{
 			_providers[_id] && onProviderOverwrite(_id);
 			_providers[_id] = providerValueOrReference;
 			return this;
 		}
 		
-		public function toValue(any:*):IMapper
+		public function toValue(any:*):IAlchemyMapper
 		{
 			return to(value(any));
 		}
 		
-		public function toReference(id:*):IMapper
+		public function toReference(id:*):IAlchemyMapper
 		{
 			return to(reference(id));
 		}
 		
-		public function asPrototype():IMapper
+		public function asPrototype():IAlchemyMapper
 		{
 			return toPrototype(getClass(_id));
 		}
 		
-		public function toPrototype(clazz:Class):IMapper
+		public function toPrototype(clazz:Class):IAlchemyMapper
 		{
 			return to(type(clazz));
 		}
 		
-		public function asSingleton():IMapper
+		public function asSingleton():IAlchemyMapper
 		{
 			return toSingleton(getClass(_id));
 		}
 		
-		public function toSingleton(type:Class):IMapper
+		public function toSingleton(type:Class):IAlchemyMapper
 		{
 			return to(singleton(type));
 		}
 		
-		public function asPool():IMapper
+		public function asPool():IAlchemyMapper
 		{
 			return toPool(getClass(_id));
 		}
 		
-		public function toPool(type:Class):IMapper
+		public function toPool(type:Class):IAlchemyMapper
 		{
 			return to(pool(type));
 		}
 		
-		public function withConstructorArguments(...args):IMapper 
+		public function withConstructorArguments(...args):IAlchemyMapper 
 		{
 			for (var i:int = 0; i < args.length; i++)
 				withConstructorArgument(args[i], i);
 			return this;
 		}
 		
-		public function withConstructorArgument(value:*, index:int = -1):IMapper 
+		public function withConstructorArgument(value:*, index:int = -1):IAlchemyMapper 
 		{
 			if (index < 0 || index >= _constructorArgumentIndex)
 				index = _constructorArgumentIndex++;
@@ -95,32 +95,32 @@ package orichalcum.alchemy.mapper
 			return this;
 		}
 		
-		public function withProperties(properties:Object):IMapper 
+		public function withProperties(properties:Object):IAlchemyMapper 
 		{
 			for (var propertyName:String in properties)
 				withProperty(propertyName, properties[propertyName]);
 			return this;
 		}
 		
-		public function withProperty(name:String, value:*):IMapper 
+		public function withProperty(name:String, value:*):IAlchemyMapper 
 		{
 			recipe.properties[name] = value;
 			return this;
 		}
 		
-		public function withPostConstruct(value:String):IMapper 
+		public function withPostConstruct(value:String):IAlchemyMapper 
 		{
 			recipe.postConstruct = value;
 			return this;
 		}
 		
-		public function withPreDestroy(value:String):IMapper 
+		public function withPreDestroy(value:String):IAlchemyMapper 
 		{
 			recipe.preDestroy = value;
 			return this;
 		}
 		
-		public function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:uint = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false):IMapper 
+		public function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:uint = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false):IAlchemyMapper 
 		{
 			recipe.eventHandlers.push(new EventHandler(type, listener, target, priority, useCapture, stopPropagation, stopImmediatePropagation));
 			return this;

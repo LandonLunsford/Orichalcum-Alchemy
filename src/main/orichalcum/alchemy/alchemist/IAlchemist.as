@@ -1,7 +1,7 @@
 package orichalcum.alchemy.alchemist 
 {
 	import orichalcum.alchemy.evaluator.IEvaluator;
-	import orichalcum.alchemy.mapper.IMapper;
+	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.metatag.bundle.IMetatagBundle;
 	import orichalcum.alchemy.recipe.Recipe;
 	
@@ -12,9 +12,9 @@ package orichalcum.alchemy.alchemist
 		 * Maps the ID specified to a provider, recipe or mediator.
 		 * @param	id Custom name, class or qualified class name
 		 * @return	Provider, recipe and mediator mapper
-		 * @see		orichalcum.alchemy.mapper.IMapper
+		 * @see		orichalcum.alchemy.mapper.IAlchemyMapper
 		 */
-		function map(id:*):IMapper;
+		function map(id:*):IAlchemyMapper;
 		
 		/**
 		 * Gets or creates an injected object of the type mapped to the ID

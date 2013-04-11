@@ -1,68 +1,74 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+	Example XML-configured alchemy mappings
+	
+	Class IDs are written using "package.name::Class" notation.
+	Custom IDs are written using "custom.namespace.member" notation.
+-->
 <alchemy>
 	
 	<!--
 		Value Mappings
-		AS3:	alchemist.map('orichalcum.example.value').to(3.14);
+		AS3:	alchemist.map('example.value').to(3.14);
 	-->
-	<map id="orichalcum.example.value" to="3.14"/>
-	<map id="orichalcum.example.value" to-value="3.14"/>
+	<map id="example.value" to="3.14"/>
+	<map id="example.value" to-value="3.14"/>
 	
 	<!--
 		Reference Mappings
-		AS3:	alchemist.map('orichalcum.example.reference').toReference('orichalcum.example.value');
+		AS3:	alchemist.map('example.reference').toReference('example.value');
 	-->
-	<map id="orichalcum.example.reference" to="{orichalcum.example.value}"/>
-	<map id="orichalcum.example.reference" to-reference="orichalcum.example.value"/>
+	<map id="example.reference" to="{example.value}"/>
+	<map id="example.reference" to-reference="example.value"/>
 	
 	<!--
 		Singleton Mappings
 		AS3:	alchemist.map(Singleton).asSingleton();
-			alchemist.map('orichalcum.example.singleton').toSingleton(Singleton);
+			alchemist.map('example.singleton-instance').toSingleton(Singleton);
 	-->
-	<map id="orichalcum.example::Singleton" as-singleton/>
-	<map id="orichalcum.example.singleton" to-singleton="orichalcum.example::Singleton"/>
+	<map id="example::Singleton" to-provider="singleton"/>
+	<map id="example.singleton-instance" to-singleton="example::Singleton"/>
 	
 	<!--
 		Prototype Mappings
 		AS3:	alchemist.map(Prototype).asPrototype();
-			alchemist.map('orichalcum.example.prototype').toSingleton(Prototype);
+			alchemist.map('example.prototype-instance').toPrototype(Prototype);
 	-->
-	<map id="orichalcum.example::Singleton" as-prototype/>
-	<map id="orichalcum.example.prototype" to-prototype="orichalcum.example::Prototype"/>
+	<map id="example::Prototype" to-provider="prototype"/>
+	<map id="example.prototype-instance" to-prototype="example::Prototype"/>
 	
 	<!--
 		Pool Mappings
-		AS3:	alchemist.map(Pool).asPrototype();
-			alchemist.map('orichalcum.example.pool').toSingleton(Pool);
+		AS3:	alchemist.map(Pool).asPool();
+			alchemist.map('example.pooled-instance').toPool(Pool);
 	-->
-	<map id="orichalcum.example::Pool" as-pool/>
-	<map id="orichalcum.example.pool" to-pool="orichalcum.example::Pool"/>
+	<map id="example::Pool" to-provider="pool"/>
+	<map id="example.pooled-instance" to-pool="example::Pool"/>
 	
 	<!--
 		Provider Mapping
 		AS3:	alchemist.map(Provision).toProvider(new Provider);
 		Note:	the active alchemist will conjure the class provided in "to-provider" so you may map it if you like.
 	-->
-	<map id="orichalcum.example::Provision" to-provider="orichalcum.example::Provider"/>
+	<map id="example::Provision" to-provider="example::Provider"/>
 	
 	<!--
 		Factory Mapping
 		AS3:	alchemist.map(Provision).toFactory(Factory.functionName);
 	-->
-	<map id="orichalcum.example::Provision" to-factory="orichalcum.example::Factory#functionName"/><!-- AS doc style -->
+	<map id="example::Provision" to-factory="example::Factory#functionName"/><!-- AS doc style -->
        
 	<!--
 		AbstractClass Mapping
 		AS3:	alchemist.map(AbstractClass).toReference(ConcreteClass);
 	-->
-	<map id="orichalcum.example::AbstractClass" to-reference="orichalcum.example::ConcreteClass"/>
+	<map id="example::AbstractClass" to-reference="example::ConcreteClass"/>
 	
 	<!--
 		Interface Mapping
 		AS3:	alchemist.map(Interface).toReference(Implementation);
 	-->
-	<map id="orichalcum.example::Interface" to-reference="orichalcum.example::Implementation"/>
+	<map id="example.package::Interface" to-reference="example::Implementation"/>
 	
 	<!--
 		Recipe Mapping
@@ -80,16 +86,16 @@
 		<constructor-argument value="1"/>
 		
 		<!-- Constructor Argument Reference Mapping -->
-		<constructor-argument value="{orichalcum.example.reference}"/>
+		<constructor-argument value="{example.reference}"/>
 		
 		<!-- Property Value Mapping -->
 		<property name="c" value="2"/>
 		
 		<!-- Property Reference Mapping -->
-		<property name="d" value="{orichalcum.example.reference}"/>
+		<property name="d" value="{example.reference}"/>
 		
 		<!-- PostConstruct Mapping -->
-		<post-construct name="inverse"/>
+		<post-construct name="invert"/>
 		
 		<!-- PreDestroy Mapping -->
 		<pre-destroy name="identity"/>
@@ -100,40 +106,73 @@
 		(You probably wont find yourself using this much but it was made available anyway)
 		Note:	MainViewMediator implements IEventDispatcher
 			MainView extends Sprite
-		AS3:	alchemist.map(MainViewMediator)
+		AS3:
+		Method 1 (Runtime configuration):
+			
+			alchemist.map(MainViewMediator)
 				.withProperty('view', type(MainView))
 				.withEventHandler('complete', 'onComplete')
 				.withEventHandler('click', 'view_onClick', 'view')
 				.withEventHandler('mouseover', 'view_onMouseOver', 'view')
+				.withEventHandler('mouseout', 'view_mouseOutHandler', 'view')
+				.withEventHandler('mousedown', 'view_mouseDownHandler', 'view')
+				.withEventHandler('mouseup', 'view_mouseUpHandler', 'view')
+				.withEventHandler('mousewheel', 'view_mouseWheelHandler', 'view')
+				
+		Method 2 (Compiletime configuration):
+		
+		public class MainViewMediator
+		{
+			[Inject]
+			public var view:MainView;
+			
+			[EventHander(event="complete")]
+			public function completeHandler():void {}
+			
+			[EventHander(event="click", target="view")]
+			public function view_clickHandler():void {}
+			
+			[EventHander(event="mouseover", target="view")]
+			public function view_mouseOverHandler(mouseX:Number, mouseY:Number):void {}
+			
+			[EventHander(event="mouseout", target="view", priority="5")]
+			public function view_mouseOutHandler():void {}
+			
+			[EventHander(event="mousedown", target="view", useCapture)]
+			public function view_mouseDownHandler():void {}
+			
+			[EventHander(event="mouseup", target="view", stopPropagation)]
+			public function view_mouseUpHandler():void {}
+			
+			[EventHander(event="mousewheel", target="view", stopImmediatePropagation)]
+			public function view_mouseWheelHandler():void {}
+		}
 	-->
 	<map id="orichalcum.example::MainViewMediator">
 		
 		<!-- Type-Reference Mapping -->
-		<property name="view" value="{orichalcum.example::MainView}"/>
+		<property name="view" value="{example::MainView}"/>
 		
 		<!-- EventHandler Mapping (target == this) -->
-		<event-handler name="onComplete" event="complete"/>
+		<event-handler event="complete" name="completeHandler"/>
 		
 		<!-- EventHandler Mapping (target == view) -->
-		<event-handler name="view_onClick" event="click" target="view"/>
+		<event-handler event="click" name="view_clickHandler" target="view"/>
 		
-		<!--
-			EventHandler Mapping with Custom Parameters
-			AS3 event handler:	public function view_onMouseOver(mouseX:Number, mouseY:Number):void
-		-->
-		<event-handler name="view_mouseOverHandler" event="mouseover" target="view" parameters="mouseX,mouseY"/>
+		<!-- EventHandler Mapping with Custom Parameters -->
+		<event-handler event="mouseover" name="view_mouseOverHandler" target="view" parameters="mouseX,mouseY"/>
 		
 		<!-- EventHandler Mapping with priority -->
-		<event-handler name="view_mouseOutHandler"  event="mouseout"target="view" priority="5"/>
+		<event-handler event="mouseout" name="view_mouseOutHandler" target="view" priority="5"/>
 		
 		<!-- EventHandler Mapping with useCapture -->
-		<event-handler name="view_mouseDownHandler" event="mousedown" target="view" useCapture/>
+		<event-handler event="mousedown" name="view_mouseDownHandler" target="view" useCapture="true"/>
 		
 		<!-- EventHandler Mapping with stopPropagation -->
-		<event-handler name="view_mouseUpHandler" event="mouseup" target="view" stopPropagation/>
+		<event-handler event="mouseup" name="view_mouseUpHandler" target="view" stopPropagation="true"/>
 		
 		<!-- EventHandler Mapping with stopImmediatePropagation -->
-		<event-handler name="view_mouseWheelHandler" event="mousewheel" target="view" stopImmediatePropagation/>
+		<event-handler event="mousewheel" name="view_mouseWheelHandler" target="view" stopImmediatePropagation="true"/>
 	</map>
 	
 </alchemy>

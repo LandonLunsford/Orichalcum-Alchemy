@@ -6,6 +6,7 @@ package orichalcum.alchemy.provider
 	public class ForwardingProvider implements IProvider
 	{
 		private var _providerId:*;
+		private var _provider:IProvider;
 		
 		/**
 		 * @param providerId The custom ID, Class or qualifiedClassName of the custom provider
@@ -13,18 +14,20 @@ package orichalcum.alchemy.provider
 		public function ForwardingProvider(providerId:*) 
 		{
 			_providerId = providerId;
+			_provider = null;
 		}
 		
 		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
 		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
-			return activeAlchemist.conjure(_providerId, activeRecipe).provide(activeAlchemist, activeRecipe);
+			_provider = activeAlchemist.conjure(_providerId, activeRecipe);
+			return _provider.provide(activeAlchemist, activeRecipe);
 		}
 		
 		public function destroy(provision:*):* 
 		{
-			return activeAlchemist.conjure(_providerId, activeRecipe).destroy(provision);
+			return _provider.destroy(provision);
 		}
 		
 	}

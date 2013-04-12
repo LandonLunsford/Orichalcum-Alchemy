@@ -63,7 +63,6 @@
 			<artifactId>flexunit</artifactId>
 			<version>${flexunit.version}</version>
 			<type>swc</type>
-			<classifier>as3</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -71,14 +70,13 @@
 			<artifactId>hamcrest-as3</artifactId>
 			<version>${hamcrest.version}</version>
 			<type>swc</type>
-			<classifier>as3</classifier>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test</testSourceDirectory>
+		<sourceDirectory>src/main</sourceDirectory>
+		<testSourceDirectory>src/test</testSourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.sonatype.flexmojos</groupId>
@@ -98,7 +96,7 @@
 						<warn-no-constructor>false</warn-no-constructor>
 					</compilerWarnings>
 					<includeTestFiles>
-						<includeTestFile>org/swiftsuspenders/suites/SwiftSuspendersTestSuite.as</includeTestFile>
+						<includeTestFile>suite/TestSuite.as</includeTestFile>
 					</includeTestFiles>
 				</configuration>
 				<dependencies>

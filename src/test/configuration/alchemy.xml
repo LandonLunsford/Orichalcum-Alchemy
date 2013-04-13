@@ -6,21 +6,21 @@
 	Custom IDs are written using "custom.namespace.member" notation.
 -->
 <alchemy>
-	
+
 	<!--
 		Value Mappings
 		AS3:	alchemist.map('example.value').to(3.14);
 	-->
 	<map id="example.value" to="3.14"/>
 	<map id="example.value" to-value="3.14"/>
-	
+
 	<!--
 		Reference Mappings
 		AS3:	alchemist.map('example.reference').toReference('example.value');
 	-->
 	<map id="example.reference" to="{example.value}"/>
 	<map id="example.reference" to-reference="example.value"/>
-	
+
 	<!--
 		Singleton Mappings
 		AS3:	alchemist.map(Singleton).asSingleton();
@@ -28,7 +28,7 @@
 	-->
 	<map id="example::Singleton" to-provider="singleton"/>
 	<map id="example.singleton-instance" to-singleton="example::Singleton"/>
-	
+
 	<!--
 		Prototype Mappings
 		AS3:	alchemist.map(Prototype).asPrototype();
@@ -36,7 +36,7 @@
 	-->
 	<map id="example::Prototype" to-provider="prototype"/>
 	<map id="example.prototype-instance" to-prototype="example::Prototype"/>
-	
+
 	<!--
 		Pool Mappings
 		AS3:	alchemist.map(Pool).asPool();
@@ -44,14 +44,14 @@
 	-->
 	<map id="example::Pool" to-provider="pool"/>
 	<map id="example.pooled-instance" to-pool="example::Pool"/>
-	
+
 	<!--
 		Provider Mapping
 		AS3:	alchemist.map(Provision).toProvider(new Provider);
 		Note:	the active alchemist will conjure the class provided in "to-provider" so you may map it if you like.
 	-->
 	<map id="example::Provision" to-provider="example::Provider"/>
-	
+
 	<!--
 		Factory Mapping
 		AS3:	alchemist.map(Provision).toFactory(Factory.functionName);
@@ -63,13 +63,13 @@
 		AS3:	alchemist.map(AbstractClass).toReference(ConcreteClass);
 	-->
 	<map id="example::AbstractClass" to-reference="example::ConcreteClass"/>
-	
+
 	<!--
 		Interface Mapping
 		AS3:	alchemist.map(Interface).toReference(Implementation);
 	-->
 	<map id="example.package::Interface" to-reference="example::Implementation"/>
-	
+
 	<!--
 		Recipe Mapping
 		AS3:	alchemist.map(Matrix)
@@ -81,26 +81,26 @@
 				.withPreDestroy('identity')
 	-->
 	<map id="flash.geom::Matrix">
-		
+
 		<!-- Constructor Argument Value Mapping -->
 		<constructor-argument value="1"/>
-		
+
 		<!-- Constructor Argument Reference Mapping -->
 		<constructor-argument value="{example.reference}"/>
-		
+
 		<!-- Property Value Mapping -->
-		<property name="c" value="2"/>
-		
+		<property c="2"/>
+
 		<!-- Property Reference Mapping -->
-		<property name="d" value="{example.reference}"/>
-		
+		<property d="{example.reference}"/>
+
 		<!-- PostConstruct Mapping -->
 		<post-construct name="invert"/>
-		
+
 		<!-- PreDestroy Mapping -->
 		<pre-destroy name="identity"/>
 	</map>
-	
+
 	<!--
 		Recipe Mapping with Event Handlers
 		(You probably wont find yourself using this much but it was made available anyway)
@@ -149,30 +149,74 @@
 		}
 	-->
 	<map id="orichalcum.example::MainViewMediator">
+
+		<constructor-argument value=""/>
+		
 		
 		<!-- Type-Reference Mapping -->
-		<property name="view" value="{example::MainView}"/>
-		
-		<!-- EventHandler Mapping (target == this) -->
-		<event-handler event="complete" name="completeHandler"/>
-		
-		<!-- EventHandler Mapping (target == view) -->
-		<event-handler event="click" name="view_clickHandler" target="view"/>
-		
+		<property view="{example::MainView}"/>
+
+		<!-- EventHandler Mapping with target equal to this -->
+		<event-handler complete="completeHandler"/>
+		<event-handler this.complete="completeHandler"/>
+
+		<!-- EventHandler Mapping with target equal to view -->
+		<event-handler view.click="view_clickHandler"/>
+
 		<!-- EventHandler Mapping with Custom Parameters -->
-		<event-handler event="mouseover" name="view_mouseOverHandler" target="view" parameters="mouseX,mouseY"/>
-		
+		<event-handler view.mouseover="view_mouseOverHandler(mouseX,mouseY)"/>
+
 		<!-- EventHandler Mapping with priority -->
-		<event-handler event="mouseout" name="view_mouseOutHandler" target="view" priority="5"/>
-		
+		<event-handler view.mouseout="view_mouseOutHandler" priority="5"/>
+
 		<!-- EventHandler Mapping with useCapture -->
-		<event-handler event="mousedown" name="view_mouseDownHandler" target="view" useCapture="true"/>
-		
+		<event-handler view.mousedown="view_mouseDownHandler" useCapture="true"/>
+
 		<!-- EventHandler Mapping with stopPropagation -->
-		<event-handler event="mouseup" name="view_mouseUpHandler" target="view" stopPropagation="true"/>
-		
+		<event-handler view.mouseup="view_mouseUpHandler" stopPropagation="true"/>
+
 		<!-- EventHandler Mapping with stopImmediatePropagation -->
-		<event-handler event="mousewheel" name="view_mouseWheelHandler" target="view" stopImmediatePropagation="true"/>
+		<event-handler view.mousewheel="view_mouseWheelHandler" stopImmediatePropagation="true"/>
+		
+		<!-- 
+			DEV NOTES:
+			Parsing algorithm for new event-handler notation
+			for each(var attribute:XML in eh.attributes()) {
+				var name:String = attribute.name();
+				var value:String = attribute.toString();
+				
+				switch (name.toLowerCase()) {
+					case 'priority':
+						eventHandler.priority = int(value);
+						break;
+					case 'usecapture':
+						eventHandler.useCapture = value.length > 0 || XmlUtil.valueOf(attribute);
+						break;
+					case 'stoppropagation':
+						eventHandler.stopPropagation = value.length > 0 || XmlUtil.valueOf(attribute);
+						break;
+					case 'stopimmediatepropagation':
+						eventHandler.stopImmediatePropagation = value.length > 0 || XmlUtil.valueOf(attribute);
+						break;
+					default:
+						var nameSplitIndex:int = name.lastIndexOf('.');
+						if (nameSplitIndex < 0){
+							eventHandler.type = name;
+						} else {
+							eventHandler.type = name.substring(nameSplitIndex + 1);
+							eventHandler.targetPath = name.substring(0, nameSplitIndex);
+						}
+						
+						var paramSplitIndex:int = value.lastIndexOf('(');
+						if (paramSplitIndex < 0){
+							eventHandler.listenerName = value;
+						} else {
+							eventHandler.listenerName = value.substring(0, paramSplitIndex);
+							eventHandler.parameters = value.substring(paramSplitIndex).replace(/(\(|\)|\s)/gm,'').split(',');
+						}
+				}
+			}
+		-->
 	</map>
-	
+
 </alchemy>

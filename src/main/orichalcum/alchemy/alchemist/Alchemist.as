@@ -93,6 +93,13 @@ package orichalcum.alchemy.alchemist
 		 */
 		private var _parent:Alchemist;
 		
+		/**
+		 * @param mappings XML map commands
+		 */
+		public function Alchemist(mappings:XML = null)
+		{
+			mappings && mapAll(mappings);
+		}
 		
 		/**
 		 * Used to identify strings that represent references to other mappings
@@ -369,6 +376,11 @@ package orichalcum.alchemy.alchemist
 		private function returnRecipeFlyweight():void
 		{
 			_recipeFlyweightsIndex--;
+		}
+		
+		private function mapAll(mappings:XML):void 
+		{
+			
 		}
 		
 	}

@@ -10,9 +10,11 @@ Originally created as an internal IoC solution for Orichalcum Studios.
 Now available for the AS3 developer community under the [MIT License](https://github.com/LandonLunsford/Orichalcum-Alchemy/blob/master/license)
 <br>
 
-## Awesome Features
+## Features
 1.
-2.
+
+## Distinguishing Features
+1.
 
 ## Coming Soon
 1. User guide

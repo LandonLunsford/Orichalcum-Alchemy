@@ -57,7 +57,7 @@
 		AS3:	alchemist.map(Provision).toFactory(Factory.functionName);
 	-->
 	<map id="example::Provision" to-factory="example::Factory#functionName"/><!-- AS doc style -->
-       
+
 	<!--
 		AbstractClass Mapping
 		AS3:	alchemist.map(AbstractClass).toReference(ConcreteClass);
@@ -149,36 +149,33 @@
 		}
 	-->
 	<map id="orichalcum.example::MainViewMediator">
-
-		<constructor-argument value=""/>
-		
 		
 		<!-- Type-Reference Mapping -->
 		<property view="{example::MainView}"/>
-
+		
 		<!-- EventHandler Mapping with target equal to this -->
 		<event-handler complete="completeHandler"/>
 		<event-handler this.complete="completeHandler"/>
-
+		
 		<!-- EventHandler Mapping with target equal to view -->
 		<event-handler view.click="view_clickHandler"/>
-
+		
 		<!-- EventHandler Mapping with Custom Parameters -->
 		<event-handler view.mouseover="view_mouseOverHandler(mouseX,mouseY)"/>
-
+		
 		<!-- EventHandler Mapping with priority -->
 		<event-handler view.mouseout="view_mouseOutHandler" priority="5"/>
-
+		
 		<!-- EventHandler Mapping with useCapture -->
 		<event-handler view.mousedown="view_mouseDownHandler" useCapture="true"/>
-
+		
 		<!-- EventHandler Mapping with stopPropagation -->
 		<event-handler view.mouseup="view_mouseUpHandler" stopPropagation="true"/>
-
+		
 		<!-- EventHandler Mapping with stopImmediatePropagation -->
 		<event-handler view.mousewheel="view_mouseWheelHandler" stopImmediatePropagation="true"/>
 		
-		<!-- 
+		<!--
 			DEV NOTES:
 			Parsing algorithm for new event-handler notation
 			for each(var attribute:XML in eh.attributes()) {

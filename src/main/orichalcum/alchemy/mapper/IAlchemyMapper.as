@@ -1,7 +1,7 @@
-package orichalcum.alchemy.mapper 
+package orichalcum.alchemy.mapper
 {
 	
-	public interface IAlchemyMapper 
+	public interface IAlchemyMapper
 	{
 		function to(providerValueOrReference:*):IAlchemyMapper;
 		function toValue(value:*):IAlchemyMapper;
@@ -9,6 +9,13 @@ package orichalcum.alchemy.mapper
 		function toPrototype(type:Class):IAlchemyMapper;
 		function toSingleton(type:Class):IAlchemyMapper;
 		function toPool(type:Class):IAlchemyMapper;
+		
+		/**
+		 * Maps an id to a factory method
+		 * @param	factoryMethod function(alchemist:IAlchemist = null):* {}
+		 * @return	this mapper
+		 */
+		function toFactory(factoryMethod:Function):IAlchemyMapper;
 		function asPrototype():IAlchemyMapper;
 		function asSingleton():IAlchemyMapper;
 		function asPool():IAlchemyMapper;

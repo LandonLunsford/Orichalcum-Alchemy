@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
+	<xs:element name="alchemy">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="map" maxOccurs="unbounded" minOccurs="0">
+					<xs:complexType mixed="true">
+						<xs:sequence>
+							<xs:element name="constructor-argument" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:string" name="value" use="required" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="property" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:anyAttribute processContents="lax" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="post-construct" maxOccurs="1" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:string" name="name" use="required" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="pre-destroy" maxOccurs="1" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="xs:string" name="name" use="required" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="event-handler" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:anyAttribute processContents="lax" />
+										</xs:extension>
+									</xs:simpleContent>
+									
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute type="xs:string" name="id" use="required" />
+						<xs:attribute type="xs:string" name="to" use="optional" />
+						<xs:attribute type="xs:string" name="to-value" use="optional" />
+						<xs:attribute type="xs:string" name="to-reference" use="optional" />
+						<xs:attribute type="xs:string" name="to-provider" use="optional" />
+						<xs:attribute type="xs:string" name="to-singleton" use="optional" />
+						<xs:attribute type="xs:string" name="to-prototype" use="optional" />
+						<xs:attribute type="xs:string" name="to-pool" use="optional" />
+						<xs:attribute type="xs:string" name="to-factory" use="optional" />
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

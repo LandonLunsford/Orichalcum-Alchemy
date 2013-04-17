@@ -153,9 +153,11 @@
 		<!-- Type-Reference Mapping -->
 		<property view="{example::MainView}"/>
 		
-		<!-- EventHandler Mapping with target equal to this -->
+		<!--
+			EventHandler Mapping with target equal to this
+			identical to <event-handler this.complete="completeHandler"/>
+		-->
 		<event-handler complete="completeHandler"/>
-		<event-handler this.complete="completeHandler"/>
 		
 		<!-- EventHandler Mapping with target equal to view -->
 		<event-handler view.click="view_clickHandler"/>
@@ -175,45 +177,6 @@
 		<!-- EventHandler Mapping with stopImmediatePropagation -->
 		<event-handler view.mousewheel="view_mouseWheelHandler" stopImmediatePropagation="true"/>
 		
-		<!--
-			DEV NOTES:
-			Parsing algorithm for new event-handler notation
-			for each(var attribute:XML in eh.attributes()) {
-				var name:String = attribute.name();
-				var value:String = attribute.toString();
-				
-				switch (name.toLowerCase()) {
-					case 'priority':
-						eventHandler.priority = int(value);
-						break;
-					case 'usecapture':
-						eventHandler.useCapture = value.length > 0 || XmlUtil.valueOf(attribute);
-						break;
-					case 'stoppropagation':
-						eventHandler.stopPropagation = value.length > 0 || XmlUtil.valueOf(attribute);
-						break;
-					case 'stopimmediatepropagation':
-						eventHandler.stopImmediatePropagation = value.length > 0 || XmlUtil.valueOf(attribute);
-						break;
-					default:
-						var nameSplitIndex:int = name.lastIndexOf('.');
-						if (nameSplitIndex < 0){
-							eventHandler.type = name;
-						} else {
-							eventHandler.type = name.substring(nameSplitIndex + 1);
-							eventHandler.targetPath = name.substring(0, nameSplitIndex);
-						}
-						
-						var paramSplitIndex:int = value.lastIndexOf('(');
-						if (paramSplitIndex < 0){
-							eventHandler.listenerName = value;
-						} else {
-							eventHandler.listenerName = value.substring(0, paramSplitIndex);
-							eventHandler.parameters = value.substring(paramSplitIndex).replace(/(\(|\)|\s)/gm,'').split(',');
-						}
-				}
-			}
-		-->
 	</map>
 
 </alchemy>

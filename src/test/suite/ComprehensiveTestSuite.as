@@ -6,6 +6,7 @@ package suite
 	import orichalcum.alchemy.alchemist.EventHandlerTest;
 	import orichalcum.alchemy.alchemist.FactoryForwardingMappingTest;
 	import orichalcum.alchemy.alchemist.FactoryMappingTest;
+	import orichalcum.alchemy.alchemist.PoolMappingTest;
 	import orichalcum.alchemy.alchemist.PostConstructTest;
 	import orichalcum.alchemy.alchemist.PreDestroyTest;
 	import orichalcum.alchemy.alchemist.PrototypeMappingTest;
@@ -25,8 +26,8 @@ package suite
 	 * Bindee that doesnt impl IEventDispatcher
 	 */
 	[Suite]
-    [RunWith("org.flexunit.runners.Suite")]
-	public class ComprehensiveTestSuite 
+	[RunWith("org.flexunit.runners.Suite")]
+	public class ComprehensiveTestSuite
 	{
 		//public var alchemistExtensionTest:AlchemistExtensionTest;
 		//public var alchemistTest:AlchemistTest;
@@ -44,7 +45,7 @@ package suite
 		//public var factoryMappingTest:FactoryMappingTest;
 		//public var prototypeMappingTest:PrototypeMappingTest;
 		//public var singletonMappingTest:SingletonMappingTest;
-		//public var poolMappingTest:PoolMappingTest;
+		public var poolMappingTest:PoolMappingTest;
 		//
 		//public var emptyRecipeTest:EmptyRecipeTest;
 		//public var fullRecipeTest:FullRecipeTest;
@@ -52,10 +53,7 @@ package suite
 		//
 		//public var recipeFactoryTest:RecipeFactoryTest;
 		//
-		
-		public var xmlConfigurationMapperTest:XmlConfigurationMapperTest;
-		
-		
+		//public var xmlConfigurationMapperTest:XmlConfigurationMapperTest;
 		
 	}
 

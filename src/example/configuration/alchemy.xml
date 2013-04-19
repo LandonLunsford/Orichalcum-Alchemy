@@ -4,6 +4,8 @@
 	
 	Class IDs are written using "package.name::Class" notation.
 	Custom IDs are written using "custom.namespace.member" notation.
+	
+	MOVE TO EXAMPLE PROJECT ON GITHUB ?
 -->
 <alchemy>
 
@@ -12,14 +14,14 @@
 		AS3:	alchemist.map('example.value').to(3.14);
 	-->
 	<map id="example.value" to="3.14"/>
-	<map id="example.value" to-value="3.14"/>
+	<map id="example.value2" to-value="3.14"/>
 
 	<!--
 		Reference Mappings
 		AS3:	alchemist.map('example.reference').toReference('example.value');
 	-->
 	<map id="example.reference" to="{example.value}"/>
-	<map id="example.reference" to-reference="example.value"/>
+	<map id="example.reference2" to-reference="example.value"/>
 
 	<!--
 		Singleton Mappings
@@ -132,7 +134,7 @@
 			[EventHander(event="click", target="view")]
 			public function view_clickHandler():void {}
 			
-			[EventHander(event="mouseover", target="view")]
+			[EventHander(event="mouseover", target="view", parameters="mouseX,mouseY")]
 			public function view_mouseOverHandler(mouseX:Number, mouseY:Number):void {}
 			
 			[EventHander(event="mouseout", target="view", priority="5")]

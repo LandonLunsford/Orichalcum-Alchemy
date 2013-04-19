@@ -31,9 +31,11 @@ package orichalcum.alchemy.recipe.factory
 			_typeRecipes = new Dictionary;
 			
 			/**
-			 * Defensively priming cache
+			 * Defensively priming cache with basic types
 			 */
-			_typeRecipes['Object'] = new Recipe;
+			const basicTypes:Array = [Object, Array, Function, Class, Number, String, int, uint, Boolean];
+			for each(var type:Class in basicTypes)
+				_typeRecipes[_reflector.getTypeName(type)] = new Recipe;
 		}
 		
 		/* INTERFACE orichalcum.lifecycle.IDisposable */
@@ -84,17 +86,25 @@ package orichalcum.alchemy.recipe.factory
 		{
 			const typeDescription:XML = describeType(reflector.getType(qualifiedClassName));
 			const factory:XML = typeDescription.factory[0];
-			const superclass:String = factory.extendsClass.@type[0].toString();
+			const superclasses:XMLList = factory.extendsClass.@type;
 			
-			return _reflector.isNativeType(superclass)
+			/* 
+			 * Ideally I would like to do this somewhere else
+			 * But it is convenient and efficient to catch this error here.
+			 */
+			if (superclasses.length() == 0)
+				throw new AlchemyError('Alchemists cannot create "{0}" because it is an interface and cannot be instantiated.', qualifiedClassName);
+			
+			const superclassName:String = superclasses[0].toString();
+			return _reflector.isNativeType(superclassName)
 				? createRecipeFromFactory(qualifiedClassName, factory)
-				: getRecipeByClassName(superclass).clone().extend(createRecipeFromFactory(qualifiedClassName, factory));
+				: getRecipeByClassName(superclassName).clone().extend(createRecipeFromFactory(qualifiedClassName, factory));
 		}
 		
 		public function createRecipeFromFactory(typeName:String, typeFactory:XML):Recipe
 		{
 			const recipe:Recipe = new Recipe;
-
+			
 			addConstructorArguments(recipe, typeName, typeFactory);
 			addProperties(recipe, typeName, typeFactory);
 			

@@ -2,7 +2,6 @@ package orichalcum.alchemy.alchemist
 {
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
-	import orichalcum.alchemy.metatag.bundle.IMetatagBundle;
 	import orichalcum.alchemy.recipe.Recipe;
 	
 	public interface IAlchemist extends IEvaluator

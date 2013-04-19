@@ -2,6 +2,7 @@ package orichalcum.alchemy.alchemist
 {
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.IEventDispatcher;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -14,9 +15,9 @@ package orichalcum.alchemy.alchemist
 	import org.flexunit.assertThat;
 	import orichalcum.alchemy.alchemist.Alchemist;
 	import orichalcum.alchemy.alchemist.IAlchemist;
+	import orichalcum.alchemy.provider.factory.type;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.singleton;
-	import orichalcum.alchemy.provider.factory.type;
 	import orichalcum.alchemy.recipe.Recipe;
 	import subject.ClassWithAllMetatags;
 	import subject.ClassWithMemberAndSetterInject;
@@ -76,6 +77,12 @@ package orichalcum.alchemy.alchemist
 		public function testConjureUnmappedId():void
 		{
 			_alchemist.conjure('unmappedId');
+		}
+		
+		[Test(expects = "Error")]
+		public function testCreateInterface():void
+		{
+			_alchemist.create(IEventDispatcher);
 		}
 		
 		[Test]
@@ -169,6 +176,8 @@ package orichalcum.alchemy.alchemist
 			_alchemist.map(ClassWithPreDestroyMetatag).withPreDestroy('otherPreDestroy');
 			_alchemist.destroy(creation);
 		}
+		
+		
 		
 	}
 

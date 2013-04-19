@@ -1,9 +1,9 @@
 package 
 {
 	import flash.display.Sprite;
-	import flexunit.framework.TestSuite;
 	import org.flexunit.internals.TraceListener;
 	import org.flexunit.runner.FlexUnitCore;
+	import suite.ComprehensiveTestSuite;
 
 	public class TestRunner extends Sprite
 	{
@@ -11,7 +11,7 @@ package
 		{
 			const core:FlexUnitCore = new FlexUnitCore;
 			core.addListener(new TraceListener);
-			core.run(TestSuite);
+			core.run(ComprehensiveTestSuite);
 		}
 		
 	}

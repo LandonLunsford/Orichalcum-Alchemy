@@ -26,15 +26,7 @@ package orichalcum.alchemy.mapper
 		function withProperty(name:String, value:*):IAlchemyMapper;
 		function withPostConstruct(value:String):IAlchemyMapper;
 		function withPreDestroy(value:String):IAlchemyMapper;
-		function withEventHandler(
-			type:String
-			,listener:String
-			,target:String = null
-			,useCapture:Boolean = false
-			,priority:uint = 0
-			,stopPropagation:Boolean = false
-			,stopImmediatePropagation:Boolean = false
-			):IAlchemyMapper;
+		function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:int = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false, parameters:Array = null):IAlchemyMapper;
 	}
 
 }

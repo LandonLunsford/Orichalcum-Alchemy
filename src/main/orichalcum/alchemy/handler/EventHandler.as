@@ -19,26 +19,20 @@ package orichalcum.alchemy.handler
 		private var _targetPath:String;
 		private var _priority:int;
 		private var _useCapture:Boolean;
-		private var _parameters:Array;
 		private var _stopPropagation:Boolean;
 		private var _stopImmediatePropagation:Boolean;
+		private var _parameters:Array;
 		
-		public function EventHandler(
-			type:String = null
-			,listenerName:String = null
-			,target:String = null
-			,priority:int = 0
-			,useCapture:Boolean = false
-			,stopPrpagation:Boolean = false
-			,stopImmediatePropagation:Boolean = false)
+		public function EventHandler(type:String = null, listenerName:String = null, target:String = null, useCapture:Boolean = false, priority:int = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false, parameters:Array = null)
 		{
 			_type = type;
 			_listenerName = listenerName;
 			_targetPath = target;
-			_priority = priority;
 			_useCapture = useCapture;
+			_priority = priority;
 			_stopPropagation = stopPropagation;
 			_stopImmediatePropagation = stopImmediatePropagation;
+			_parameters = parameters;
 		}
 		
 		/* INTERFACE orichalcum.provizor.arm.IDisposable */
@@ -147,8 +141,8 @@ package orichalcum.alchemy.handler
 		public function toString():String
 		{
 			return StringUtil.substitute(
-				'<event-handler event="{0}" target="{1}" parameters="{2}" useCapture="{3}" stopPropagation="{4}" stopImmediatePropagation="{5}"/>'
-				, type, targetPath, parameters, useCapture, stopPropagation, stopImmediatePropagation);
+				'<event-handler event="{0}" listener="{1}" target="{2}" parameters="{3}" useCapture="{4}" priority="{5}" stopPropagation="{6}" stopImmediatePropagation="{7}"/>'
+				, type, listenerName, targetPath, parameters, useCapture, priority, stopPropagation, stopImmediatePropagation);
 		}
 		
 		public function handle(event:Event):void

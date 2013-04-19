@@ -5,9 +5,9 @@ package orichalcum.alchemy.error
 	public class AlchemyError extends Error
 	{
 		
-		public function AlchemyError(message:String, ...substitutions) 
+		public function AlchemyError(message:String = null, ...substitutions) 
 		{
-			super(StringUtil.substitute(message, substitutions));
+			super(StringUtil.substitute(message || '', substitutions));
 		}
 		
 	}

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+	Used to test XMLConfigurationMapper
+-->
+<alchemy>
+	
+	<!-- value mapping -->
+	<map id="implicitToValue" to="1.1"/>
+	<map id="explicitToValue" to-value="2.2"/>
+
+	<!-- reference mapping -->
+	<map id="implicitToReference" to="{implicitToValue}"/>
+	<map id="explicitToReference" to-reference="implicitToValue"/>
+
+	<!-- singleton mapping -->
+	<map id="flash.geom::Point" to-provider="singleton"/>
+	<map id="point.singleton.id" to-singleton="flash.geom::Point"/>
+
+	<!-- prototype mapping -->
+	<map id="flash.geom::Rectangle" to-provider="prototype"/>
+	<map id="rectangle.prototype.id" to-prototype="flash.geom::Rectangle"/>
+
+	<!-- pool mapping -->
+	<map id="flash.display::Sprite" to-provider="pool"/>
+	<map id="sprite.pool.id" to-pool="flash.display::Sprite"/>
+
+	<!-- provider mapping -->
+	<map id="provider.provision" to-provider="subject::Provider"/>
+
+	<!-- static factory -->
+	<map id="staticFactoryMethodProvision" to-factory="subject::Factory#staticFactoryMethod"/>
+	
+	<!-- instance method factory -->
+	<map id="instanceFactoryMethodProvision" to-factory="subject::Factory#instanceFactoryMethod"/>
+	
+	<!-- instance method by id factory -->
+	<map id="factory.id" to-reference="subject::Factory"/>
+	<map id="factory.provision.id" to-factory="factory.id#instanceFactoryMethod"/>
+
+	<!-- abstract class mapping -->
+	<map id="flash.display::DisplayObject" to-reference="flash.display::Bitmap"/>
+
+	<!-- interface class mapping -->
+	<map id="flash.events::IEventDispatcher" to-reference="flash.events::EventDispatcher"/>
+
+	<map id="flash.geom::Matrix">
+		<constructor-argument value="1"/>
+		<constructor-argument value="{implicitToValue}"/>
+		<property c="2"/>
+		<property d="{implicitToValue}"/>
+	</map>
+	
+	<map id="matrix.with.lifecycle.hooks" to-prototype="flash.geom::Matrix">
+		<property a="0.5"/>
+		<property b="0"/>
+		<property c="0"/>
+		<property d="0.5"/>
+		<post-construct name="invert"/>
+		<pre-destroy name="identity"/>
+	</map>
+		
+	<map id="subject::MainViewMediator">
+		
+		<property view="{subject::MainView}"/>
+		
+		<!--
+			EventHandler Mapping with target equal to this
+			identical to <event-handler this.complete="completeHandler"/>
+		-->
+		<event-handler complete="completeHandler"/>
+		
+		<!-- EventHandler Mapping with target equal to view -->
+		<event-handler view.click="view_clickHandler"/>
+		
+		<!-- EventHandler Mapping with Custom Parameters -->
+		<event-handler view.mouseOver="view_mouseOverHandler(mouseX,mouseY)"/>
+		
+		<!-- EventHandler Mapping with priority -->
+		<event-handler view.mouseOut="view_mouseOutHandler" priority="5"/>
+		
+		<!-- EventHandler Mapping with useCapture -->
+		<event-handler view.mouseDown="view_mouseDownHandler" useCapture="true"/>
+		
+		<!-- EventHandler Mapping with stopPropagation -->
+		<event-handler view.mouseUp="view_mouseUpHandler" stopPropagation="true"/>
+		
+		<!-- EventHandler Mapping with stopImmediatePropagation -->
+		<event-handler view.mouseWheel="view_mouseWheelHandler" stopImmediatePropagation="true"/>
+		
+	</map>
+
+</alchemy>

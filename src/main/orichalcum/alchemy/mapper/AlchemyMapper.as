@@ -3,6 +3,7 @@ package orichalcum.alchemy.mapper
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.handler.EventHandler;
+	import orichalcum.alchemy.provider.factory.factory;
 	import orichalcum.alchemy.provider.factory.pool;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.singleton;
@@ -79,6 +80,11 @@ package orichalcum.alchemy.mapper
 			return to(pool(type));
 		}
 		
+		public function toFactory(factoryMethod:Function):IAlchemyMapper
+		{
+			return to(factory(factoryMethod));
+		}
+		
 		public function withConstructorArguments(...args):IAlchemyMapper 
 		{
 			for (var i:int = 0; i < args.length; i++)
@@ -120,9 +126,9 @@ package orichalcum.alchemy.mapper
 			return this;
 		}
 		
-		public function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:uint = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false):IAlchemyMapper 
+		public function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:int = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false, parameters:Array = null):IAlchemyMapper 
 		{
-			recipe.eventHandlers.push(new EventHandler(type, listener, target, priority, useCapture, stopPropagation, stopImmediatePropagation));
+			recipe.eventHandlers.push(new EventHandler(type, listener, target, useCapture, priority, stopPropagation, stopImmediatePropagation, parameters));
 			return this;
 		}
 		

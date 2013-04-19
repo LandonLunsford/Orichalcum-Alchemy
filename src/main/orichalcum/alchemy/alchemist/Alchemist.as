@@ -1,7 +1,5 @@
 package orichalcum.alchemy.alchemist 
 {
-	import flash.display.DisplayObject;
-	import flash.events.Event;
 	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;

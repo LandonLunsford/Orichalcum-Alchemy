@@ -3,11 +3,12 @@ package orichalcum.alchemy.alchemist
 	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
+	import orichalcum.alchemy.configuration.xml.mapper.XmlConfigurationMapper;
 	import orichalcum.alchemy.error.AlchemyError;
+	import orichalcum.alchemy.language.bundle.ILanguageBundle;
+	import orichalcum.alchemy.language.bundle.LanguageBundle;
 	import orichalcum.alchemy.mapper.AlchemyMapper;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
-	import orichalcum.alchemy.metatag.bundle.IMetatagBundle;
-	import orichalcum.alchemy.metatag.bundle.StandardMetatagBundle;
 	import orichalcum.alchemy.provider.IProvider;
 	import orichalcum.alchemy.recipe.factory.RecipeFactory;
 	import orichalcum.alchemy.recipe.Recipe;
@@ -17,7 +18,6 @@ package orichalcum.alchemy.alchemist
 	
 	public class Alchemist implements IDisposable, IAlchemist
 	{
-		
 		/**
 		 * Reflection utility
 		 * @private
@@ -25,26 +25,22 @@ package orichalcum.alchemy.alchemist
 		static private var _reflector:IReflector = Reflector.getInstance(ApplicationDomain.currentDomain);
 		
 		/**
+		 * Parsing rules
+		 * @private
+		 */
+		static private var _languageBundle:ILanguageBundle = new LanguageBundle;
+		
+		/**
 		 * Generates recipes based on class metatags
 		 * @private
 		 */
-		static private var _recipeFactory:RecipeFactory = new RecipeFactory(_reflector, new StandardMetatagBundle);
+		static private var _recipeFactory:RecipeFactory = new RecipeFactory(_reflector, _languageBundle);
 		
 		/**
 		 * Creates, injects, binds, unbinds, unjects and destroys instances
 		 * @private
 		 */
 		static private var _instanceFactory:InstanceFactory = new InstanceFactory;
-		
-		/**
-		 * @private
-		 */
-		static private var _expressionQualifier:RegExp = /^{.*}$/;
-		
-		/**
-		 * @private
-		 */
-		static private var _expressionRemovals:RegExp = /{|}|\s/gm;
 		
 		/**
 		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
@@ -92,54 +88,23 @@ package orichalcum.alchemy.alchemist
 		private var _parent:Alchemist;
 		
 		/**
-		 * @param mappings XML map commands
+		 * @param list of XML mapping configurations
 		 */
-		public function Alchemist(mappings:XML = null)
+		public function Alchemist(...mappings)
 		{
 			mappings && mapAll(mappings);
 		}
 		
-		/**
-		 * Used to identify strings that represent references to other mappings
-		 * @default /^{.*}$/
-		 */
-		static public function get expressionQualifier():RegExp
+		static public function get languageBundle():ILanguageBundle
 		{
-			return _expressionQualifier;
+			return _languageBundle;
 		}
 		
-		static public function set expressionQualifier(value:RegExp):void
+		static public function set languageBundle(value:ILanguageBundle):void
 		{
-			_expressionQualifier = value;
+			_languageBundle = value;
 		}
 		
-		/**
-		 * Used to strip the characters used to qualify a reference from the reference string
-		 * @default /{|}|\s/gm
-		 */
-		static public function get expressionRemovals():RegExp 
-		{
-			return _expressionRemovals;
-		}
-		
-		static public function set expressionRemovals(value:RegExp):void 
-		{
-			_expressionRemovals = value;
-		}
-		
-		/**
-		 * Used to customize the metatags used to qualify injections, post-construct, pre-destroy and event handlers
-		 * @default orichalcum.alchemy.metatag.bundle.StandardMetatagBundle
-		 */
-		static public function get metatagBundle():IMetatagBundle
-		{
-			return _recipeFactory.metatagBundle;
-		}
-		
-		static public function set metatagBundle(value:IMetatagBundle):void 
-		{
-			_recipeFactory.metatagBundle = value;
-		}
 		
 		/* INTERFACE orichalcum.lifecycle.IDisposable */
 		
@@ -324,8 +289,8 @@ package orichalcum.alchemy.alchemist
 			if (providerReferenceOrValue is IProvider)
 				return (providerReferenceOrValue as IProvider).provide(this, recipe);
 				
-			if (providerReferenceOrValue is String && _expressionQualifier.test(providerReferenceOrValue))
-				return conjure((providerReferenceOrValue as String).replace(_expressionRemovals, ''));
+			if (providerReferenceOrValue is String && _languageBundle.expressionLanguage.expressionQualifier.test(providerReferenceOrValue))
+				return conjure((providerReferenceOrValue as String).replace(_languageBundle.expressionLanguage.expressionRemovals, ''));
 			
 			return providerReferenceOrValue;
 		}
@@ -376,9 +341,9 @@ package orichalcum.alchemy.alchemist
 			_recipeFlyweightsIndex--;
 		}
 		
-		private function mapAll(mappings:XML):void 
+		private function mapAll(mappings:Array):void 
 		{
-			
+			(new XmlConfigurationMapper(_reflector, _languageBundle)).map(this, mappings);
 		}
 		
 	}

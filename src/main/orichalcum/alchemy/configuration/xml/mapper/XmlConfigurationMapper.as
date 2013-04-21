@@ -1,9 +1,16 @@
 package orichalcum.alchemy.configuration.xml.mapper
 {
-	import flash.utils.getDefinitionByName;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.handler.EventHandler;
+	import orichalcum.alchemy.language.bundle.ILanguageBundle;
+	import orichalcum.alchemy.language.bundle.LanguageBundle;
+	import orichalcum.alchemy.language.IXmltagLanguage;
+	import orichalcum.alchemy.language.xmltag.IConstructorArgumentXmltag;
+	import orichalcum.alchemy.language.xmltag.IEventHandlerXmltag;
+	import orichalcum.alchemy.language.xmltag.IMapXmltag;
+	import orichalcum.alchemy.language.xmltag.IPostConstructXmltag;
+	import orichalcum.alchemy.language.xmltag.IPreDestroyXmltag;
+	import orichalcum.alchemy.language.xmltag.IPropertyXmltag;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.provider.FactoryForwardingProvider;
 	import orichalcum.alchemy.provider.ForwardingProvider;
@@ -13,17 +20,27 @@ package orichalcum.alchemy.configuration.xml.mapper
 
 	public class XmlConfigurationMapper
 	{
-		private var _expressionQualifier:RegExp;
-		private var _expressionRemovals:RegExp;
-		private var _factoryMethodNameDelimiter:String;
 		private var _reflector:IReflector;
+		private var _expressionQualifier:RegExp;
+		private var _mapXmltag:IMapXmltag;
+		private var _constructorArgumentXmltag:IConstructorArgumentXmltag;
+		private var _propertyXmltag:IPropertyXmltag;
+		private var _eventHandlerXmltag:IEventHandlerXmltag;
+		private var _postConstructXmltag:IPostConstructXmltag;
+		private var _preDestroyXmltag:IPreDestroyXmltag;
 		
-		public function XmlConfigurationMapper(reflector:IReflector = null, expressionQualifier:RegExp = null, expressionRemovals:RegExp = null, factoryMethodNameDelimiter:String = '#')
+		public function XmlConfigurationMapper(reflector:IReflector = null, languageBundle:ILanguageBundle = null)
 		{
 			_reflector = reflector || Reflector.getInstance();
-			_expressionQualifier = expressionQualifier || /^{.*}$/;
-			_expressionRemovals = expressionRemovals || /{|}|\s/gm;
-			_factoryMethodNameDelimiter = factoryMethodNameDelimiter;
+			languageBundle = languageBundle || new LanguageBundle;
+			_expressionQualifier = languageBundle.expressionLanguage.expressionQualifier;
+			const language:IXmltagLanguage = languageBundle.xmltagLanguage;
+			_mapXmltag = language.mapXmltag;
+			_constructorArgumentXmltag = language.constructorArgumentXmltag;
+			_propertyXmltag = language.propertyXmltag;
+			_eventHandlerXmltag = language.eventHandlerXmltag;
+			_postConstructXmltag = language.postConstructXmltag;
+			_preDestroyXmltag = language.preDestroyXmltag;
 		}
 		
 		public function map(alchemist:IAlchemist, ...configurations):void
@@ -40,7 +57,7 @@ package orichalcum.alchemy.configuration.xml.mapper
 				}
 				else if (configuration is XML)
 				{
-					_map(alchemist, configuration.children());
+					_map(alchemist, configuration.child(_mapXmltag.name));
 				}
 				else
 				{
@@ -53,24 +70,24 @@ package orichalcum.alchemy.configuration.xml.mapper
 		{
 			for each(var mapping:XML in mappings)
 			{
-				var id:String = mapping.attribute('id').toString();
+				var id:String = mapping.attribute(_mapXmltag.id).toString();
 				
 				if (id == null)
-					throw new AlchemyError('The following mapping has no "id" attribute:\n{0}', mapping);
+					throw new AlchemyError('Required attribute "{0}" not found on "{1}".', _mapXmltag.id, mapping.toString());
 				
 				if (id.length == 0)
-					throw new AlchemyError('The following mapping has an empty "id" attribute:\n{0}', mapping);
+					throw new AlchemyError('Required attribute "{0}" is empty on "{1}".', _mapXmltag.id, mapping);
 				
 				if (mappings.(@id == id).length() > 1)
 					throw new AlchemyError('Injection IDs must be unique. The following injections have the same name:\n' + mappings.(@id == id));
 				
 				const mapper:IAlchemyMapper = alchemist.map(id);
 				mapProvider(mapper, mapping, id);
-				mapConstructorArguments(mapper, mapping);
-				mapProperties(mapper, mapping);
-				mapEventHandlers(mapper, mapping);
-				mapPostConstruct(mapper, mapping);
-				mapPreDestroy(mapper, mapping);
+				mapConstructorArguments(mapper, mapping, id);
+				mapProperties(mapper, mapping, id);
+				mapEventHandlers(mapper, mapping, id);
+				mapPostConstruct(mapper, mapping, id);
+				mapPreDestroy(mapper, mapping, id);
 			}
 		}
 		
@@ -88,69 +105,60 @@ package orichalcum.alchemy.configuration.xml.mapper
 			 * The below code is highly cooupled with the XML schema
 			 */
 			
-			const to:XMLList = mapping.attribute('to');
-			if (to.length() > 0) return mapper.to(parse(to[0]));
+			const to:XML = getSingularAttribute(_mapXmltag.to, mapping, id);
+			if (to) return mapper.to(parse(to));
 			
-			const toValue:XMLList = mapping.attribute('to-value');
-			if (toValue.length() > 0) return mapper.to(parse(toValue[0]));
+			const toValue:XML = getSingularAttribute(_mapXmltag.toValue, mapping, id);
+			if (toValue) return mapper.to(parse(toValue));
 			
-			const toReference:XMLList = mapping.attribute('to-reference');
-			if (toReference.length() > 0) return mapper.toReference(toReference[0].toString());
+			const toReference:XML = getSingularAttribute(_mapXmltag.toReference, mapping, id);
+			if (toReference) return mapper.toReference(toReference.toString());
 			
-			const toSingleton:XMLList = mapping.attribute('to-singleton');
-			if (toSingleton.length() > 0) return mapper.toSingleton(_reflector.getType(toSingleton[0].toString()));
+			const toSingleton:XML = getSingularAttribute(_mapXmltag.toSingleton, mapping, id);
+			if (toSingleton) return mapper.toSingleton(_reflector.getType(toSingleton.toString()));
 			
-			const toPrototype:XMLList = mapping.attribute('to-prototype');
-			if (toPrototype.length() > 0) return mapper.toPrototype(_reflector.getType(toPrototype[0].toString()));
+			const toPrototype:XML = getSingularAttribute(_mapXmltag.toPrototype, mapping, id);
+			if (toPrototype) return mapper.toPrototype(_reflector.getType(toPrototype.toString()));
 			
-			const toPool:XMLList = mapping.attribute('to-pool');
-			if (toPool.length() > 0) return mapper.toPool(_reflector.getType(toPool[0].toString()));
+			const toPool:XML = getSingularAttribute(_mapXmltag.toPool, mapping, id);
+			if (toPool) return mapper.toPool(_reflector.getType(toPool.toString()));
 			
-			const toFactory:XMLList = mapping.attribute('to-factory');
-			if (toFactory.length() > 0)
+			const toFactory:XML = getSingularAttribute(_mapXmltag.toFactory, mapping, id);
+			if (toFactory)
 			{
-				const factory:String = toFactory[0].toString();
-				const factoryMethodNameDelimiterIndex:int = factory.lastIndexOf(_factoryMethodNameDelimiter);
+				const factory:String = toFactory.toString();
+				const factoryMethodNameDelimiterIndex:int = factory.lastIndexOf(_mapXmltag.factoryMethodDelimiter);
 				
 				if (factoryMethodNameDelimiterIndex == -1)
-					throw new AlchemyError('Unable to map "{0}" to factory. Missing "{1}" delimiter in factory definition "{2}". See format: "factoryIdOrClassName#factoryMethodName".', id, _factoryMethodNameDelimiter, factory);
+					throw new AlchemyError('Unable to map "{0}" to factory. Missing "{1}" delimiter in factory definition "{2}". See format: "factoryIdOrClassName#factoryMethodName".', id, _mapXmltag.factoryMethodDelimiter, factory);
 					
 				const factoryMethodName:String = factory.substring(factoryMethodNameDelimiterIndex + 1);
 				const factoryClassNameOrId:String = factory.substring(0, factoryMethodNameDelimiterIndex);
 				return mapper.to(new FactoryForwardingProvider(factoryMethodName, factoryClassNameOrId));
 			}
 			
-			const toProvider:XMLList = mapping.attribute('to-provider');
-			if (toProvider.length() > 0)
+			const toProvider:XML = getSingularAttribute(_mapXmltag.toProvider, mapping, id);
+			if (toProvider)
 			{
-				const providerType:String = mapping.attribute('to-provider')[0].toString();
+				const providerType:String = toProvider.toString();
 				if (providerType == 'singleton') return mapper.asSingleton();
 				if (providerType == 'prototype') return mapper.asPrototype();
 				if (providerType == 'pool') return mapper.asPool();
-				
-				// error check for real class? -- good lookahead!
 				return mapper.to(new ForwardingProvider(providerType));
 			}
 			
 			mapper.asSingleton();
 		}
 		
-		private function mapConstructorArguments(mapper:IAlchemyMapper, mapping:XML):void
+		private function mapConstructorArguments(mapper:IAlchemyMapper, mapping:XML, id:String):void
 		{
-			for each(var constructorArgument:XML in mapping.child('constructor-argument'))
-			{
-				var constructorArgumentValues:XMLList = constructorArgument.attribute('value');
-				
-				if (constructorArgumentValues.length() != 1)
-					throw new AlchemyError;
-				
-				mapper.withConstructorArgument(parse(constructorArgumentValues[0]));
-			}
+			for each(var constructorArgument:XML in mapping.child(_constructorArgumentXmltag.name))
+				mapper.withConstructorArgument(parse(getRequiredAttribute(_constructorArgumentXmltag.argument, constructorArgument, id)));
 		}
 		
-		private function mapProperties(mapper:IAlchemyMapper, mapping:XML):void
+		private function mapProperties(mapper:IAlchemyMapper, mapping:XML, id:String):void
 		{
-			for each(var property:XML in mapping.child('property'))
+			for each(var property:XML in mapping.child(_propertyXmltag.name))
 			{
 				for each(var propertyNode:XML in property.attributes())
 				{
@@ -159,13 +167,13 @@ package orichalcum.alchemy.configuration.xml.mapper
 			}
 		}
 		
-		private function mapEventHandlers(mapper:IAlchemyMapper, mapping:XML):void
+		private function mapEventHandlers(mapper:IAlchemyMapper, mapping:XML, id:String):void
 		{
-			for each(var eventHandler:XML in mapping.child('event-handler'))
-				mapEventHandler(mapper, eventHandler);
+			for each(var eventHandler:XML in mapping.child(_eventHandlerXmltag.name))
+				mapEventHandler(mapper, eventHandler, id);
 		}
 		
-		private function mapEventHandler(mapper:IAlchemyMapper, eventHandler:XML):void 
+		private function mapEventHandler(mapper:IAlchemyMapper, eventHandler:XML, id:String):void 
 		{
 			var priority:int
 				,type:String
@@ -181,21 +189,21 @@ package orichalcum.alchemy.configuration.xml.mapper
 				var name:String = attribute.name();
 				var value:String = attribute.toString();
 				
-				switch (name.toLowerCase())
+				switch (name)
 				{
-					case 'priority':
+					case _eventHandlerXmltag.priority:
 						priority = int(value);
 						break;
 						
-					case 'usecapture':
+					case _eventHandlerXmltag.useCapture:
 						useCapture = value.length > 0 || XmlUtil.valueOf(attribute);
 						break;
 						
-					case 'stoppropagation':
+					case _eventHandlerXmltag.stopPropagation:
 						stopPropagation = value.length > 0 || XmlUtil.valueOf(attribute);
 						break;
 						
-					case 'stopimmediatepropagation':
+					case _eventHandlerXmltag.stopImmediatePropagation:
 						stopImmediatePropagation = value.length > 0 || XmlUtil.valueOf(attribute);
 						break;
 						
@@ -227,41 +235,58 @@ package orichalcum.alchemy.configuration.xml.mapper
 			mapper.withEventHandler(type, listener, targetPath, useCapture, priority, stopPropagation, stopImmediatePropagation, parameters);
 		}
 		
-		private function mapPostConstruct(mapper:IAlchemyMapper, mapping:XML):void
+		private function mapPostConstruct(mapper:IAlchemyMapper, mapping:XML, id:String):void
 		{
-			const postConstructs:XMLList = mapping.child('post-construct');
-			if (postConstructs.length() > 1)
-			{
-				throw new AlchemyError;
-			}
-			else if (postConstructs.length() == 1)
-			{
-				const postConstruct:XML = postConstructs[0];
-				const postConstructNames:XMLList = postConstruct.attribute('name');
-				if (postConstructNames.length() != 1)
-					throw new AlchemyError;
-				mapper.withPostConstruct(postConstructNames[0].toString());
-			}
+			const postConstruct:XML = getSingularChild(_postConstructXmltag.name, mapping, id);
+			if (postConstruct)
+				mapper.withPostConstruct(getRequiredAttribute(_postConstructXmltag.argument, postConstruct, id).toString());
 		}
 		
-		private function mapPreDestroy(mapper:IAlchemyMapper, mapping:XML):void
+		private function mapPreDestroy(mapper:IAlchemyMapper, mapping:XML, id:String):void
 		{
-			const preDestroys:XMLList = mapping.child('pre-destroy');
-			if (preDestroys.length() > 1)
-			{
-				throw new AlchemyError;
-			}
-			else if (preDestroys.length() == 1)
-			{
-				const preDestroy:XML = preDestroys[0];
-				const preDestroyNames:XMLList = preDestroy.attribute('name');
-				if (preDestroyNames.length() != 1)
-					throw new AlchemyError;
-				mapper.withPreDestroy(preDestroyNames[0].toString());
-			}
+			const preDestroy:XML = getSingularChild(_preDestroyXmltag.name, mapping, id);
+			if (preDestroy)
+				mapper.withPreDestroy(getRequiredAttribute(_preDestroyXmltag.argument, preDestroy, id).toString());
 		}
 		
-		/* UTILITY */
+		private function getSingularChild(childName:String, parent:XML, id:String):XML
+		{
+			const children:XMLList = parent.child(childName);
+			
+			if (children.length() > 1)
+				throw new AlchemyError('Multiple "<{0}>" elements found on mapping id "{1}" where there is a maximum of one.', childName, id);
+				
+			if (children.length() < 1)
+				return null;
+				
+			return children[0];
+		}
+		
+		private function getSingularAttribute(attributeName:String, element:XML, id:String):XML
+		{
+			const values:XMLList = element.attribute(attributeName);
+			
+			if (values.length() > 1)
+				throw new AlchemyError('Multiple "{0}" atrributes found on mapping id "{1}" where there is a maximum of one.', attributeName, id);
+			
+			if (values.length() < 1)
+				return null;
+			
+			return values[0];
+		}
+		
+		private function getRequiredAttribute(attributeName:String, element:XML, id:String):XML
+		{
+			const values:XMLList = element.attribute(attributeName);
+			
+			if (values.length() > 1)
+				throw new AlchemyError('Multiple "{0}" atrributes found on "<{1}>" for "{2}" where there is a maximum of one.', attributeName, element.name(), id);
+					
+			if (values.length() < 1)
+				throw new AlchemyError('Required attribute "{0}" not found on "<{1}>" for "{2}".', attributeName, element.name(), id);
+			
+			return values[0];
+		}
 		
 		private function parse(value:XML):*
 		{

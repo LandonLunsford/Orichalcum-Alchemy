@@ -2,8 +2,8 @@ package orichalcum.alchemy.recipe.factory
 {
 	import org.flexunit.asserts.assertFalse;
 	import org.flexunit.asserts.assertTrue;
-	import orichalcum.alchemy.metatag.bundle.IMetatagBundle;
-	import orichalcum.alchemy.metatag.bundle.StandardMetatagBundle;
+	import org.hamcrest.object.notNullValue;
+	import orichalcum.alchemy.language.bundle.LanguageBundle;
 	import orichalcum.alchemy.recipe.factory.RecipeFactory;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.reflection.IReflector;
@@ -21,7 +21,7 @@ package orichalcum.alchemy.recipe.factory
 		[BeforeClass]
 		static public function setup():void
 		{
-			_recipeFactory = new RecipeFactory(Reflector.getInstance(), new StandardMetatagBundle);
+			_recipeFactory = new RecipeFactory(Reflector.getInstance(), new LanguageBundle);
 			_hasEverything = _recipeFactory.getRecipeForClass(ClassWithAllMetatags);
 			_hasNothing = _recipeFactory.getRecipeForClass(ClassWithNoMetatags);
 		}
@@ -32,6 +32,60 @@ package orichalcum.alchemy.recipe.factory
 			_recipeFactory = null;
 			_hasEverything = null;
 			_hasNothing = null;
+		}
+		
+		[Test]
+		public function testObjectRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(Object), notNullValue());
+		}
+		
+		[Test]
+		public function testArrayRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(Array), notNullValue());
+		}
+		
+		[Test]
+		public function testFunctionRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(Function), notNullValue());
+		}
+		
+		[Test]
+		public function testNumberRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(Number), notNullValue());
+		}
+		
+		[Test]
+		public function testStringRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(String), notNullValue());
+		}
+		
+		[Test]
+		public function testClassRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(Class), notNullValue());
+		}
+		
+		[Test]
+		public function testIntRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(int), notNullValue());
+		}
+		
+		[Test]
+		public function testUintRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(uint), notNullValue());
+		}
+		
+		[Test]
+		public function testBooleanRequest():void
+		{
+			assertTrue(_recipeFactory.getRecipeForClass(Boolean), notNullValue());
 		}
 		
 		[Test]

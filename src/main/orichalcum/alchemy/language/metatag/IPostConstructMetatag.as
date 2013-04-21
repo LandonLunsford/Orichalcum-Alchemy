@@ -1,4 +1,4 @@
-package orichalcum.alchemy.metatag 
+package orichalcum.alchemy.language.metatag 
 {
 
 	public interface IPostConstructMetatag 

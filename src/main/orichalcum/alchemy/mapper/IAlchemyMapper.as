@@ -139,6 +139,7 @@ package orichalcum.alchemy.mapper
 		 * @param	stopImmediatePropagation Prevents processing of any event listeners in the current node and any subsequent nodes in the event flow.
 		 * @param	parameters List of property names to be extracted from the event object and passed to the listener function
 		 * @return	IAlchemyMapper
+		 * @see		orichalcum.alchemy.handler.IEventHandler
 		 */
 		function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:int = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false, parameters:Array = null):IAlchemyMapper;
 		

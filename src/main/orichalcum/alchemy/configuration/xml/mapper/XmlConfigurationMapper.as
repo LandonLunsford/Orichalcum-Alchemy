@@ -227,6 +227,10 @@ package orichalcum.alchemy.configuration.xml.mapper
 						else
 						{
 							listener = value.substring(0, paramSplitIndex);
+							
+							/**
+							 * This parsing methodology is tightly cupled
+							 */
 							parameters = value.substring(paramSplitIndex).replace(/(\(|\)|\s)/gm,'').split(',');
 						}
 				}
@@ -238,15 +242,13 @@ package orichalcum.alchemy.configuration.xml.mapper
 		private function mapPostConstruct(mapper:IAlchemyMapper, mapping:XML, id:String):void
 		{
 			const postConstruct:XML = getSingularChild(_postConstructXmltag.name, mapping, id);
-			if (postConstruct)
-				mapper.withPostConstruct(getRequiredAttribute(_postConstructXmltag.argument, postConstruct, id).toString());
+			postConstruct && mapper.withPostConstruct(getRequiredAttribute(_postConstructXmltag.argument, postConstruct, id).toString());
 		}
 		
 		private function mapPreDestroy(mapper:IAlchemyMapper, mapping:XML, id:String):void
 		{
 			const preDestroy:XML = getSingularChild(_preDestroyXmltag.name, mapping, id);
-			if (preDestroy)
-				mapper.withPreDestroy(getRequiredAttribute(_preDestroyXmltag.argument, preDestroy, id).toString());
+			preDestroy && mapper.withPreDestroy(getRequiredAttribute(_preDestroyXmltag.argument, preDestroy, id).toString());
 		}
 		
 		private function getSingularChild(childName:String, parent:XML, id:String):XML

@@ -114,15 +114,15 @@ package orichalcum.alchemy.mapper
 			return this;
 		}
 		
-		public function withPostConstruct(value:String):IAlchemyMapper 
+		public function withPostConstruct(functionName:String):IAlchemyMapper 
 		{
-			recipe.postConstruct = value;
+			recipe.postConstruct = functionName;
 			return this;
 		}
 		
-		public function withPreDestroy(value:String):IAlchemyMapper 
+		public function withPreDestroy(functionName:String):IAlchemyMapper 
 		{
-			recipe.preDestroy = value;
+			recipe.preDestroy = functionName;
 			return this;
 		}
 		

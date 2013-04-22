@@ -52,12 +52,12 @@ package orichalcum.alchemy.recipe
 			return false;
 		}
 		
-		override public function get constructorArguments():IList 
+		override public function get constructorArguments():Array 
 		{
 			return null;
 		}
 		
-		override public function set constructorArguments(value:IList):void 
+		override public function set constructorArguments(value:Array):void 
 		{
 			
 		}
@@ -72,12 +72,12 @@ package orichalcum.alchemy.recipe
 			
 		}
 		
-		override public function get eventHandlers():IList
+		override public function get eventHandlers():Array
 		{
 			return null;
 		}
 		
-		override public function set eventHandlers(value:IList):void 
+		override public function set eventHandlers(value:Array):void 
 		{
 			
 		}

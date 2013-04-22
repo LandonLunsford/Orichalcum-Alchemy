@@ -101,7 +101,7 @@ package orichalcum.alchemy.alchemist
 			
 			if (recipe.hasConstructorArguments)
 			{
-				const a:IList = recipe.constructorArguments;
+				const a:Array = recipe.constructorArguments;
 				switch(a.length)
 				{
 					case 1:	return new type(

@@ -17,26 +17,26 @@ package orichalcum.alchemy.recipe
 		public function setup():void
 		{
 			_fullRecipe = new Recipe;
-			_fullRecipe.constructorArguments = new ArrayList(0, 1, 2, 3);
+			_fullRecipe.constructorArguments = [0, 1, 2, 3];
 			_fullRecipe.properties = { a:'a', b:'b' };
-			_fullRecipe.eventHandlers = new LinkedList(new EventHandler('a'), new EventHandler('b'));
+			_fullRecipe.eventHandlers = [new EventHandler('a'), new EventHandler('b')];
 			_fullRecipe.postConstruct = 'init';
 			_fullRecipe.preDestroy = 'dispose';
 			
 			_halfRecipe = new Recipe;
-			_halfRecipe.constructorArguments = new ArrayList(0, 1);
+			_halfRecipe.constructorArguments = [0, 1];
 			_halfRecipe.properties = { a:'A' };
-			_halfRecipe.eventHandlers = new LinkedList(new EventHandler('a'));
+			_halfRecipe.eventHandlers = [new EventHandler('a')];
 			_halfRecipe.postConstruct = 'INIT';
 			_halfRecipe.preDestroy = 'DISPOSE';
 			
 			_fullExtendsHalf = new Recipe;
-			_fullExtendsHalf.constructorArguments = new ArrayList(
+			_fullExtendsHalf.constructorArguments = [
 				_halfRecipe.constructorArguments[0]
 				,_halfRecipe.constructorArguments[1]
 				,_fullRecipe.constructorArguments[2]
 				,_fullRecipe.constructorArguments[3]
-			);
+			];
 			_fullExtendsHalf.properties = { a:'A', b:'b' };
 			_fullExtendsHalf.eventHandlers = _fullRecipe.eventHandlers.concat(_halfRecipe.eventHandlers);
 			_fullExtendsHalf.postConstruct = _halfRecipe.postConstruct;
@@ -47,9 +47,9 @@ package orichalcum.alchemy.recipe
 		public function testSelfExtension():void
 		{
 			const extension:Recipe = _fullRecipe.clone().extend(_fullRecipe.clone());
-			assertThat(extension.constructorArguments.toArray(), equalTo(_fullRecipe.constructorArguments.toArray()));
+			assertThat(extension.constructorArguments, equalTo(_fullRecipe.constructorArguments));
 			assertThat(extension.properties, hasProperties(_fullRecipe.properties));
-			assertThat(extension.eventHandlers.toArray(), equalTo(_fullRecipe.eventHandlers.concat(_fullRecipe.eventHandlers).toArray()));
+			assertThat(extension.eventHandlers, equalTo(_fullRecipe.eventHandlers.concat(_fullRecipe.eventHandlers)));
 			assertThat(extension.postConstruct, equalTo(_fullRecipe.postConstruct));
 			assertThat(extension.preDestroy, equalTo(_fullRecipe.preDestroy));
 		}
@@ -58,9 +58,9 @@ package orichalcum.alchemy.recipe
 		public function testFullExtendsHalf():void
 		{
 			const extension:Recipe = _fullRecipe.clone().extend(_halfRecipe.clone());
-			assertThat(extension.constructorArguments.toArray(), equalTo(_fullExtendsHalf.constructorArguments.toArray()));
+			assertThat(extension.constructorArguments, equalTo(_fullExtendsHalf.constructorArguments));
 			assertThat(extension.properties, hasProperties(_fullExtendsHalf.properties));
-			assertThat(extension.eventHandlers.toArray(), equalTo(_fullExtendsHalf.eventHandlers.toArray()));
+			assertThat(extension.eventHandlers, equalTo(_fullExtendsHalf.eventHandlers));
 			assertThat(extension.postConstruct, equalTo(_fullExtendsHalf.postConstruct));
 			assertThat(extension.preDestroy, equalTo(_fullExtendsHalf.preDestroy));
 		}
@@ -69,9 +69,9 @@ package orichalcum.alchemy.recipe
 		public function testHalfExtendsFull():void
 		{
 			const extension:Recipe = _halfRecipe.clone().extend(_fullRecipe.clone());
-			assertThat(extension.constructorArguments.toArray(), equalTo(_fullRecipe.constructorArguments.toArray()));
+			assertThat(extension.constructorArguments, equalTo(_fullRecipe.constructorArguments));
 			assertThat(extension.properties, hasProperties(_fullRecipe.properties));
-			assertThat(extension.eventHandlers.toArray(), equalTo(_halfRecipe.eventHandlers.concat(_fullRecipe.eventHandlers).toArray()));
+			assertThat(extension.eventHandlers, equalTo(_halfRecipe.eventHandlers.concat(_fullRecipe.eventHandlers)));
 			assertThat(extension.postConstruct, equalTo(_fullRecipe.postConstruct));
 			assertThat(extension.preDestroy, equalTo(_fullRecipe.preDestroy));
 		}

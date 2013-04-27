@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.metatag 
 {
 
-	public class PostConstructMetatag implements IPostConstructMetatag
+	public class PostConstructMetatag 
 	{
 		private var _name:String;
 		
@@ -9,8 +9,6 @@ package orichalcum.alchemy.language.metatag
 		{
 			_name = name;
 		}
-		
-		/* INTERFACE orichalcum.alchemy.metatag.IPostConstructMetatag */
 		
 		public function get name():String 
 		{

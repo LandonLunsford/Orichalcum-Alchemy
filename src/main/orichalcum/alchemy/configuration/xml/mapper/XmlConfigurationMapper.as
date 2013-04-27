@@ -29,7 +29,7 @@ package orichalcum.alchemy.configuration.xml.mapper
 		private var _postConstructXmltag:IPostConstructXmltag;
 		private var _preDestroyXmltag:IPreDestroyXmltag;
 		
-		public function XmlConfigurationMapper(reflector:IReflector = null, languageBundle:ILanguageBundle = null)
+		public function XmlConfigurationMapper(reflector:IReflector = null, languageBundle:LanguageBundle = null)
 		{
 			_reflector = reflector || Reflector.getInstance();
 			languageBundle = languageBundle || new LanguageBundle;

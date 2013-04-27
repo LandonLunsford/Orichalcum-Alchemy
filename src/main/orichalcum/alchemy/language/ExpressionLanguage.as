@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language 
 {
 
-	public class ExpressionLanguage implements IExpressionLanguage 
+	public class ExpressionLanguage
 	{
 		private var _expressionQualifier:RegExp;
 		private var _expressionRemovals:RegExp;
@@ -11,8 +11,6 @@ package orichalcum.alchemy.language
 			_expressionQualifier = expressionQualifier || /^{.*}$/;
 			_expressionRemovals = expressionRemovals || /{|}|\s/gm;
 		}
-		
-		/* INTERFACE orichalcum.alchemy.language.expression.IExpressionLanguage */
 		
 		public function get expressionQualifier():RegExp 
 		{

@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.xmltag 
 {
 	
-	public class MapXmltag implements IMapXmltag 
+	public class MapXmltag 
 	{
 		private var _name:String;
 		private var _id:String;
@@ -40,8 +40,6 @@ package orichalcum.alchemy.language.xmltag
 			_toFactory = toFactory;
 			_factoryMethodDelimiter = factoryMethodDelimiter;
 		}
-		
-		/* INTERFACE orichalcum.alchemy.language.xmltag.IMapXmltag */
 		
 		public function get name():String 
 		{

@@ -28,7 +28,7 @@ package orichalcum.alchemy.alchemist
 		 * Parsing rules
 		 * @private
 		 */
-		static private var _languageBundle:ILanguageBundle = new LanguageBundle;
+		static private var _languageBundle:LanguageBundle = new LanguageBundle;
 		
 		/**
 		 * Generates recipes based on class metatags
@@ -93,14 +93,15 @@ package orichalcum.alchemy.alchemist
 		public function Alchemist(...mappings)
 		{
 			mappings && mapAll(mappings);
+			map(getQualifiedClassName(this)).to(this);
 		}
 		
-		static public function get languageBundle():ILanguageBundle
+		static public function get languageBundle():LanguageBundle
 		{
 			return _languageBundle;
 		}
 		
-		static public function set languageBundle(value:ILanguageBundle):void
+		static public function set languageBundle(value:LanguageBundle):void
 		{
 			_languageBundle = value;
 		}

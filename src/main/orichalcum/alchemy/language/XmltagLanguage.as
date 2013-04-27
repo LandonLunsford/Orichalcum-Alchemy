@@ -2,25 +2,19 @@ package orichalcum.alchemy.language
 {
 	import orichalcum.alchemy.language.xmltag.ConstructorArgumentXmltag;
 	import orichalcum.alchemy.language.xmltag.EventHandlerXmltag;
-	import orichalcum.alchemy.language.xmltag.IConstructorArgumentXmltag;
-	import orichalcum.alchemy.language.xmltag.IEventHandlerXmltag;
-	import orichalcum.alchemy.language.xmltag.IMapXmltag;
-	import orichalcum.alchemy.language.xmltag.IPostConstructXmltag;
-	import orichalcum.alchemy.language.xmltag.IPreDestroyXmltag;
-	import orichalcum.alchemy.language.xmltag.IPropertyXmltag;
 	import orichalcum.alchemy.language.xmltag.MapXmltag;
 	import orichalcum.alchemy.language.xmltag.PostConstructXmltag;
 	import orichalcum.alchemy.language.xmltag.PreDestroyXmltag;
 	import orichalcum.alchemy.language.xmltag.PropertyXmltag;
 	
-	public class XmltagLanguage implements IXmltagLanguage
+	public class XmltagLanguage
 	{
-		private var _mapXmltag:IMapXmltag;
-		private var _constructorArgumentXmltag:IConstructorArgumentXmltag;
-		private var _propertyXmltag:IPropertyXmltag;
-		private var _eventHandlerXmltag:IEventHandlerXmltag;
-		private var _postConstructXmltag:IPostConstructXmltag;
-		private var _preDestroyXmltag:IPreDestroyXmltag;
+		private var _mapXmltag:MapXmltag;
+		private var _constructorArgumentXmltag:ConstructorArgumentXmltag;
+		private var _propertyXmltag:PropertyXmltag;
+		private var _eventHandlerXmltag:EventHandlerXmltag;
+		private var _postConstructXmltag:PostConstructXmltag;
+		private var _preDestroyXmltag:PreDestroyXmltag;
 		
 		public function XmltagLanguage() 
 		{
@@ -34,32 +28,32 @@ package orichalcum.alchemy.language
 		
 		/* INTERFACE orichalcum.alchemy.language.IXmltagLanguage */
 		
-		public function get mapXmltag():IMapXmltag 
+		public function get mapXmltag():MapXmltag 
 		{
 			return _mapXmltag;
 		}
 		
-		public function get constructorArgumentXmltag():IConstructorArgumentXmltag 
+		public function get constructorArgumentXmltag():ConstructorArgumentXmltag 
 		{
 			return _constructorArgumentXmltag;
 		}
 		
-		public function get propertyXmltag():IPropertyXmltag 
+		public function get propertyXmltag():PropertyXmltag 
 		{
 			return _propertyXmltag;
 		}
 		
-		public function get eventHandlerXmltag():IEventHandlerXmltag 
+		public function get eventHandlerXmltag():EventHandlerXmltag 
 		{
 			return _eventHandlerXmltag;
 		}
 		
-		public function get postConstructXmltag():IPostConstructXmltag 
+		public function get postConstructXmltag():PostConstructXmltag 
 		{
 			return _postConstructXmltag;
 		}
 		
-		public function get preDestroyXmltag():IPreDestroyXmltag 
+		public function get preDestroyXmltag():PreDestroyXmltag 
 		{
 			return _preDestroyXmltag;
 		}

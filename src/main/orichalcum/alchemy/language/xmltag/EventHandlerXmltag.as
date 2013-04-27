@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.xmltag 
 {
 
-	public class EventHandlerXmltag implements IEventHandlerXmltag
+	public class EventHandlerXmltag
 	{
 		private var _name:String;
 		private var _priority:String;
@@ -17,8 +17,6 @@ package orichalcum.alchemy.language.xmltag
 			_stopPropagation = stopPropagation;
 			_stopImmediatePropagation = stopImmediatePropagation;
 		}
-		
-		/* INTERFACE orichalcum.alchemy.language.xmltag.IEventHandlerXmltag */
 		
 		public function get name():String 
 		{

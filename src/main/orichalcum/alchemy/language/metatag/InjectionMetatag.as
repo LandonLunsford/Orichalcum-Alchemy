@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.metatag 
 {
 
-	public class InjectionMetatag implements IInjectionMetatag
+	public class InjectionMetatag
 	{
 		private var _name:String;
 		
@@ -9,8 +9,6 @@ package orichalcum.alchemy.language.metatag
 		{
 			_name = name;
 		}
-		
-		/* INTERFACE orichalcum.alchemy.metatag.IInjectionMetatag */
 		
 		public function get name():String 
 		{

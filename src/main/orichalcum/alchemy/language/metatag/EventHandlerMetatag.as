@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.metatag 
 {
 	
-	public class EventHandlerMetatag
+	public class EventHandlerMetatag implements IEventHandlerMetatag
 	{
 		private var _name:String;
 		private var _eventKey:String;
@@ -31,6 +31,8 @@ package orichalcum.alchemy.language.metatag
 			_stopPropagationKey = stopPropagationKey;
 			_stopImmediatePropagationKey = stopImmediatePropagationKey;
 		}
+		
+		/* INTERFACE orichalcum.alchemy.metatag.IEventHandlerMetatag */
 		
 		public function get name():String
 		{

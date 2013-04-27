@@ -1,14 +1,17 @@
 package orichalcum.alchemy.language.bundle 
 {
 	import orichalcum.alchemy.language.ExpressionLanguage;
+	import orichalcum.alchemy.language.IExpressionLanguage;
+	import orichalcum.alchemy.language.IMetatagLanguage;
+	import orichalcum.alchemy.language.IXmltagLanguage;
 	import orichalcum.alchemy.language.MetatagLanguage;
 	import orichalcum.alchemy.language.XmltagLanguage;
 	
-	public class LanguageBundle
+	public class LanguageBundle implements ILanguageBundle
 	{
-		private var _expressionLanguage:ExpressionLanguage;
-		private var _metatagLanguage:MetatagLanguage;
-		private var _xmltagLanguage:XmltagLanguage;
+		private var _expressionLanguage:IExpressionLanguage;
+		private var _metatagLanguage:IMetatagLanguage;
+		private var _xmltagLanguage:IXmltagLanguage;
 		
 		public function LanguageBundle()
 		{
@@ -17,17 +20,19 @@ package orichalcum.alchemy.language.bundle
 			_xmltagLanguage = new XmltagLanguage;
 		}
 		
-		public function get expressionLanguage():ExpressionLanguage 
+		/* INTERFACE orichalcum.alchemy.language.bundle.ILanguageBundle */
+		
+		public function get expressionLanguage():IExpressionLanguage 
 		{
 			return _expressionLanguage;
 		}
 		
-		public function get metatagLanguage():MetatagLanguage 
+		public function get metatagLanguage():IMetatagLanguage 
 		{
 			return _metatagLanguage;
 		}
 		
-		public function get xmltagLanguage():XmltagLanguage 
+		public function get xmltagLanguage():IXmltagLanguage 
 		{
 			return _xmltagLanguage;
 		}

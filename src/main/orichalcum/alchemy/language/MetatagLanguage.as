@@ -1,16 +1,20 @@
 package orichalcum.alchemy.language 
 {
 	import orichalcum.alchemy.language.metatag.EventHandlerMetatag;
+	import orichalcum.alchemy.language.metatag.IEventHandlerMetatag;
+	import orichalcum.alchemy.language.metatag.IInjectionMetatag;
 	import orichalcum.alchemy.language.metatag.InjectionMetatag;
+	import orichalcum.alchemy.language.metatag.IPostConstructMetatag;
+	import orichalcum.alchemy.language.metatag.IPreDestroyMetatag;
 	import orichalcum.alchemy.language.metatag.PostConstructMetatag;
 	import orichalcum.alchemy.language.metatag.PreDestroyMetatag;
 	
-	public class MetatagLanguage 
+	public class MetatagLanguage implements IMetatagLanguage
 	{
-		private var _injectionMetatag:InjectionMetatag;
-		private var _postConstructMetatag:PostConstructMetatag;
-		private var _preDestroyMetatag:PreDestroyMetatag;
-		private var _eventHandlerMetatag:EventHandlerMetatag;
+		private var _injectionMetatag:IInjectionMetatag;
+		private var _postConstructMetatag:IPostConstructMetatag;
+		private var _preDestroyMetatag:IPreDestroyMetatag;
+		private var _eventHandlerMetatag:IEventHandlerMetatag;
 		
 		public function MetatagLanguage() 
 		{
@@ -20,22 +24,24 @@ package orichalcum.alchemy.language
 			_eventHandlerMetatag = new EventHandlerMetatag;
 		}
 		
-		public function get eventHandlerMetatag():EventHandlerMetatag 
+		/* INTERFACE orichalcum.alchemy.language.metatag.IMetatagLanguage */
+		
+		public function get eventHandlerMetatag():IEventHandlerMetatag 
 		{
 			return _eventHandlerMetatag;
 		}
 		
-		public function get injectionMetatag():InjectionMetatag 
+		public function get injectionMetatag():IInjectionMetatag 
 		{
 			return _injectionMetatag;
 		}
 		
-		public function get postConstructMetatag():PostConstructMetatag 
+		public function get postConstructMetatag():IPostConstructMetatag 
 		{
 			return _postConstructMetatag;
 		}
 		
-		public function get preDestroyMetatag():PreDestroyMetatag 
+		public function get preDestroyMetatag():IPreDestroyMetatag 
 		{
 			return _preDestroyMetatag;
 		}

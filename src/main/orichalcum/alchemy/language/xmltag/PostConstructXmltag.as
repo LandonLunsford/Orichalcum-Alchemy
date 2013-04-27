@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.xmltag 
 {
 
-	public class PostConstructXmltag
+	public class PostConstructXmltag implements IPostConstructXmltag
 	{
 		private var _name:String;
 		private var _argument:String;
@@ -11,6 +11,8 @@ package orichalcum.alchemy.language.xmltag
 			_name = name;
 			_argument = argument;
 		}
+		
+		/* INTERFACE orichalcum.alchemy.language.xmltag.IPostConstructXmltag */
 		
 		public function get name():String 
 		{

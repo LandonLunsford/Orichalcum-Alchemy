@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.xmltag 
 {
 	
-	public class PropertyXmltag 
+	public class PropertyXmltag implements IPropertyXmltag
 	{
 		private var _name:String;
 		
@@ -9,6 +9,8 @@ package orichalcum.alchemy.language.xmltag
 		{
 			_name = name;
 		}
+		
+		/* INTERFACE orichalcum.alchemy.language.xmltag.IPropertyXmltag */
 		
 		public function get name():String 
 		{

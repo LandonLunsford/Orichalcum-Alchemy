@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.metatag 
 {
 
-	public class PreDestroyMetatag
+	public class PreDestroyMetatag implements IPreDestroyMetatag
 	{
 		private var _name:String;
 		
@@ -9,6 +9,8 @@ package orichalcum.alchemy.language.metatag
 		{
 			_name = name;
 		}
+		
+		/* INTERFACE orichalcum.alchemy.metatag.IPreDestroyMetatag */
 		
 		public function get name():String 
 		{

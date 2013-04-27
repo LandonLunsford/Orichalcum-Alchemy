@@ -1,7 +1,7 @@
 package orichalcum.alchemy.language.xmltag 
 {
 
-	public class ConstructorArgumentXmltag 
+	public class ConstructorArgumentXmltag implements IConstructorArgumentXmltag
 	{
 		private var _name:String;
 		private var _argument:String;
@@ -11,6 +11,8 @@ package orichalcum.alchemy.language.xmltag
 			_name = name;
 			_argument = argument;
 		}
+		
+		/* INTERFACE orichalcum.alchemy.language.xmltag.IConstructorArgumentXmltag */
 		
 		public function get name():String 
 		{

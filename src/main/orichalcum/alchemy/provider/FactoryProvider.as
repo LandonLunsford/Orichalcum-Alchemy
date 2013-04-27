@@ -1,7 +1,6 @@
 package orichalcum.alchemy.provider
 {
 	import orichalcum.alchemy.alchemist.IAlchemist;
-	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 

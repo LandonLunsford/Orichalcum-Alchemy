@@ -93,6 +93,7 @@ package orichalcum.alchemy.alchemist
 		public function Alchemist(...mappings)
 		{
 			mappings && mapAll(mappings);
+			map(getQualifiedClassName(this)).to(this);
 		}
 		
 		static public function get languageBundle():ILanguageBundle

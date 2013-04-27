@@ -1,7 +1,7 @@
 package orichalcum.alchemy.provider 
 {
-	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.alchemy.alchemist.IAlchemist;
+	import orichalcum.alchemy.recipe.Recipe;
 
 	/**
 	 * This class will require the Alchemist to keep a conjuredInstance to Provider map in order to

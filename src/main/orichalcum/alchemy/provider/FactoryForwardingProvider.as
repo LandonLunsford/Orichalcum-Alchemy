@@ -1,9 +1,9 @@
 package orichalcum.alchemy.provider
 {
 	import flash.system.ApplicationDomain;
+	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.recipe.Recipe;
-	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.lifecycle.IDisposable;
 
 	/**

@@ -6,7 +6,6 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.recipe.Recipe;
-	import orichalcum.collection.IList;
 	import orichalcum.utility.ObjectUtil;
 	import orichalcum.utility.StringUtil;
 

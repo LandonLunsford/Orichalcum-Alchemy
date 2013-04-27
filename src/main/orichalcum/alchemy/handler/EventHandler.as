@@ -1,9 +1,7 @@
 package orichalcum.alchemy.handler 
 {
 	import flash.events.Event;
-	import flash.events.IEventDispatcher;
 	import orichalcum.lifecycle.IDisposable;
-	import orichalcum.utility.ObjectUtil;
 	import orichalcum.utility.StringUtil;
 
 	public class EventHandler implements IEventHandler, IDisposable

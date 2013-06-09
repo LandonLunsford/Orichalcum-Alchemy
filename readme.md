@@ -1,7 +1,7 @@
 Orichalcum-Alchemy
 ==================
 A Truly Magical IoC Container!
-![ScreenShot](https://raw.github.com/LandonLunsford/Orichalcum-Alchemy/edit/master/images/orichalchemy-pot.png)
+![ScreenShot](https://github.com/LandonLunsford/Orichalcum-Alchemy/edit/master/images/orichalchemy-pot.png)
 <br>
 
 ## Backgound

@@ -1,11 +1,12 @@
 Orichalcum-Alchemy
 ==================
 A Truly Magical IoC Container!
+![ScreenShot](https://raw.github.com/LandonLunsford/Orichalcum-Alchemy/edit/master/images/orichalchemy-pot.png)
 <br>
 
 ## Backgound
 
-Originally created as an internal IoC solution for Orichalcum Studios.
+Originally created as an internal IoC solution for jaredlunsford.com.
 <br>
 This featured library is now available for the AS3 developer community under the [MIT License](https://github.com/LandonLunsford/Orichalcum-Alchemy/blob/master/license).
 <br>

@@ -1,9 +1,16 @@
 Orichalcum-Alchemy
 ==================
+
 ![ScreenShot](https://raw.github.com/LandonLunsford/Orichalcum-Alchemy/master/images/orichalchemy-pot.png)
-<br>
-<center><strong>Meet Mr. Alchemy Pot. He is a truly magical IoC container!</strong></center>
-<br>
+
+<p>
+Hi I'm Orichalcum Alchemy!
+But you can call him Orichalchemy for short.
+</p>
+<p>
+I am literally an IoC <i>container</i>!
+Cheers!
+</p>
 ## Backgound
 
 Originally created as an internal IoC solution for jaredlunsford.com.

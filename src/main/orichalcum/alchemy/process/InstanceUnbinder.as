@@ -12,7 +12,7 @@ package orichalcum.alchemy.process
 		
 		/* INTERFACE orichalcum.alchemy.lifecycle.process.IAlchemyProcess */
 		
-		public function process(instance:*, id:*, type:Class, recipe:Recipe, evaluator:IEvaluator):* 
+		public function process(instance:*, id:*, type:Class, recipe:Recipe):* 
 		{
 			if (!recipe.hasEventHandlers)
 				return instance;

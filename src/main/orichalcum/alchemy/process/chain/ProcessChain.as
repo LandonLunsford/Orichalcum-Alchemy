@@ -16,11 +16,11 @@ package orichalcum.alchemy.process.chain
 		
 		/* INTERFACE orichalcum.alchemy.lifecycle.process.IProcessChain */
 		
-		public function process(instance:*, id:*, type:Class, recipe:Recipe, evaluator:IEvaluator):* 
+		public function process(instance:*, id:*, type:Class, recipe:Recipe):* 
 		{
 			for each(var processor:IAlchemyProcess in _processors)
 			{
-				instance = processor.process(instance, id, type, recipe, evaluator);
+				instance = processor.process(instance, id, type, recipe);
 			}
 			return instance;
 		}

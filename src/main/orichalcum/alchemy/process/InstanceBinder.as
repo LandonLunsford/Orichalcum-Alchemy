@@ -1,6 +1,7 @@
 package orichalcum.alchemy.process 
 {
 	import flash.events.IEventDispatcher;
+	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.evaluator.IEvaluator;
@@ -14,7 +15,7 @@ package orichalcum.alchemy.process
 		
 		/* INTERFACE orichalcum.alchemy.lifecycle.process.IAlchemyProcess */
 		
-		public function process(instance:*, id:*, type:Class, recipe:Recipe, evaluator:IEvaluator):* 
+		public function process(instance:*, id:*, type:Class, recipe:Recipe):* 
 		{
 			for each(var eventHandler:IEventHandler in recipe.eventHandlers)
 			{

@@ -5,10 +5,13 @@ package orichalcum.alchemy.alchemist
 	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.configuration.xml.mapper.XmlConfigurationMapper;
 	import orichalcum.alchemy.error.AlchemyError;
+	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.language.bundle.ILanguageBundle;
 	import orichalcum.alchemy.language.bundle.LanguageBundle;
 	import orichalcum.alchemy.process.chain.IProcessChain;
 	import orichalcum.alchemy.process.chain.ProcessChain;
+	import orichalcum.alchemy.process.FriendActivator;
+	import orichalcum.alchemy.process.FriendDeactivator;
 	import orichalcum.alchemy.process.IAlchemyProcess;
 	import orichalcum.alchemy.process.InstanceBinder;
 	import orichalcum.alchemy.process.InstanceComposer;
@@ -45,42 +48,6 @@ package orichalcum.alchemy.alchemist
 		 * @private
 		 */
 		static private var _recipeFactory:RecipeFactory = new RecipeFactory(_reflector, _languageBundle);
-		
-		/**
-		 * Creational lifecylce processes
-		 * @private
-		 */
-		private var _creationFilters:IProcessChain = new ProcessChain(
-			new InstanceCreator,
-			new InstanceInjector,
-			new InstanceBinder,
-			new InstanceComposer
-		);
-		
-		/**
-		 * Injection lifecycle processes
-		 * @private
-		 */
-		private var _injectionFilters:IProcessChain = new ProcessChain(
-			new InstanceInjector,
-			new InstanceBinder
-		);
-		
-		/**
-		 * Lifecycle processes for destruction
-		 * @private
-		 */
-		private var _distructionFilters:IProcessChain = new ProcessChain(
-			new InstanceUnbinder,
-			new InstanceDestroyer,
-			new InstanceUnjector
-		);
-		 
-		/**
-		 * Creates, injects, binds, unbinds, unjects and destroys instances
-		 * @private
-		 */
-		static private var _instanceFactory:InstanceFactory = new InstanceFactory;
 		
 		/**
 		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
@@ -124,6 +91,38 @@ package orichalcum.alchemy.alchemist
 		 * @private
 		 */
 		private var _friendsByInstance:Dictionary = new Dictionary;
+		
+		/**
+		 * Creational lifecylce processes
+		 * @private
+		 */
+		private var _creationFilters:IProcessChain = new ProcessChain(
+			new InstanceCreator(this as IEvaluator),
+			new InstanceInjector(this as IEvaluator),
+			new InstanceBinder,
+			new InstanceComposer,
+			new FriendActivator(this as IAlchemist, _friendsByInstance)
+		);
+		
+		/**
+		 * Injection lifecycle processes
+		 * @private
+		 */
+		private var _injectionFilters:IProcessChain = new ProcessChain(
+			new InstanceInjector(this as IEvaluator),
+			new InstanceBinder
+		);
+		
+		/**
+		 * Lifecycle processes for destruction
+		 * @private
+		 */
+		private var _distructionFilters:IProcessChain = new ProcessChain(
+			new FriendDeactivator(this as IAlchemist, _friendsByInstance),
+			new InstanceUnbinder,
+			new InstanceDestroyer,
+			new InstanceUnjector
+		);
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
@@ -212,8 +211,6 @@ package orichalcum.alchemy.alchemist
 				refactor this later
 			*/
 			
-			
-			
 			return provision;	
 		}
 		
@@ -221,7 +218,12 @@ package orichalcum.alchemy.alchemist
 		{
 			if (!type) throw new ArgumentError('Argument "type" passed to method Alchemist.create() must not be null.');
 			//const instance:* = _instanceFactory.create(type, getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe), this);
-			const instance:* = _creationFilters.process(null, null, type, getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe), this);
+			const instance:* = _creationFilters.process(
+				null,
+				null,
+				type,
+				getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe)
+			);
 			returnRecipeFlyweight();
 			return instance;
 		}
@@ -229,7 +231,13 @@ package orichalcum.alchemy.alchemist
 		public function inject(instance:Object):Object
 		{
 			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
-			_instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]), this);
+			//_instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]), this);
+			_injectionFilters.process(
+				instance,
+				null,
+				_reflector.getType(_reflector.getTypeName(instance)),
+				getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance])
+			);
 			returnRecipeFlyweight();
 			return instance;
 		}
@@ -238,7 +246,13 @@ package orichalcum.alchemy.alchemist
 		{
 			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
 			_providersByInstance[instance] && (_providersByInstance[instance] as IProvider).destroy(instance);
-			_instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
+			//_instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
+			_distructionFilters.process(
+				instance,
+				null,
+				_reflector.getType(_reflector.getTypeName(instance)),
+				getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance])
+			);
 			returnRecipeFlyweight();
 			return instance;
 		}

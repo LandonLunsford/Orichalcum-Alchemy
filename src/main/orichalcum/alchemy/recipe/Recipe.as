@@ -77,9 +77,13 @@ package orichalcum.alchemy.recipe
 			if (recipe.hasDisposer) preDestroy = recipe.preDestroy;
 			if (recipe.hasFriends)
 			{
-				for each(var filter:IFilter in recipe.friends)
+				for each(var friend:IFilter in recipe.friends)
 				{
-					if ((i = friends.indexOf(recipe)) < 0) friends[friends.length] = filter;
+					var x:int = friends.indexOf(recipe);
+					if (x < 0)
+					{
+						friends[friends.length] = friend;
+					}
 				}
 			}
 			return this;

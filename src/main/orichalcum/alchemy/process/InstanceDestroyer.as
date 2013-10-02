@@ -10,9 +10,10 @@ package orichalcum.alchemy.process
 		
 		/* INTERFACE orichalcum.alchemy.lifecycle.process.IAlchemyProcess */
 		
-		public function process(instance:*, id:*, type:Class, recipe:Recipe, evaluator:IEvaluator):* 
+		public function process(instance:*, id:*, type:Class, recipe:Recipe):* 
 		{
-			recipe.hasDisposer && (instance[recipe.preDestroy] as Function).call(instance, recipe);
+			//recipe.hasDisposer && (instance[recipe.preDestroy] as Function).call(instance, recipe);
+			recipe.hasDisposer && (instance[recipe.preDestroy] as Function).call(instance);
 			return instance;
 		}
 		

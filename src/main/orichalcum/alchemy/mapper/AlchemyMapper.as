@@ -1,7 +1,6 @@
 package orichalcum.alchemy.mapper 
 {
 	import flash.utils.Dictionary;
-	import org.flexunit.runner.manipulation.IFilter;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.handler.EventHandler;
 	import orichalcum.alchemy.provider.factory.factory;
@@ -135,7 +134,7 @@ package orichalcum.alchemy.mapper
 		
 		public function withFriends(...friends):IAlchemyMapper 
 		{
-			for each(var friend:IFilter in friends)
+			for each(var friend:* in friends)
 			{
 				friend && recipe.friends.push(friend);
 			}

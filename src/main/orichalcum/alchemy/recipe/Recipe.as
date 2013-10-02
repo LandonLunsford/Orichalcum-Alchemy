@@ -1,6 +1,5 @@
 package orichalcum.alchemy.recipe 
 {
-	import org.flexunit.runner.manipulation.IFilter;
 	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.provider.factory.value;
 	import orichalcum.lifecycle.IDisposable;
@@ -77,7 +76,7 @@ package orichalcum.alchemy.recipe
 			if (recipe.hasDisposer) preDestroy = recipe.preDestroy;
 			if (recipe.hasFriends)
 			{
-				for each(var friend:IFilter in recipe.friends)
+				for each(var friend:* in recipe.friends)
 				{
 					var x:int = friends.indexOf(recipe);
 					if (x < 0)

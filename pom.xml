@@ -1,56 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2011 the original author or authors
-  ~
-  ~ Permission is hereby granted to use, modify, and distribute this file
-  ~ in accordance with the terms of the license agreement accompanying it.
-  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	
+	<!--
+		https://github.com/justinjmoses/flexmojos-introduction
+		https://docs.sonatype.org/display/FLEXMOJOS/Building+an+AIR+Application
+		
+		<maven.build.timestamp.format>yyyyMMdd.HHmmss</maven.build.timestamp.format>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<output.name>${project.artifactId}-${project.version}.${timestamp}</output.name>
+		-->
+	<!-- 
+	
+	must install swcs in repo
+	
+	mvn install:install-file -DgroupId=com.milkmangames.extensions -DartifactId=com.milkmangames.extensions.StoreKit -Dversion=1.0 -Dpackaging=swc -Dfile=com.milkmangames.extensions.StoreKit.swc
+	
+	
+	
+	mvn install:install-file -DgroupId=orichalcum-studios.as3 -DartifactId=orichalcum-commons -Dversion=1.0 -Dpackaging=swc -Dfile=orichalcum-commons-1.0.swc
+	
+	
+	-->
+	
+	
+	
+	
+	
 	<modelVersion>4.0.0</modelVersion>
-	
+	<groupId>orichalcum</groupId>
 	<artifactId>orichalcum-alchemy</artifactId>
-	<groupId>org.orichalcum-studios</groupId>
-	<version>1.0</version>
-
-	<packaging>swc</packaging>
-
 	<name>Orichalcum Alchemy</name>
-	<description>IoC Container</description>
-	<url>https://github.com/LandonLunsford/Orichalcum-Alchemy</url>
-	<licenses>
-		<license>
-			<name>Orichalcum Studios Custom License</name>
-			<url>https://github.com/LandonLunsford/Orichalcum-Alchemy/LICENSE</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<developers>
-		<developer>
-			<id>LandonLunsford</id>
-			<name>Landon Lunsford</name>
-			<url>http://github.com/LandonLunsford</url>
-			<roles>
-				<role>Creator</role>
-			</roles>
-		</developer>
-	</developers>
-
-	<scm>
-		<url>http://github.com/LandonLunsford/Orichalcum-Alchemy</url>
-		<connection>git://github.com/LandonLunsford/Orichalcum-Alchemy.git</connection>
-	</scm>
-	
+	<version>1.0</version>
+	<packaging>swc</packaging>
 	<properties>
-		<flexmojos.version>4.0-RC2</flexmojos.version>
 		<flex.sdk.version>4.5.1.21328</flex.sdk.version>
-		<flexunit.version>4.1.0-8</flexunit.version>
-		<hamcrest.version>1.1.3</hamcrest.version>
+		<flex46.sdk.version>4.6.b.23201</flex46.sdk.version>
+		<flex.mojo.version>4.0-RC2</flex.mojo.version>
+		<!--<flexunit.version>4.0-rc-1</flexunit.version>-->
+		<flexunit.version>0.9</flexunit.version>
+		<hamcrest.version>1.1.0</hamcrest.version>
+		<debug>true</debug>
+		
+		
+		<!--
+		<document.class>${basedir}/src/main/com/orihalcum/games/rollypolly/Main.as</document.class>
+			-->
+		
 	</properties>
-	
+	<build>
+		<!--
+		<filters>
+			<filter>filters.properties</filter>
+		</filters>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		
+		<directory>target/${output.name}</directory>
+		<finalName>${output.name}</finalName>
+		-->
+		<sourceDirectory>src/main</sourceDirectory>
+		<testSourceDirectory>src/test</testSourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.flexmojos</groupId>
+				<artifactId>flexmojos-maven-plugin</artifactId>
+				<version>${flex.mojo.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<sourceFile>${document.class}</sourceFile>
+					<debug>${debug}</debug>
+				</configuration>
+			</plugin>
+			<!-- optional
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<id>runbatchfile</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>${basedir}/Run.bat</executable>
+				</configuration>
+			</plugin>
+			-->
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>com.adobe.flex.framework</groupId>
@@ -58,58 +104,71 @@
 			<version>${flex.sdk.version}</version>
 			<type>pom</type>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.adobe.flexunit</groupId>
 			<artifactId>flexunit</artifactId>
 			<version>${flexunit.version}</version>
 			<type>swc</type>
+			<classifier>as3</classifier>
 			<scope>test</scope>
 		</dependency>
+		
+
 		<dependency>
-			<groupId>org.hamcrest</groupId>
+			<groupId>hamcrest-as3</groupId>
 			<artifactId>hamcrest-as3</artifactId>
 			<version>${hamcrest.version}</version>
 			<type>swc</type>
+			<classifier>as3</classifier>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+		
+		<dependency>
+			<groupId>orichalcum-studios.as3</groupId>
+			<artifactId>orichalcum-commons</artifactId>
+			<version>1.0</version>
+			<type>swc</type>
+		</dependency>
 	
-	<build>
-		<sourceDirectory>src/main</sourceDirectory>
-		<testSourceDirectory>src/test</testSourceDirectory>
-		<plugins>
-			<plugin>
-				<groupId>org.sonatype.flexmojos</groupId>
-				<artifactId>flexmojos-maven-plugin</artifactId>
-				<version>${flexmojos.version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<keepAs3Metadatas>
-						<keepAs3Metadata>Inject</keepAs3Metadata>
-						<keepAs3Metadata>PostConstruct</keepAs3Metadata>
-						<keepAs3Metadata>PreDestroy</keepAs3Metadata>
-						<keepAs3Metadata>EventHandler</keepAs3Metadata>
-					</keepAs3Metadatas>
-					<dumpConfigAttach>true</dumpConfigAttach>
-					<verboseStacktraces>true</verboseStacktraces>
-					<compilerWarnings>
-						<warn-no-constructor>false</warn-no-constructor>
-					</compilerWarnings>
-					<includeTestFiles>
-						<includeTestFile>suite/TestSuite.as</includeTestFile>
-					</includeTestFiles>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>com.adobe.flex</groupId>
-						<artifactId>compiler</artifactId>
-						<version>${flex.sdk.version}</version>
-						<type>pom</type>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-	</build>
+	</dependencies>
+	<repositories>
+		
+		<repository>
+			<id>flex-mojos-repository</id>
+			<url>http://repository.sonatype.org/content/groups/flexgroup</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 
 	
+	</repositories>
+	<pluginRepositories>
+		<!--<pluginRepository>
+			<id>maven-central-repository</id>
+			<url>http://repo1.maven.org/central/net/flexmojos/oss/flexmojos-maven-plugin/6.0.0/flexmojos-maven-plugin-6.0.0.pom</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		-->
+		<pluginRepository>
+			<id>flex-mojos-plugin-repository</id>
+			<url>http://repository.sonatype.org/content/groups/flexgroup</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		
+	</pluginRepositories>
 </project>

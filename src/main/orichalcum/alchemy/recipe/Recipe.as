@@ -1,5 +1,6 @@
 package orichalcum.alchemy.recipe 
 {
+	import org.flexunit.runner.manipulation.IFilter;
 	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.provider.factory.value;
 	import orichalcum.lifecycle.IDisposable;
@@ -21,6 +22,7 @@ package orichalcum.alchemy.recipe
 		private var _eventHandlers:Array;
 		private var _postConstruct:String;
 		private var _preDestroy:String;
+		private var _friends:Array;
 		
 		/* INTERFACE orichalcum.lifecycle.IDisposable */
 		
@@ -40,6 +42,7 @@ package orichalcum.alchemy.recipe
 			_eventHandlers = null;
 			_postConstruct = null;
 			_preDestroy = null;
+			_friends = null;
 		}
 		
 		public function clone():Recipe
@@ -48,6 +51,7 @@ package orichalcum.alchemy.recipe
 			if (hasConstructorArguments) clone._constructorArguments = constructorArguments.concat();
 			if (hasProperties) clone._properties = ObjectUtil.clone(properties);
 			if (hasEventHandlers) clone._eventHandlers = eventHandlers.concat();
+			if (hasFriends) clone._friends = friends.concat();
 			clone._postConstruct = postConstruct;
 			clone._preDestroy = preDestroy;
 			return clone;
@@ -58,6 +62,7 @@ package orichalcum.alchemy.recipe
 			if (hasConstructorArguments) _constructorArguments.length = 0;
 			if (hasEventHandlers) _eventHandlers.length = 0;
 			if (hasProperties) ObjectUtil.empty(_properties);
+			if (hasFriends) _friends.length = 0;
 			_postConstruct = null;
 			_preDestroy = null;
 			return this;
@@ -70,6 +75,13 @@ package orichalcum.alchemy.recipe
 			if (recipe.hasEventHandlers) for each(var eventHandler:IEventHandler in recipe.eventHandlers) eventHandlers[eventHandlers.length] = eventHandler;
 			if (recipe.hasComposer) postConstruct = recipe.postConstruct;
 			if (recipe.hasDisposer) preDestroy = recipe.preDestroy;
+			if (recipe.hasFriends)
+			{
+				for each(var filter:IFilter in recipe.friends)
+				{
+					if ((i = friends.indexOf(recipe)) < 0) friends[friends.length] = filter;
+				}
+			}
 			return this;
 		}
 		
@@ -96,6 +108,11 @@ package orichalcum.alchemy.recipe
 		public function get hasEventHandlers():Boolean 
 		{
 			return _eventHandlers != null && _eventHandlers.length;
+		}
+		
+		public function get hasFriends():Boolean
+		{
+			return _friends != null && _friends.length;
 		}
 		
 		public function get constructorArguments():Array 
@@ -146,6 +163,16 @@ package orichalcum.alchemy.recipe
 		public function set preDestroy(value:String):void 
 		{
 			_preDestroy = value;
+		}
+		
+		public function get friends():Array
+		{
+			return _friends ||= [];
+		}
+		
+		public function set friends(value:Array):void
+		{
+			_friends = value;
 		}
 		
 	}

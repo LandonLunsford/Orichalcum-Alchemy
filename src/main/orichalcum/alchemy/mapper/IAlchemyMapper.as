@@ -1,5 +1,6 @@
 package orichalcum.alchemy.mapper
 {
+	import org.flexunit.runner.manipulation.IFilter;
 	
 	public interface IAlchemyMapper
 	{
@@ -142,6 +143,10 @@ package orichalcum.alchemy.mapper
 		 */
 		function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:int = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false, parameters:Array = null):IAlchemyMapper;
 		
+		/**
+		 * @TODO
+		 */
+		function withFriends(...friends):IAlchemyMapper;
 	}
 
 }

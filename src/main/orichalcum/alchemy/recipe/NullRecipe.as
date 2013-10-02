@@ -52,6 +52,11 @@ package orichalcum.alchemy.recipe
 			return false;
 		}
 		
+		override public function get hasFriends():Boolean 
+		{
+			return false;
+		}
+		
 		override public function get constructorArguments():Array 
 		{
 			return null;
@@ -98,6 +103,16 @@ package orichalcum.alchemy.recipe
 		}
 		
 		override public function set preDestroy(value:String):void 
+		{
+			
+		}
+		
+		override public function get friends():Array 
+		{
+			return null;
+		}
+		
+		override public function set friends(value:Array):void 
 		{
 			
 		}

@@ -1,100 +1,19 @@
-package orichalcum.alchemy.alchemist 
+package orichalcum.alchemy.process 
 {
-	import flash.events.IEventDispatcher;
 	import flash.utils.getQualifiedClassName;
-	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.evaluator.IEvaluator;
-	import orichalcum.alchemy.handler.IEventHandler;
 	import orichalcum.alchemy.recipe.Recipe;
-	import orichalcum.utility.ObjectUtil;
 	import orichalcum.utility.StringUtil;
 
-	/**
-	 * This class performs the dirty work of the alchemist
-	 * It is the alchemists' instance creator, injector, binder,
-	 * composer, disposer, unbinder and injector
-	 * @private
-	 */
-	internal class InstanceFactory
+
+	public class InstanceCreator implements IAlchemyProcess
 	{
 		
-		public function create(type:Class, recipe:Recipe, evaluator:IEvaluator):Object 
-		{
-			return compose(inject(createInstance(type, recipe, evaluator), recipe, evaluator), recipe);
-		}
+		/* INTERFACE orichalcum.alchemy.lifecycle.process.IAlchemyProcess */
 		
-		public function inject(instance:Object, recipe:Recipe, evaluator:IEvaluator):Object 
+		public function process(instance:*, id:*, type:Class, recipe:Recipe, evaluator:IEvaluator):* 
 		{
-			for (var propertyName:String in recipe.properties)
-				instance[propertyName] = evaluator.evaluate(recipe.properties[propertyName]);
-			return bind(instance, recipe);
-		}
-		
-		private function compose(instance:Object, recipe:Recipe):Object
-		{
-			recipe.hasComposer && (instance[recipe.postConstruct] as Function).call(instance);
-			return instance;
-		}
-		
-		public function destroy(instance:Object, recipe:Recipe):Object 
-		{
-			recipe.hasDisposer && (instance[recipe.preDestroy] as Function).call(instance, recipe);
-			return unject(unbind(instance, recipe), recipe);
-		}
-		
-		private function bind(instance:Object, recipe:Recipe):Object
-		{
-			for each(var eventHandler:IEventHandler in recipe.eventHandlers)
-			{
-				var target:Object = ObjectUtil.find(instance, eventHandler.targetPath);
-				var eventDispatcher:IEventDispatcher = target as IEventDispatcher;
-				
-				if (eventDispatcher == null)
-				{
-					if (target === instance)
-					{
-						throw new AlchemyError('Class "{0}" must implement "flash.events::IEventDispatcher" in order to have an event handler with no target specified.', getQualifiedClassName(instance));
-					}
-					else
-					{
-						throw new AlchemyError('Variable or child named "{0}" could not be found on "{1}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
-					}
-				}
-					
-				if (!(eventHandler.listenerName in instance))
-					throw new AlchemyError('Unable to bind method "{0}" to event type "{1}". Method "{0}" not found on "{2}".', eventHandler.listenerName, eventHandler.type, getQualifiedClassName(instance));
-				
-				eventHandler.listener = instance[eventHandler.listenerName];
-				eventDispatcher.addEventListener(eventHandler.type, eventHandler.handle, eventHandler.useCapture, eventHandler.priority);
-			}
-			return instance;
-		}
-		
-		private function unbind(instance:Object, recipe:Recipe):Object
-		{
-			if (!recipe.hasEventHandlers)
-				return instance;
 			
-			for each(var eventHandler:IEventHandler in recipe.eventHandlers)
-			{
-				var target:IEventDispatcher = ObjectUtil.find(instance, eventHandler.targetPath) as IEventDispatcher;
-					
-				if (target.hasEventListener(eventHandler.type))
-					target.removeEventListener(eventHandler.type, eventHandler.handle);
-			}
-			return instance;
-		}
-		
-		private function unject(instance:Object, recipe:Recipe):Object
-		{
-			for (var propertyName:String in recipe.properties)
-				if (instance[propertyName] is Object)
-					instance[propertyName] = null;
-			return instance;
-		}
-		
-		private function createInstance(type:Class, recipe:Recipe, evaluator:IEvaluator):Object
-		{
 			if (type == null)
 				throw new ArgumentError('Argument "type" passed to method "createInstance" must not be null.');
 			
@@ -275,7 +194,6 @@ package orichalcum.alchemy.alchemist
 			}
 			return new type;
 		}
-		
 	}
 
 }

@@ -17,7 +17,7 @@ package orichalcum.alchemy.provider
 			super(type);
 		}
 		
-		override public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
 			return pool.length
 				? activeAlchemist.inject(pool.pop())

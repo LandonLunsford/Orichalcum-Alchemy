@@ -8,13 +8,9 @@ package subject
 	{
 		static public var provision:*;
 		
-		public function Provider() 
-		{
-		}
-		
 		/* INTERFACE orichalcum.alchemy.provider.IProvider */
 		
-		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
 			return provision;
 		}

@@ -1,5 +1,6 @@
 package orichalcum.alchemy.alchemist 
 {
+	import flash.events.EventDispatcher;
 	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
@@ -29,7 +30,7 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
 	
-	public class Alchemist implements IDisposable, IAlchemist
+	public class Alchemist extends EventDispatcher implements IDisposable, IAlchemist
 	{
 		/**
 		 * Reflection utility
@@ -100,8 +101,7 @@ package orichalcum.alchemy.alchemist
 			new InstanceCreator(this as IEvaluator),
 			new InstanceInjector(this as IEvaluator),
 			new InstanceBinder,
-			new InstanceComposer,
-			new FriendActivator(this as IAlchemist, _friendsByInstance)
+			new InstanceComposer
 		);
 		
 		/**
@@ -118,11 +118,18 @@ package orichalcum.alchemy.alchemist
 		 * @private
 		 */
 		private var _distructionFilters:IProcessChain = new ProcessChain(
-			new FriendDeactivator(this as IAlchemist, _friendsByInstance),
 			new InstanceUnbinder,
 			new InstanceDestroyer,
 			new InstanceUnjector
 		);
+		
+		//private var _postConstructProcessors:IProcessChain = new ProcessChain(
+			//new FriendActivator(this as IAlchemist, _friendsByInstance)
+		//);
+		//
+		//private var _preDestroyProcessors:IProcessChain = new ProcessChain(
+			//new FriendDeactivator(this as IAlchemist, _friendsByInstance)
+		//);
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
@@ -195,7 +202,7 @@ package orichalcum.alchemy.alchemist
 			}
 			else
 			{
-				provision = evaluateWithRecipe(provider, recipe ||= getRecipe(id));
+				provision = evaluateWithRecipe(id, provider, recipe ||= getRecipe(id));
 				provider && (_providersByInstance[provision] = provider);
 			}
 			
@@ -209,6 +216,10 @@ package orichalcum.alchemy.alchemist
 				onDestroy(provision:*):*
 				
 				refactor this later
+				
+				these filters must be applied after singleton providers have assigned their instance to
+				the _instance property
+				otherwise we are dealing with an infinite loop
 			*/
 			
 			return provision;	
@@ -217,7 +228,6 @@ package orichalcum.alchemy.alchemist
 		public function create(type:Class, recipe:Recipe = null):Object
 		{
 			if (!type) throw new ArgumentError('Argument "type" passed to method Alchemist.create() must not be null.');
-			//const instance:* = _instanceFactory.create(type, getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe), this);
 			const instance:* = _creationFilters.process(
 				null,
 				null,
@@ -231,7 +241,6 @@ package orichalcum.alchemy.alchemist
 		public function inject(instance:Object):Object
 		{
 			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
-			//_instanceFactory.inject(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]), this);
 			_injectionFilters.process(
 				instance,
 				null,
@@ -246,7 +255,6 @@ package orichalcum.alchemy.alchemist
 		{
 			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
 			_providersByInstance[instance] && (_providersByInstance[instance] as IProvider).destroy(instance);
-			//_instanceFactory.destroy(instance, getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]));
 			_distructionFilters.process(
 				instance,
 				null,
@@ -268,7 +276,7 @@ package orichalcum.alchemy.alchemist
 		
 		public function evaluate(providerReferenceOrValue:*):*
 		{
-			return evaluateWithRecipe(providerReferenceOrValue, null);
+			return evaluateWithRecipe(null, providerReferenceOrValue, null);
 		}
 		
 		/* PRIVATE PARTS */
@@ -358,10 +366,10 @@ package orichalcum.alchemy.alchemist
 		 * but also minimizes the libraries data footprint by avoiding excessive wrapping of values/references with providers
 		 * @private
 		 */
-		private function evaluateWithRecipe(providerReferenceOrValue:*, recipe:Recipe = null):*
+		private function evaluateWithRecipe(id:*, providerReferenceOrValue:*, recipe:Recipe = null):*
 		{
 			if (providerReferenceOrValue is IProvider)
-				return (providerReferenceOrValue as IProvider).provide(this, recipe);
+				return (providerReferenceOrValue as IProvider).provide(id, this, recipe);
 				
 			if (providerReferenceOrValue is String && _languageBundle.expressionLanguage.expressionQualifier.test(providerReferenceOrValue))
 				return conjure((providerReferenceOrValue as String).replace(_languageBundle.expressionLanguage.expressionRemovals, ''));

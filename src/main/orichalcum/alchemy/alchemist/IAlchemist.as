@@ -1,10 +1,11 @@
 package orichalcum.alchemy.alchemist 
 {
+	import flash.events.IEventDispatcher;
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.recipe.Recipe;
 	
-	public interface IAlchemist extends IEvaluator
+	public interface IAlchemist extends IEventDispatcher, IEvaluator
 	{
 		
 		/**

@@ -11,7 +11,7 @@ package orichalcum.alchemy.provider
 		 * @param	activeRecipe The recipe mapped to the provision
 		 * @return	The provision it is responsible for providing.
 		 */
-		function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):*;
+		function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):*;
 		
 		/**
 		 * Destruction phase hook

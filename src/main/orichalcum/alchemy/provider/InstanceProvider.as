@@ -24,7 +24,7 @@ package orichalcum.alchemy.provider
 		
 		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
-		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
 			throw new IllegalOperationError('InstanceProvider.provide() is an abstract method and must be overriden.');
 		}
@@ -39,6 +39,11 @@ package orichalcum.alchemy.provider
 		public function get type():Class
 		{
 			return _type;
+		}
+		
+		public function set type(value:Class):void
+		{
+			_type = value;
 		}
 
 	}

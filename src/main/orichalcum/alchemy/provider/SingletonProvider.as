@@ -25,7 +25,7 @@ package orichalcum.alchemy.provider
 		
 		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
-		override public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):*
+		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):*
 		{
 			return _instance ||= activeAlchemist.create(type, activeRecipe);
 		}

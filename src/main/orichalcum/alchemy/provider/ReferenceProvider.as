@@ -4,10 +4,8 @@ package orichalcum.alchemy.provider
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
-
-	/**
-	 * @todo add better id validation
-	 */
+	
+	
 	public class ReferenceProvider implements IProvider, IDisposable
 	{
 		private var _reference:String;
@@ -29,7 +27,7 @@ package orichalcum.alchemy.provider
 		
 		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
-		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):*
+		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):*
 		{
 			return activeAlchemist.conjure(_reference, activeRecipe);
 		}
@@ -49,7 +47,7 @@ package orichalcum.alchemy.provider
 			if (id is Class)
 				return getQualifiedClassName(id as Class);
 				
-			throw new ArgumentError;
+			throw new ArgumentError('Argument "id" must be of type "String" or "Class" not ' + getQualifiedClassName(id));
 		}
 		
 		

@@ -21,7 +21,7 @@ package orichalcum.alchemy.provider
 		{
 			return pool.length
 				? activeAlchemist.inject(pool.pop())
-				: activeAlchemist.create(type, activeRecipe);
+				: activeAlchemist.create(type, activeRecipe, id);
 		}
 		
 		override public function destroy(provision:*):*

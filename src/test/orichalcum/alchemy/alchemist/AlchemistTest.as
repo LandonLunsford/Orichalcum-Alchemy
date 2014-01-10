@@ -36,44 +36,44 @@ package orichalcum.alchemy.alchemist
 			_alchemist = new Alchemist;
 		}
 		
-		[Test(expects = "ArgumentError")]
+		[Test(expects = "Error")]
 		public function testConjureNull():void
 		{
 			_alchemist.conjure(null);
 		}
 		
-		[Test(expects = "ArgumentError")]
+		[Test(expects = "Error")]
 		public function testConjureUndefined():void
 		{
 			_alchemist.conjure(undefined);
 		}
 		
-		[Test(expects = "ArgumentError")]
+		[Test(expects = "Error")]
 		public function testConjureInt():void
 		{
 			_alchemist.conjure(int(1));
 		}
 		
-		[Test(expects = "ArgumentError")]
+		[Test(expects = "Error")]
 		public function testConjureUint():void
 		{
 			_alchemist.conjure(uint(1));
 		}
 		
-		[Test(expects = "ArgumentError")]
+		[Test(expects = "Error")]
 		public function testConjureNumber():void
 		{
 			_alchemist.conjure(Number(1));
 		}
 				
-		[Test(expects = "ArgumentError")]
+		[Test(expects = "Error")]
 		public function testConjureBoolean():void
 		{
 			_alchemist.conjure(true);
 			_alchemist.conjure(false);
 		}
 		
-		[Test(expects = "orichalcum.alchemy.error.AlchemyError")]
+		[Test(expects = "Error")]
 		public function testConjureUnmappedId():void
 		{
 			_alchemist.conjure('unmappedId');

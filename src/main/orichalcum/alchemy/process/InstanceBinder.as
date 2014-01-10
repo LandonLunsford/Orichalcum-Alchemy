@@ -13,10 +13,9 @@ package orichalcum.alchemy.process
 	public class InstanceBinder implements IAlchemyProcess 
 	{
 		
-		/* INTERFACE orichalcum.alchemy.lifecycle.process.IAlchemyProcess */
-		
 		public function process(instance:*, id:*, type:Class, recipe:Recipe):* 
 		{
+			
 			for each(var eventHandler:IEventHandler in recipe.eventHandlers)
 			{
 				var target:Object = ObjectUtil.find(instance, eventHandler.targetPath);
@@ -33,7 +32,7 @@ package orichalcum.alchemy.process
 						throw new AlchemyError('Variable or child named "{0}" could not be found on "{1}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
 					}
 				}
-					
+				
 				if (!(eventHandler.listenerName in instance))
 					throw new AlchemyError('Unable to bind method "{0}" to event type "{1}". Method "{0}" not found on "{2}".', eventHandler.listenerName, eventHandler.type, getQualifiedClassName(instance));
 				

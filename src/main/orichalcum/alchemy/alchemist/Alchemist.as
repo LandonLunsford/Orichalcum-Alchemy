@@ -7,6 +7,7 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.configuration.xml.mapper.XmlConfigurationMapper;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.evaluator.IEvaluator;
+	import orichalcum.alchemy.filter.IFilter;
 	import orichalcum.alchemy.language.bundle.ILanguageBundle;
 	import orichalcum.alchemy.language.bundle.LanguageBundle;
 	import orichalcum.alchemy.process.chain.IProcessChain;
@@ -70,16 +71,16 @@ package orichalcum.alchemy.alchemist
 		private var _providers:Dictionary = new Dictionary;
 		
 		/**
-		 * Used to facilitate providers' provision destruction hook
-		 * @private
-		 */
-		private var _providersByInstance:Dictionary = new Dictionary;
-		
-		/**
 		 * Contains all mapped recipes
 		 * @private
 		 */
 		private var _recipes:Dictionary = new Dictionary;
+		
+		/**
+		 * Used to facilitate providers' provision destruction hook
+		 * @private
+		 */
+		private var _providersByInstance:Dictionary = new Dictionary;
 		
 		/**
 		 * Used to facilitate unbinding and pre-destroy hooks for runtime configured instances
@@ -97,11 +98,18 @@ package orichalcum.alchemy.alchemist
 		 * Creational lifecylce processes
 		 * @private
 		 */
-		private var _creationFilters:IProcessChain = new ProcessChain(
-			new InstanceCreator(this as IEvaluator),
+		private var _creator:IAlchemyProcess = new InstanceCreator(this as IEvaluator);
+		
+		/**
+		 * Creational lifecylce processes
+		 * @private
+		 */
+		private var _createFilters:IProcessChain = new ProcessChain(
+			//new InstanceCreator(this as IEvaluator),
 			new InstanceInjector(this as IEvaluator),
 			new InstanceBinder,
-			new InstanceComposer
+			new InstanceComposer,
+			new FriendActivator(this as IAlchemist, _friendsByInstance)
 		);
 		
 		/**
@@ -117,19 +125,12 @@ package orichalcum.alchemy.alchemist
 		 * Lifecycle processes for destruction
 		 * @private
 		 */
-		private var _distructionFilters:IProcessChain = new ProcessChain(
+		private var _destroyFilters:IProcessChain = new ProcessChain(
+			new FriendDeactivator(this as IAlchemist, _friendsByInstance),
 			new InstanceUnbinder,
 			new InstanceDestroyer,
 			new InstanceUnjector
 		);
-		
-		//private var _postConstructProcessors:IProcessChain = new ProcessChain(
-			//new FriendActivator(this as IAlchemist, _friendsByInstance)
-		//);
-		//
-		//private var _preDestroyProcessors:IProcessChain = new ProcessChain(
-			//new FriendDeactivator(this as IAlchemist, _friendsByInstance)
-		//);
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
@@ -138,6 +139,18 @@ package orichalcum.alchemy.alchemist
 		 * @private
 		 */
 		private var _parent:Alchemist;
+		
+		/**
+		 * @private used to prevent infinite loops for circular dependencies
+		 */
+		private var _instancesInProcessById:Dictionary = new Dictionary;
+		
+		/**
+		 * Experimental.
+		 * Allows hooking into each provide() and destroy() call
+		 */
+		public var filters:Vector.<IFilter> = new Vector.<IFilter>;
+		
 		
 		/**
 		 * @param list of XML mapping configurations
@@ -188,79 +201,75 @@ package orichalcum.alchemy.alchemist
 		
 		public function conjure(id:*, recipe:Recipe = null):*
 		{
-			id = getValidId(id);
+			const validId:String = getValidId(id);
 			
-			const provider:* = getProvider(id);
+			if (_instancesInProcessById[validId])
+				return _instancesInProcessById[validId];
+			
+			const provider:* = getProvider(validId);
 			var provision:*;
 			
 			if (provider === NotFound)
 			{
-				if (!_reflector.isType(id))
-					throw new AlchemyError('Alchemist has no provider mapped to "{0}"', id);
-					
-				provision = conjureUnmappedType(id);
+				_reflector.isType(validId) || throwError('Alchemist has no provider mapped to "{0}"', validId);
+				provision = conjureUnmappedType(validId);
 			}
 			else
 			{
-				provision = evaluateWithRecipe(id, provider, recipe ||= getRecipe(id));
+				provision = evaluateWithRecipe(validId, provider, recipe ||= getRecipe(validId));
 				provider && (_providersByInstance[provision] = provider);
 			}
 			
 			recipe && (_recipesByInstance[provision] = recipe);
 			
-			/*
-				To implement mediators, I would implement some kind of
-				request filter that fires up the "linked" provisions
-				
-				onProvide(provisionId:*, provision:*):*
-				onDestroy(provision:*):*
-				
-				refactor this later
-				
-				these filters must be applied after singleton providers have assigned their instance to
-				the _instance property
-				otherwise we are dealing with an infinite loop
-			*/
+			_applyProvideFilters(provision);
 			
 			return provision;	
 		}
 		
-		public function create(type:Class, recipe:Recipe = null):Object
+		public function create(type:Class, recipe:Recipe = null, id:* = null):Object
 		{
-			if (!type) throw new ArgumentError('Argument "type" passed to method Alchemist.create() must not be null.');
-			const instance:* = _creationFilters.process(
-				null,
-				null,
-				type,
-				getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe)
-			);
+			type || throwError('Argument "type" passed to method Alchemist.create() must not be null.');
+			
+			//if (_instancesInProcessById[id])
+			//{
+				//trace('Infinite loop!')
+				//return null;
+			//}
+			
+			const recipeFlyweight:Recipe = getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe);
+			const instance:* = _creator.process(null, null, type, recipeFlyweight);
+			
+			_instancesInProcessById[id] = instance;
+			_createFilters.process(instance, null, type, recipeFlyweight);
+			delete _instancesInProcessById[id];
+			
 			returnRecipeFlyweight();
+			
 			return instance;
 		}
 		
 		public function inject(instance:Object):Object
 		{
-			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
-			_injectionFilters.process(
-				instance,
-				null,
-				_reflector.getType(_reflector.getTypeName(instance)),
-				getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance])
-			);
+			instance || throwError('Argument "instance" passed to method Alchemist.inject() must not be null.');
+			
+			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
+			const recipe:Recipe = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
+			_injectionFilters.process(instance, null, type, recipe);
 			returnRecipeFlyweight();
 			return instance;
 		}
 		
 		public function destroy(instance:Object):Object
 		{
-			if (!instance) throw new ArgumentError('Argument "instance" passed to method Alchemist.create() must not be null.');
+			instance || throwError('Argument "instance" passed to method Alchemist.destroy() must not be null.');
+			
+			_applyDestroyFilters(instance);
 			_providersByInstance[instance] && (_providersByInstance[instance] as IProvider).destroy(instance);
-			_distructionFilters.process(
-				instance,
-				null,
-				_reflector.getType(_reflector.getTypeName(instance)),
-				getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance])
-			);
+			
+			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
+			const recipe:Recipe = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
+			_destroyFilters.process(instance, null, type, recipe);
 			returnRecipeFlyweight();
 			return instance;
 		}
@@ -358,7 +367,7 @@ package orichalcum.alchemy.alchemist
 			 * what I want is to just create the instance with the factory cached recipe (not an extension)
 			 * because there will be no modification
 			 */
-			return create(_reflector.getType(qualifiedClassName), getRecipe(qualifiedClassName));
+			return create(_reflector.getType(qualifiedClassName), getRecipe(qualifiedClassName), qualifiedClassName);
 		}
 		
 		/**
@@ -382,8 +391,7 @@ package orichalcum.alchemy.alchemist
 		 */
 		private function getValidId(id:*):String
 		{
-			if (id == null)
-				throw new ArgumentError('Argument "id" must not be null.');
+			id || throwError('Argument "id" must not be null.');
 			
 			var validId:String;
 			
@@ -397,13 +405,12 @@ package orichalcum.alchemy.alchemist
 			}
 			else
 			{
-				throw new ArgumentError('Argument "id" must be of type "String" or "Class" not ' + _reflector.getTypeName(validId));
+				throwError('Argument "id" must be of type "String" or "Class" not ' + _reflector.getTypeName(id));
 			}
-			if (_reflector.isPrimitiveType(id))
+			if (_reflector.isPrimitiveType(validId))
 			{
-				throw new ArgumentError('Argument "id" must not be any of these primitive types: (Function, Object, Array, Boolean, Number, String, int, uint)');
+				throwError('Argument "id" must not be any of these primitive types: (Function, Object, Array, Boolean, Number, String, int, uint)');
 			}
-			
 			return validId;
 		}
 		
@@ -423,10 +430,44 @@ package orichalcum.alchemy.alchemist
 			_recipeFlyweightsIndex--;
 		}
 		
+		/**
+		 * @private
+		 */
 		private function mapAll(mappings:Array):void 
 		{
 			(new XmlConfigurationMapper(_reflector, _languageBundle)).map(this, mappings);
 		}
+		
+		/**
+		 * @private
+		 */
+		private function _applyProvideFilters(instance:*):void 
+		{
+			for each(var filter:IFilter in filters)
+			{
+				filter && filter.applies(instance, this) && filter.onProvide(instance, this);
+			}
+		}
+		
+		/**
+		 * @private
+		 */
+		private function _applyDestroyFilters(instance:Object):void 
+		{
+			for each(var filter:IFilter in filters)
+			{
+				filter && filter.applies(instance, this) && filter.onDestroy(instance, this);
+			}
+		}
+		
+		/**
+		 * @private
+		 */
+		private function throwError(message:String, ...substitutions):void
+		{
+			throw new AlchemyError(message, substitutions);
+		}
+		
 		
 	}
 

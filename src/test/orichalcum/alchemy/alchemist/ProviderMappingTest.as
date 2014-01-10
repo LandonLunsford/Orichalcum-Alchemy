@@ -36,7 +36,7 @@ package orichalcum.alchemy.alchemist
 		
 		/* INTERFACE orichalcum.alchemy.provider.IProvider */
 		
-		public function provide(activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
 			return _provision;
 		}

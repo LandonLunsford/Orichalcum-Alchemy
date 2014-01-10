@@ -6,7 +6,6 @@ package orichalcum.alchemy.recipe.factory
 	import orichalcum.alchemy.language.bundle.LanguageBundle;
 	import orichalcum.alchemy.recipe.factory.RecipeFactory;
 	import orichalcum.alchemy.recipe.Recipe;
-	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
 	import subject.ClassWithAllMetatags;
 	import subject.ClassWithNoMetatags;
@@ -146,18 +145,6 @@ package orichalcum.alchemy.recipe.factory
 		public function testHasNoProperties():void
 		{
 			assertFalse(_hasNothing.hasProperties);
-		}
-		
-		[Ignore]
-		[Test]
-		public function debugTrace():void
-		{
-			var recipe:Recipe = _hasEverything;
-			trace(recipe.constructorArguments);
-			trace(recipe.eventHandlers);
-			trace(recipe.postConstruct);
-			trace(recipe.preDestroy);
-			trace(recipe.properties);
 		}
 		
 	}

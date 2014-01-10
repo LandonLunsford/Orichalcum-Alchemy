@@ -190,6 +190,9 @@ package orichalcum.alchemy.recipe.factory
 			
 			for (var j:int = 0; j < totalEventHandlers; j++)
 			{
+				
+				
+				
 				var handler:EventHandler = new EventHandler;
 				var eventHandlerMetadata:XML = eventHandlerMetatags[j];
 				var method:XML = eventHandlerMetadata.parent();
@@ -198,8 +201,10 @@ package orichalcum.alchemy.recipe.factory
 				
 				handler.listenerName = method.@name.toString();
 				
+				var targetAndEvent:Array = handler.listenerName.split('_');
+				
 				var eventArgs:XMLList = metatagArgs.(@key == _eventHandlerMetatag.eventKey);
-				if (eventArgs.length() == 0) throw new AlchemyError(NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE, _eventHandlerMetatag.eventKey, _preDestroyMetatag.name, typeName);
+				if (eventArgs.length() == 0 && targetAndEvent.length < 2) throw new AlchemyError(NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE, _eventHandlerMetatag.eventKey, _preDestroyMetatag.name, typeName);
 				if (eventArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, _eventHandlerMetatag.eventKey, _eventHandlerMetatag.name, handler.listenerName, typeName);
 				
 				var targetArgs:XMLList = metatagArgs.(@key == _eventHandlerMetatag.targetKey);
@@ -221,10 +226,22 @@ package orichalcum.alchemy.recipe.factory
 				if (stopImmediatePropagationArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, _eventHandlerMetatag.stopImmediatePropagationKey, _eventHandlerMetatag.name, handler.listenerName, typeName);
 				
 				if (eventArgs.length() > 0)
+				{
 					handler.type = eventArgs[0].@value[0].toString();
+				}
+				else if (targetAndEvent.length >= 2)
+				{
+					handler.type = targetAndEvent[1];
+				}
 				
 				if (targetArgs.length() > 0)
+				{
 					handler.targetPath = targetArgs[0].@value[0].toString();
+				}
+				else if (targetAndEvent.length >= 1)
+				{
+					handler.targetPath = targetAndEvent[0];
+				}
 				
 				if (priorityArgs.length() > 0)
 					handler.priority = int(priorityArgs.@value[0]);

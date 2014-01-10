@@ -17,7 +17,7 @@ package orichalcum.alchemy.provider
 		
 		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
-			return activeAlchemist.create(type, activeRecipe);
+			return activeAlchemist.create(type, activeRecipe, id);
 		}
 		
 	}

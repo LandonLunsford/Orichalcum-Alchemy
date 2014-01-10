@@ -28,11 +28,12 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * Creates, injects, calls post-construct hook and returns an object mapped to the ID
 		 * based on the provider and recipe mapped to the specified ID.
-		 * @param	id Custom name, class or qualified class name
+		 * @param	type The class of the object to create
 		 * @param	recipe Custom recipe used to override the mapped recipe
+		 * @param	id Internally used to prevent circular dependencies from causeing an infinite loop - set at your own risk
 		 * @return	An instance of the object type mapped to the id
 		 */
-		function create(type:Class, recipe:Recipe = null):Object;
+		function create(type:Class, recipe:Recipe = null, id:* = null):Object;
 		
 		/**
 		 * Injects and binds an object based on the object's class metatags and class-mapped recipes

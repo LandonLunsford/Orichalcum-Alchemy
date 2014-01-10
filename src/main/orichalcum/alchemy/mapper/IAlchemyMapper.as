@@ -146,6 +146,11 @@ package orichalcum.alchemy.mapper
 		/**
 		 * @TODO
 		 */
+		function withFriend(friend:*):IAlchemyMapper;
+		
+		/**
+		 * @TODO
+		 */
 		function withFriends(...friends):IAlchemyMapper;
 	}
 

@@ -6,6 +6,7 @@ package suite
 	import orichalcum.alchemy.alchemist.EventHandlerTest;
 	import orichalcum.alchemy.alchemist.FactoryForwardingMappingTest;
 	import orichalcum.alchemy.alchemist.FactoryMappingTest;
+	import orichalcum.alchemy.alchemist.FriendTest;
 	import orichalcum.alchemy.alchemist.PoolMappingTest;
 	import orichalcum.alchemy.alchemist.PostConstructTest;
 	import orichalcum.alchemy.alchemist.PreDestroyTest;
@@ -13,6 +14,7 @@ package suite
 	import orichalcum.alchemy.alchemist.ReferenceMappingTest;
 	import orichalcum.alchemy.alchemist.SetterInjectionTest;
 	import orichalcum.alchemy.alchemist.SingletonMappingTest;
+	import orichalcum.alchemy.alchemist.SymbiotTest;
 	import orichalcum.alchemy.alchemist.ValueMappingTest;
 	import orichalcum.alchemy.alchemist.VariableInjectionTest;
 	import orichalcum.alchemy.configuration.xml.mapper.XmlConfigurationMapperTest;
@@ -57,6 +59,9 @@ package suite
 		public var recipeFactoryTest:RecipeFactoryTest;
 		
 		public var xmlConfigurationMapperTest:XmlConfigurationMapperTest;
+		
+		public var friendTest:FriendTest;
+		public var symbiotTest:SymbiotTest;
 		
 	}
 

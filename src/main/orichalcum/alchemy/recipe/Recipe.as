@@ -78,8 +78,7 @@ package orichalcum.alchemy.recipe
 			{
 				for each(var friend:* in recipe.friends)
 				{
-					var x:int = friends.indexOf(recipe);
-					if (x < 0)
+					if (friends.indexOf(friend) < 0)
 					{
 						friends[friends.length] = friend;
 					}

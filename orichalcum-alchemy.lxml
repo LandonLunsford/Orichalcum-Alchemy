@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SWCProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <FlexBinPath>.\bin\orichalcum-alchemy-1.0.swc</FlexBinPath>
+  <FlexBinPath>.\bin\orichalcum-alchemy.swc</FlexBinPath>
   <FlashBinPath>.\bin\orichalcum-alchemy.flash.swc</FlashBinPath>
   <FlexIncludeASI>false</FlexIncludeASI>
   <MakeCS3>false</MakeCS3>

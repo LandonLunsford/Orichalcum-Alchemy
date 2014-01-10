@@ -132,12 +132,16 @@ package orichalcum.alchemy.mapper
 			return this;
 		}
 		
+		public function withFriend(friend:*):IAlchemyMapper
+		{
+			friend && recipe.friends.push(friend);
+			return this;
+		}
+		
 		public function withFriends(...friends):IAlchemyMapper 
 		{
 			for each(var friend:* in friends)
-			{
-				friend && recipe.friends.push(friend);
-			}
+				withFriend(friend);
 			return this;
 		}
 		

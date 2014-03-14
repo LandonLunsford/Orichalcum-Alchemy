@@ -8,15 +8,12 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.filter.IFilter;
-	import orichalcum.alchemy.language.bundle.ILanguageBundle;
-	import orichalcum.alchemy.language.bundle.LanguageBundle;
 	import orichalcum.alchemy.mapper.AlchemyMapper;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.process.chain.IProcessChain;
 	import orichalcum.alchemy.process.chain.ProcessChain;
 	import orichalcum.alchemy.process.FriendActivator;
 	import orichalcum.alchemy.process.FriendDeactivator;
-	import orichalcum.alchemy.process.IAlchemyProcess;
 	import orichalcum.alchemy.process.InstanceBinder;
 	import orichalcum.alchemy.process.InstanceComposer;
 	import orichalcum.alchemy.process.InstanceCreator;
@@ -26,6 +23,14 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.process.InstanceUnjector;
 	import orichalcum.alchemy.provider.IProvider;
 	import orichalcum.alchemy.recipe.factory.RecipeFactory;
+	import orichalcum.alchemy.recipe.ingredient.processor.ConstructorArgumentProcessor;
+	import orichalcum.alchemy.recipe.ingredient.processor.EventHandlerProcessor;
+	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
+	import orichalcum.alchemy.recipe.ingredient.processor.PostConstructProcessor;
+	import orichalcum.alchemy.recipe.ingredient.processor.PreDestroyProcessor;
+	import orichalcum.alchemy.recipe.ingredient.processor.PropertyProcessor;
+	import orichalcum.alchemy.recipe.ingredient.processor.SignalHandlerProcessor;
+	import orichalcum.alchemy.recipe.ingredient.processor.SymbiotProcessor;
 	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
@@ -33,6 +38,11 @@ package orichalcum.alchemy.alchemist
 	
 	public class Alchemist extends EventDispatcher implements IDisposable, IAlchemist
 	{
+		
+		
+		private var expressionQualifier:RegExp = expressionQualifier || /^{.*}$/;
+		private var expressionRemovals:RegExp = expressionRemovals || /{|}|\s/gm;
+		
 		/**
 		 * Reflection utility
 		 * @private
@@ -40,16 +50,10 @@ package orichalcum.alchemy.alchemist
 		static private var _reflector:IReflector = Reflector.getInstance(ApplicationDomain.currentDomain);
 		
 		/**
-		 * Parsing rules
-		 * @private
-		 */
-		static private var _languageBundle:ILanguageBundle = new LanguageBundle;
-		
-		/**
 		 * Generates recipes based on class metatags
 		 * @private
 		 */
-		static private var _recipeFactory:RecipeFactory = new RecipeFactory(_reflector, _languageBundle);
+		static private var _recipeFactory:RecipeFactory = new RecipeFactory(_reflector, this);
 		
 		/**
 		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
@@ -92,45 +96,56 @@ package orichalcum.alchemy.alchemist
 		 * Holds active friends, friends stay active so long as any of their friends is in play (not destroyed)
 		 * @private
 		 */
-		private var _friendsByInstance:Dictionary = new Dictionary;
+		private var _symbiotsByInstance:Dictionary = new Dictionary;
 		
 		/**
 		 * Creational lifecylce processes
 		 * @private
 		 */
-		private var _creator:IAlchemyProcess = new InstanceCreator(this as IEvaluator);
+		//private var _creator:IAlchemyProcess = new InstanceCreator(this as IEvaluator);
+		private var _creator:InstanceFactory = new InstanceFactory;
+		private var _processors:Array = [
+			new ConstructorArgumentProcessor,
+			new PropertyProcessor,
+			new PostConstructProcessor,
+			new PreDestroyProcessor,
+			new EventHandlerProcessor,
+			new SignalHandlerProcessor,
+			new SymbiotProcessor
+		];
+		
 		
 		/**
 		 * Creational lifecylce processes
 		 * @private
 		 */
-		private var _createFilters:IProcessChain = new ProcessChain(
+		//private var _createFilters:IProcessChain = new ProcessChain(
 			//new InstanceCreator(this as IEvaluator),
-			new InstanceInjector(this as IEvaluator),
-			new InstanceBinder,
-			new InstanceComposer,
-			new FriendActivator(this as IAlchemist, _friendsByInstance)
-		);
+			//new InstanceInjector(this as IEvaluator),
+			//new InstanceBinder,
+			//new InstanceComposer,
+			//new FriendActivator(this as IAlchemist, _symbiotsByInstance)
+		//);
 		
 		/**
 		 * Injection lifecycle processes
 		 * @private
 		 */
-		private var _injectionFilters:IProcessChain = new ProcessChain(
-			new InstanceInjector(this as IEvaluator),
-			new InstanceBinder
-		);
+		//private var _injectionFilters:IProcessChain = new ProcessChain(
+			//new InstanceInjector(this as IEvaluator),
+			//new InstanceBinder
+		//);
 		
 		/**
 		 * Lifecycle processes for destruction
 		 * @private
 		 */
-		private var _destroyFilters:IProcessChain = new ProcessChain(
-			new FriendDeactivator(this as IAlchemist, _friendsByInstance),
-			new InstanceUnbinder,
-			new InstanceDestroyer,
-			new InstanceUnjector
-		);
+		//private var _destroyFilters:IProcessChain = new ProcessChain(
+			//new FriendDeactivator(this as IAlchemist, _symbiotsByInstance),
+			//new InstanceUnbinder,
+			//new InstanceDestroyer,
+			//new InstanceUnjector
+		//);
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
@@ -159,16 +174,6 @@ package orichalcum.alchemy.alchemist
 		{
 			mappings && mapAll(mappings);
 			map(getQualifiedClassName(this)).to(this);
-		}
-		
-		static public function get languageBundle():ILanguageBundle
-		{
-			return _languageBundle;
-		}
-		
-		static public function set languageBundle(value:ILanguageBundle):void
-		{
-			_languageBundle = value;
 		}
 		
 		public function dispose():void
@@ -232,14 +237,8 @@ package orichalcum.alchemy.alchemist
 		{
 			type || throwError('Argument "type" passed to method Alchemist.create() must not be null.');
 			
-			//if (_instancesInProcessById[id])
-			//{
-				//trace('Infinite loop!')
-				//return null;
-			//}
-			
 			const recipeFlyweight:Recipe = getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe);
-			const instance:* = _creator.process(null, null, type, recipeFlyweight);
+			const instance:* = _creator.process(type, this, recipeFlyweight);
 			
 			_instancesInProcessById[id] = instance;
 			_createFilters.process(instance, null, type, recipeFlyweight);
@@ -326,7 +325,7 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * @private
 		 */
-		private function getRecipeForClassOrInstance(classOrInstance:Object, recipeFlyweight:Recipe, runtimeConfiguredRecipe:Recipe = null):Recipe 
+		private function getRecipeForClassOrInstance(classOrInstance:Object, recipeFlyweight:Dictionary, runtimeConfiguredRecipe:Dictionary = null):Dictionary 
 		{
 			return getRecipeForClassName(getQualifiedClassName(classOrInstance), recipeFlyweight, runtimeConfiguredRecipe);
 		}
@@ -334,7 +333,7 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * @private
 		 */
-		private function getRecipeForClassName(qualifiedClassName:String, recipeFlyweight:Recipe, runtimeConfiguredRecipe:Recipe = null):Recipe
+		private function getRecipeForClassName(qualifiedClassName:String, recipeFlyweight:Dictionary, runtimeConfiguredRecipe:Dictionary = null):Dictionary
 		{
 			return getMergedRecipe(recipeFlyweight, _recipeFactory.getRecipeByClassName(qualifiedClassName), getRecipe(qualifiedClassName), runtimeConfiguredRecipe);
 		}
@@ -342,20 +341,33 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * @private
 		 */
-		private function getMergedRecipe(recipeFlyweight:Recipe, staticTypeRecipe:Recipe, runtimeTypeRecipe:Recipe, runtimeInstanceRecipe:Recipe):Recipe
+		private function getMergedRecipe(recipeFlyweight:Dictionary, staticTypeRecipe:Dictionary, runtimeTypeRecipe:Dictionary, runtimeInstanceRecipe:Dictionary):Dictionary
 		{
 			/*
 			 * Because of recursive nature of the algorithm a
 			 * flyweight *pool* must be used to compensate for
 			 * the function requiring a new recipe every recursive call.
 			 */
+			//const recipe:Recipe = recipeFlyweight ? recipeFlyweight.empty() : new Recipe;
+			if (recipeFlyweight)
+			{
+				for (var key:* in recipeFlyweight)
+				{
+					delete recipeFlyweight[key];
+				}
+			}
 			
-			const recipe:Recipe = recipeFlyweight ? recipeFlyweight.empty() : new Recipe;
-			staticTypeRecipe && recipe.extend(staticTypeRecipe);
-			runtimeTypeRecipe && recipe.extend(runtimeTypeRecipe);
-			runtimeInstanceRecipe && recipe.extend(runtimeInstanceRecipe);
+			const recipe:Recipe = recipeFlyweight ? recipeFlyweight : new Recipe;
+			//staticTypeRecipe && recipe.extend(staticTypeRecipe);
+			//runtimeTypeRecipe && recipe.extend(runtimeTypeRecipe);
+			//runtimeInstanceRecipe && recipe.extend(runtimeInstanceRecipe);
+			staticTypeRecipe && _inherit(recipe, staticTypeRecipe);
+			runtimeTypeRecipe && _inherit(recipe, runtimeTypeRecipe);
+			runtimeInstanceRecipe && _inherit(recipe, runtimeInstanceRecipe);
 			return recipe;
 		}
+		
+		
 		
 		/**
 		 * @private
@@ -381,8 +393,8 @@ package orichalcum.alchemy.alchemist
 			if (providerReferenceOrValue is IProvider)
 				return (providerReferenceOrValue as IProvider).provide(id, this, recipe);
 				
-			if (providerReferenceOrValue is String && _languageBundle.expressionLanguage.expressionQualifier.test(providerReferenceOrValue))
-				return conjure((providerReferenceOrValue as String).replace(_languageBundle.expressionLanguage.expressionRemovals, ''));
+			if (providerReferenceOrValue is String && expressionQualifier.test(providerReferenceOrValue))
+				return conjure((providerReferenceOrValue as String).replace(expressionRemovals, ''));
 			
 			return providerReferenceOrValue;
 		}
@@ -468,6 +480,36 @@ package orichalcum.alchemy.alchemist
 		{
 			throw new AlchemyError(message, substitutions);
 		}
+		
+		private function _inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void
+		{
+			for each(var processor:IIngredientProcessor in _processors)
+			{
+				processor.inherit(parentRecipe, childRecipe);
+			}
+		}
+		
+		public function get processors():Array 
+		{
+			return _processors;
+		}
+		
+		public function set processors(value:Array):void 
+		{
+			_processors = value;
+		}
+		
+		static public function get reflector():IReflector 
+		{
+			return _reflector;
+		}
+		
+		static public function set reflector(value:IReflector):void 
+		{
+			_reflector = value;
+		}
+		
+		
 		
 		
 	}

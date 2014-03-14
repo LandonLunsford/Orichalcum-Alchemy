@@ -4,6 +4,7 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.recipe.Recipe;
+	import orichalcum.reflection.IReflector;
 	
 	public interface IAlchemist extends IEventDispatcher, IEvaluator
 	{
@@ -67,6 +68,12 @@ package orichalcum.alchemy.alchemist
 		 * Sets the parent of the context for dependency heirarchies
 		 */
 		//function set parent(value:IAlchemist):void;
+		
+		function get processors():Array;
+		function set processors(value:Array):void;
+		
+		function get reflector():IReflector;
+		function set reflector(value:IReflector):void;
 	}
 
 }

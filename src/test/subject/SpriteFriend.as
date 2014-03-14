@@ -11,7 +11,7 @@ package subject
 		[PostConstruct]
 		public function postConstruct():void
 		{
-			trace(sprite.name);
+			//trace(sprite.name);
 		}
 		
 	}

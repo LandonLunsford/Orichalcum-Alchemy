@@ -7,8 +7,6 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.recipe.ingredient.EventHandler;
 	import orichalcum.utility.ObjectUtil;
-	import subject.ClassWithEventHandlerMetatags;
-
 
 	public class EventHandlerProcessor implements IIngredientProcessor
 	{
@@ -128,8 +126,8 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			for each(var eventHandler:EventHandler in recipe[_key])
 			{
 				
-				if (instance is ClassWithEventHandlerMetatags)
-					trace(instance, eventHandler.targetPath, eventHandler, ObjectUtil.find(instance, eventHandler.targetPath));
+				//if (instance is ClassWithEventHandlerMetatags)
+					//trace(instance, eventHandler.targetPath, eventHandler, ObjectUtil.find(instance, eventHandler.targetPath));
 				
 				var target:Object = ObjectUtil.find(instance, eventHandler.targetPath);
 				var eventDispatcher:IEventDispatcher = target as IEventDispatcher;

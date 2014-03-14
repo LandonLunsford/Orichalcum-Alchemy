@@ -5,20 +5,8 @@ package orichalcum.alchemy.alchemist
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.mapper.AlchemyMapper;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
-	import orichalcum.alchemy.process.chain.IProcessChain;
-	import orichalcum.alchemy.process.chain.ProcessChain;
-	import orichalcum.alchemy.process.FriendActivator;
-	import orichalcum.alchemy.process.FriendDeactivator;
-	import orichalcum.alchemy.process.InstanceBinder;
-	import orichalcum.alchemy.process.InstanceComposer;
-	import orichalcum.alchemy.process.InstanceCreator;
-	import orichalcum.alchemy.process.InstanceDestroyer;
-	import orichalcum.alchemy.process.InstanceInjector;
-	import orichalcum.alchemy.process.InstanceUnbinder;
-	import orichalcum.alchemy.process.InstanceUnjector;
 	import orichalcum.alchemy.provider.IProvider;
 	import orichalcum.alchemy.recipe.factory.RecipeFactory;
 	import orichalcum.alchemy.recipe.ingredient.processor.ConstructorArgumentProcessor;
@@ -35,7 +23,6 @@ package orichalcum.alchemy.alchemist
 	
 	public class Alchemist extends EventDispatcher implements IDisposable, IAlchemist
 	{
-		
 		
 		private var expressionQualifier:RegExp = /^{.*}$/;
 		private var expressionRemovals:RegExp = /{|}|\s/gm;
@@ -99,8 +86,8 @@ package orichalcum.alchemy.alchemist
 		 * Creational lifecylce processes
 		 * @private
 		 */
-		//private var _creator:IAlchemyProcess = new InstanceCreator(this as IEvaluator);
 		private var _creator:InstanceFactory = new InstanceFactory;
+		
 		private var _processors:Array = [
 			new ConstructorArgumentProcessor,
 			new PropertyProcessor,
@@ -110,39 +97,6 @@ package orichalcum.alchemy.alchemist
 			new SignalHandlerProcessor,
 			new SymbiotProcessor
 		];
-		
-		
-		/**
-		 * Creational lifecylce processes
-		 * @private
-		 */
-		//private var _createFilters:IProcessChain = new ProcessChain(
-			//new InstanceCreator(this as IEvaluator),
-			//new InstanceInjector(this as IEvaluator),
-			//new InstanceBinder,
-			//new InstanceComposer,
-			//new FriendActivator(this as IAlchemist, _symbiotsByInstance)
-		//);
-		
-		/**
-		 * Injection lifecycle processes
-		 * @private
-		 */
-		//private var _injectionFilters:IProcessChain = new ProcessChain(
-			//new InstanceInjector(this as IEvaluator),
-			//new InstanceBinder
-		//);
-		
-		/**
-		 * Lifecycle processes for destruction
-		 * @private
-		 */
-		//private var _destroyFilters:IProcessChain = new ProcessChain(
-			//new FriendDeactivator(this as IAlchemist, _symbiotsByInstance),
-			//new InstanceUnbinder,
-			//new InstanceDestroyer,
-			//new InstanceUnjector
-		//);
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
@@ -239,23 +193,15 @@ package orichalcum.alchemy.alchemist
 			
 			const recipeFlyweight:Dictionary = getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe);
 			const instance:* = _creator.create(type, this, recipeFlyweight);
-			
 			_instancesInProcessById[id] = instance;
-			
-			//_createFilters.process(instance, null, type, recipeFlyweight);
+			teFilters.process(instance, null, type, recipeFlyweight);
 			for (var i:int = 0; i < _processors.length; i++)
 			{
 				var processor:IIngredientProcessor = _processors[i];
 				processor.activate(instance, recipeFlyweight, this);
 			}
-			
-			
 			delete _instancesInProcessById[id];
-			
 			returnRecipeFlyweight();
-			
-			//trace('instance created', instance)
-			
 			return instance;
 		}
 		

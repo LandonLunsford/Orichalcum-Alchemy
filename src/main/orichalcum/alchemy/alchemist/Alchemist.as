@@ -112,13 +112,6 @@ package orichalcum.alchemy.alchemist
 		private var _instancesInProcessById:Dictionary = new Dictionary;
 		
 		/**
-		 * Experimental.
-		 * Allows hooking into each provide() and destroy() call
-		 */
-		//public var filters:Vector.<IFilter> = new Vector.<IFilter>;
-		
-		
-		/**
 		 * @param list of XML mapping configurations
 		 */
 		public function Alchemist(...mappings)
@@ -171,7 +164,7 @@ package orichalcum.alchemy.alchemist
 			
 			if (provider === NotFound)
 			{
-				_reflector.isType(validId) || throwError('Alchemist has no provider mapped to "{0}"', validId);
+				_reflector.isType(validId) || throwError('Alchemist has no provider mapped to "{}"', validId);
 				provision = conjureUnmappedType(validId);
 			}
 			else
@@ -182,7 +175,10 @@ package orichalcum.alchemy.alchemist
 			
 			recipe && (_recipesByInstance[provision] = recipe);
 			
-			//_applyProvideFilters(provision);
+			for each(var processor:IIngredientProcessor in _processors)
+			{
+				//processor.provide(instance, recipe, this);
+			}
 			
 			return provision;	
 		}
@@ -194,7 +190,6 @@ package orichalcum.alchemy.alchemist
 			const recipeFlyweight:Dictionary = getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe);
 			const instance:* = _creator.create(type, this, recipeFlyweight);
 			_instancesInProcessById[id] = instance;
-			teFilters.process(instance, null, type, recipeFlyweight);
 			for (var i:int = 0; i < _processors.length; i++)
 			{
 				var processor:IIngredientProcessor = _processors[i];
@@ -212,7 +207,6 @@ package orichalcum.alchemy.alchemist
 			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
 			const recipe:Dictionary = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
 			
-			//_injectionFilters.process(instance, null, type, recipe);
 			for (var i:int = 0; i < _processors.length; i++)
 			{
 				var processor:IIngredientProcessor = _processors[i];
@@ -232,12 +226,13 @@ package orichalcum.alchemy.alchemist
 			
 			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
 			const recipe:Dictionary = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
-			//_destroyFilters.process(instance, null, type, recipe);
+			
 			for (var i:int = _processors.length - 1; i >= 0; i--)
 			{
 				var processor:IIngredientProcessor = _processors[i];
 				processor.deactivate(instance, recipe, this);
 			}
+			
 			returnRecipeFlyweight();
 			return instance;
 		}
@@ -326,9 +321,6 @@ package orichalcum.alchemy.alchemist
 			}
 			
 			const recipe:Dictionary = recipeFlyweight ? recipeFlyweight : new Dictionary;
-			//staticTypeRecipe && recipe.extend(staticTypeRecipe);
-			//runtimeTypeRecipe && recipe.extend(runtimeTypeRecipe);
-			//runtimeInstanceRecipe && recipe.extend(runtimeInstanceRecipe);
 			staticTypeRecipe && _inherit(recipe, staticTypeRecipe);
 			runtimeTypeRecipe && _inherit(recipe, runtimeTypeRecipe);
 			runtimeInstanceRecipe && _inherit(recipe, runtimeInstanceRecipe);
@@ -418,28 +410,6 @@ package orichalcum.alchemy.alchemist
 		{
 			//(new XmlConfigurationMapper(_reflector, _languageBundle)).map(this, mappings);
 		}
-		
-		/**
-		 * @private
-		 */
-		//private function _applyProvideFilters(instance:*):void 
-		//{
-			//for each(var filter:IFilter in filters)
-			//{
-				//filter && filter.applies(instance, this) && filter.onProvide(instance, this);
-			//}
-		//}
-		
-		/**
-		 * @private
-		 */
-		//private function _applyDestroyFilters(instance:Object):void 
-		//{
-			//for each(var filter:IFilter in filters)
-			//{
-				//filter && filter.applies(instance, this) && filter.onDestroy(instance, this);
-			//}
-		//}
 		
 		/**
 		 * @private

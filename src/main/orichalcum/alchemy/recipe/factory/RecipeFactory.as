@@ -6,19 +6,15 @@ package orichalcum.alchemy.recipe.factory
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
+	import orichalcum.datastructure.Maps;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
 
 
 	public class RecipeFactory implements IDisposable
 	{
-		//static private const MULTIPLE_METATAGS_ERROR_MESSAGE:String = 'Multiple "[{0}]" metatags defined in class "{2}".';
-		//static private const MULTIPLE_METATAGS_FOR_MEMBER_ERROR_MESSAGE:String = 'Multiple "[{0}]" metatags defined for member "{1}" of class "{2}".';
-		//static private const MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE:String = 'Multiple "{0}" attributes found on "[{1}]" metatag for member "{2}" in class "{3}".';
-		//static private const NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE:String = 'Required attribute "{0}" not found on "[{1}]" metatag for "{2}" in class "{3}".';
-		
-		private var _typeRecipes:Dictionary;
 		private var _alchemist:IAlchemist;
+		private var _typeRecipes:Dictionary;
 		
 		public function get reflector():IReflector 
 		{
@@ -27,32 +23,23 @@ package orichalcum.alchemy.recipe.factory
 		
 		public function RecipeFactory(alchemist:IAlchemist)
 		{
-			_typeRecipes = new Dictionary;
 			_alchemist = alchemist;
+			_typeRecipes = new Dictionary;
 			
 			/**
 			 * Defensively priming cache with basic types
 			 */
-			const nullRecipe:Dictionary = new Dictionary;
 			const basicTypes:Array = [Object, Array, Function, Class, Number, String, int, uint, Boolean];
+			const emptyRecipe:Dictionary = new Dictionary;
 			for each(var type:Class in basicTypes)
 			{
-				_typeRecipes[reflector.getTypeName(type)] = nullRecipe;
+				_typeRecipes[reflector.getTypeName(type)] = emptyRecipe;
 			}
 		}
 		
-		/* INTERFACE orichalcum.lifecycle.IDisposable */
-		
 		public function dispose():void 
 		{
-			for (var recipeName:String in _typeRecipes)
-			{
-				if (_typeRecipes[recipeName] is IDisposable)
-				{
-					(_typeRecipes[recipeName] as IDisposable).dispose();
-				}
-				delete _typeRecipes[recipeName];
-			}
+			_alchemist = null;
 			_typeRecipes = null;
 		}
 		
@@ -69,50 +56,21 @@ package orichalcum.alchemy.recipe.factory
 		public function createRecipe(qualifiedClassName:String):Dictionary
 		{
 			const typeDescription:XML = describeType(reflector.getType(qualifiedClassName));
-			const factory:XML = typeDescription.factory[0];
-			const superclasses:XMLList = factory.extendsClass.@type;
+			const superclasses:XMLList = typeDescription.factory[0].extendsClass.@type;
 			
 			/* 
 			 * Ideally I would like to do this somewhere else
 			 * But it is convenient and efficient to catch this error here.
 			 */
 			if (superclasses.length() == 0)
-			{
 				throw new AlchemyError('Alchemists cannot create "{0}" because it is an interface and cannot be instantiated.', qualifiedClassName);
-			}
 			
 			const superclassName:String = superclasses[0].toString();
 			
-			//return
-				//? createRecipeFromFactory(qualifiedClassName, factory)
-				//: getRecipeByClassName(superclassName).clone().extend(createRecipeFromFactory(qualifiedClassName, factory));
-				
-			if (reflector.isNativeType(superclassName))
-			{
-				return createRecipeFromFactory(qualifiedClassName, typeDescription);
-			}
-			else
-			{
-				const clone:Dictionary = new Dictionary;
-				const superClassRecipe:Dictionary = getRecipeByClassName(superclassName);
-				for (var key:* in superClassRecipe)
-				{
-					clone[key] = superClassRecipe[key];
-				}
-				
-				_inherit(clone, createRecipeFromFactory(qualifiedClassName, typeDescription));
-				
-				return clone;
-			}
-				
-		}
-		
-		private function _inherit(destination:Dictionary, source:Dictionary):void 
-		{
-			for each(var processor:IIngredientProcessor in _alchemist.processors)
-			{
-				processor.inherit(destination, source);
-			}
+			return reflector.isNativeType(superclassName)
+				? createRecipeFromFactory(qualifiedClassName, typeDescription)
+				: _inherit(Maps.fromObject(getRecipeByClassName(superclassName)),
+					createRecipeFromFactory(qualifiedClassName, typeDescription));
 		}
 		
 		public function createRecipeFromFactory(typeName:String, typeDescription:XML):Dictionary
@@ -123,6 +81,15 @@ package orichalcum.alchemy.recipe.factory
 				processor.create(typeName, typeDescription, recipe, _alchemist);
 			}
 			return recipe;
+		}
+		
+		private function _inherit(destination:Dictionary, source:Dictionary):Dictionary 
+		{
+			for each(var processor:IIngredientProcessor in _alchemist.processors)
+			{
+				processor.inherit(destination, source);
+			}
+			return destination;
 		}
 		
 	}

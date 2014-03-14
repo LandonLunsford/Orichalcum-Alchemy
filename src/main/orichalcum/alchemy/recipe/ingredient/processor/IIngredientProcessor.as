@@ -1,6 +1,5 @@
 package orichalcum.alchemy.recipe.ingredient.processor 
 {
-	import flash.display.ActionScriptVersion;
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	
@@ -16,6 +15,9 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		
 		function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
+
+		//function provide(instance:*, alchemist:IAlchemist):void;
+		
 	}
 
 }

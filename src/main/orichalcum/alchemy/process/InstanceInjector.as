@@ -14,8 +14,6 @@ package orichalcum.alchemy.process
 			_evaluator = evaluator;
 		}
 		
-		/* INTERFACE orichalcum.alchemy.lifecycle.process.IAlchemyProcess */
-		
 		public function process(instance:*, id:*, type:Class, recipe:Recipe):* 
 		{
 			for (var propertyName:String in recipe.properties)

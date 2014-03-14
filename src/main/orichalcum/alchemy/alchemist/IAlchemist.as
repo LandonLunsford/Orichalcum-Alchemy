@@ -17,6 +17,12 @@ package orichalcum.alchemy.alchemist
 		function map(id:*):IAlchemyMapper;
 		
 		/**
+		 * Unmaps the ID specified to a provider, recipe or mediator.
+		 * @param	id Custom name, class or qualified class name
+		 */
+		function unmap(id:*):void;
+		
+		/**
 		 * Gets or creates an injected object of the type mapped to the ID
 		 * based on the provider and recipe mapped to the specified ID.
 		 * @param	id Custom name, class or qualified class name
@@ -53,9 +59,14 @@ package orichalcum.alchemy.alchemist
 		 * Creates a child alchemist which will fallback on its parent's mappings
 		 * when it cannot an injection request.
 		 * @return child alchemist
+		 * @deprecated
 		 */
 		function extend():IAlchemist;
 		
+		/**
+		 * Sets the parent of the context for dependency heirarchies
+		 */
+		//function set parent(value:IAlchemist):void;
 	}
 
 }

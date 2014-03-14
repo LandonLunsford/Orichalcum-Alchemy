@@ -26,7 +26,7 @@ package orichalcum.alchemy.recipe.factory
 		static private const MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE:String = 'Multiple "{0}" attributes found on "[{1}]" metatag for member "{2}" in class "{3}".';
 		static private const NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE:String = 'Required attribute "{0}" not found on "[{1}]" metatag for "{2}" in class "{3}".';
 		
-		private var _reflector:IReflector
+		private var _reflector:IReflector;
 		private var _typeRecipes:Dictionary;
 		private var _injectionMetatag:IInjectionMetatag;
 		private var _postConstructMetatag:IPostConstructMetatag;

@@ -10,6 +10,8 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.filter.IFilter;
 	import orichalcum.alchemy.language.bundle.ILanguageBundle;
 	import orichalcum.alchemy.language.bundle.LanguageBundle;
+	import orichalcum.alchemy.mapper.AlchemyMapper;
+	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.process.chain.IProcessChain;
 	import orichalcum.alchemy.process.chain.ProcessChain;
 	import orichalcum.alchemy.process.FriendActivator;
@@ -22,8 +24,6 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.process.InstanceInjector;
 	import orichalcum.alchemy.process.InstanceUnbinder;
 	import orichalcum.alchemy.process.InstanceUnjector;
-	import orichalcum.alchemy.mapper.AlchemyMapper;
-	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.provider.IProvider;
 	import orichalcum.alchemy.recipe.factory.RecipeFactory;
 	import orichalcum.alchemy.recipe.Recipe;
@@ -138,7 +138,7 @@ package orichalcum.alchemy.alchemist
 		 * thisAlchemist = parentAlchemist.extend()
 		 * @private
 		 */
-		private var _parent:Alchemist;
+		private var _parent:IAlchemist;
 		
 		/**
 		 * @private used to prevent infinite loops for circular dependencies
@@ -171,9 +171,6 @@ package orichalcum.alchemy.alchemist
 			_languageBundle = value;
 		}
 		
-		
-		/* INTERFACE orichalcum.lifecycle.IDisposable */
-		
 		public function dispose():void
 		{
 			for (var providerName:String in _providers)
@@ -192,11 +189,15 @@ package orichalcum.alchemy.alchemist
 			_recipes = null;
 		}
 		
-		/* INTERFACE orichalcum.alchemy.alchemist.IAlchemist */
-
 		public function map(id:*):IAlchemyMapper
 		{
 			return new AlchemyMapper(_reflector, getValidId(id), _providers, _recipes);
+		}
+		
+		public function unmap(id:*):void
+		{
+			delete _providers[id];
+			delete _recipes[id];
 		}
 		
 		public function conjure(id:*, recipe:Recipe = null):*

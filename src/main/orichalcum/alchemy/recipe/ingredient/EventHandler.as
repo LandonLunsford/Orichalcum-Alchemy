@@ -27,6 +27,7 @@ package orichalcum.alchemy.recipe.ingredient
 		private var _stopPropagation:Boolean;
 		private var _stopImmediatePropagation:Boolean;
 		private var _parameters:Array;
+		private var _once:Boolean;
 		
 		public function EventHandler(options:Object = null)
 		{
@@ -41,6 +42,7 @@ package orichalcum.alchemy.recipe.ingredient
 				if ('stopPropagation' in options) _stopPropagation = options.stopPropagation;
 				if ('stopImmediatePropagation' in options) _stopImmediatePropagation = options.stopImmediatePropagation;
 				if ('parameters' in options) _parameters = options.parameters;
+				if ('once' in options) _once = options.once;
 			}
 		}
 		
@@ -176,36 +178,14 @@ package orichalcum.alchemy.recipe.ingredient
 			_parameters = value;
 		}
 		
-		public function toString():String
+		public function get once():Boolean
 		{
-			return Strings.interpolate(
-				'<event-handler event="{}" listener="{}" target="{}" relay="{}" parameters="{}" useCapture="{}" priority="{}" stopPropagation="{}" stopImmediatePropagation="{}"/>'
-				, type, listenerName, targetPath, relayPath, parameters, useCapture, priority, stopPropagation, stopImmediatePropagation);
+			return _once;
 		}
 		
-		public function handle(event:Event):void
+		public function set once(value:Boolean):void
 		{
-			if (stopImmediatePropagation)
-			{
-				event.stopImmediatePropagation();
-			}
-			else if (stopPropagation)
-			{
-				event.stopPropagation();
-			}
-			
-			if (listener.length == 0)
-			{
-				listener();
-			}
-			else if (listener.length > 0)
-			{
-				hasParameters
-					? listener.apply(null, getArguments(event)) // should not be null, but the listener methods owner
-					: listener(event);
-			}
-			
-			relay && relay.dispatchEvent(event);
+			_once = value;
 		}
 		
 		public function get isBound():Boolean
@@ -230,6 +210,13 @@ package orichalcum.alchemy.recipe.ingredient
 			listener = null;
 		}
 		
+		public function toString():String
+		{
+			return Strings.interpolate(
+				'<event-handler event="{}" listener="{}" target="{}" relay="{}" parameters="{}" useCapture="{}" priority="{}" stopPropagation="{}" stopImmediatePropagation="{}"/>'
+				, type, listenerName, targetPath, relayPath, parameters, useCapture, priority, stopPropagation, stopImmediatePropagation);
+		}
+		
 		/* PRIVATE PARTS */
 		
 		private function get hasParameters():Boolean
@@ -242,12 +229,42 @@ package orichalcum.alchemy.recipe.ingredient
 			_delegateArguments.length = 0;
 			for each(var eventParameter:String in parameters)
 			{
-				// for good error messages keep mediator class name
-				_delegateArguments.push(event[parameters]);
+				// for good error messages I should keep the host's class name
+				_delegateArguments[_delegateArguments.length] = event[parameters];
 			}
 			return _delegateArguments;
 		}
 	
+		private function handle(event:Event):void
+		{
+			if (stopImmediatePropagation)
+			{
+				event.stopImmediatePropagation();
+			}
+			else if (stopPropagation)
+			{
+				event.stopPropagation();
+			}
+			
+			if (listener.length == 0)
+			{
+				listener();
+			}
+			else if (listener.length > 0)
+			{
+				hasParameters
+					? listener.apply(null, getArguments(event)) // should not be null, but the listener methods owner
+					: listener(event);
+			}
+			
+			if (relay && !(stopImmediatePropagation || stopPropagation))
+			{
+				relay.dispatchEvent(event);
+			}
+			
+			_once && unbind();
+		}
+		
 	}
 
 }

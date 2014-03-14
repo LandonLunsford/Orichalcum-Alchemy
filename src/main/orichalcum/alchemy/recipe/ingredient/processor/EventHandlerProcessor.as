@@ -75,9 +75,9 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				{
 					handler.type = eventArgs[0].@value[0].toString();
 				}
-				else if (targetAndEvent.length >= 2)
+				else
 				{
-					handler.type = targetAndEvent[1];
+					handler.type = targetAndEvent[targetAndEvent.length == 1 ? 0 : 1];
 				}
 				
 				if (targetArgs.length() > 0)
@@ -113,6 +113,12 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				handler.once = (keylessArgs.(@value == 'once')).length() > 0
 					|| onceArgs.length() > 0
 					&& onceArgs.@value.toString() == 'true';
+					
+				if ((keylessArgs.(@value == 'relay')).length() > 0 || relayArgs.length() > 0)
+				{
+					handler.relayPath = '__alchemist__';
+				}
+			
 				
 				(recipe[_key] ||= []).push(handler);
 			}
@@ -160,24 +166,31 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				
 				if (eventHandler.relayPath)
 				{
-					const relay:Object = ObjectUtil.find(instance, eventHandler.relayPath);
-					const relayAsEventDispatcher:IEventDispatcher = relay as IEventDispatcher;
-					if (relayAsEventDispatcher == null)
+					if (eventHandler.relayPath == '__alchemist__')
 					{
-						if (relayAsEventDispatcher === instance)
-						{
-							throw new AlchemyError('Class "{}" must implement "flash.events::IEventDispatcher" in order to have an event handler with no target specified.', getQualifiedClassName(instance));
-						}
-						else
-						{
-							throw new AlchemyError('Variable or child named "{}" could not be found on "{}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
-						}
+						eventHandler.relay = alchemist;
 					}
-					else if (relayAsEventDispatcher == targetAsEventDispatcher)
+					else
 					{
-						throw new AlchemyError('EventHandler target and relay must not be the same. This will cause an infinite loop.');
+						const relay:Object = ObjectUtil.find(instance, eventHandler.relayPath);
+						const relayAsEventDispatcher:IEventDispatcher = relay as IEventDispatcher;
+						if (relayAsEventDispatcher == null)
+						{
+							if (relayAsEventDispatcher === instance)
+							{
+								throw new AlchemyError('Class "{}" must implement "flash.events::IEventDispatcher" in order to have an event handler with no target specified.', getQualifiedClassName(instance));
+							}
+							else
+							{
+								throw new AlchemyError('Variable or child named "{}" could not be found on "{}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
+							}
+						}
+						else if (relayAsEventDispatcher == targetAsEventDispatcher)
+						{
+							throw new AlchemyError('EventHandler target and relay must not be the same. This will cause an infinite loop.');
+						}
+						eventHandler.relay = relayAsEventDispatcher;
 					}
-					eventHandler.relay = relayAsEventDispatcher;
 				}
 				
 				eventHandler.target = targetAsEventDispatcher;

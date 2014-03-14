@@ -10,10 +10,10 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		private var _key:String = 'symbiots';
 		private var _friendsByInstance:Dictionary = new Dictionary;
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
+		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
 		{
 			/**
-			 * Does nothing
+			 * Do nothing
 			 */
 		}
 		
@@ -58,7 +58,17 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				delete _friendsByInstance[instance];
 			}
 		}
+		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
 		
+		public function configure(xml:XML, alchemist:IAlchemist):void 
+		{
+			// process xml bean
+		}
 	}
 
 }

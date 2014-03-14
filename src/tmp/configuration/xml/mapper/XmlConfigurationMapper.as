@@ -2,15 +2,6 @@ package orichalcum.alchemy.configuration.xml.mapper
 {
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.language.bundle.ILanguageBundle;
-	import orichalcum.alchemy.language.bundle.LanguageBundle;
-	import orichalcum.alchemy.language.IXmltagLanguage;
-	import orichalcum.alchemy.language.xmltag.IConstructorArgumentXmltag;
-	import orichalcum.alchemy.language.xmltag.IEventHandlerXmltag;
-	import orichalcum.alchemy.language.xmltag.IMapXmltag;
-	import orichalcum.alchemy.language.xmltag.IPostConstructXmltag;
-	import orichalcum.alchemy.language.xmltag.IPreDestroyXmltag;
-	import orichalcum.alchemy.language.xmltag.IPropertyXmltag;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.provider.FactoryForwardingProvider;
 	import orichalcum.alchemy.provider.ForwardingProvider;

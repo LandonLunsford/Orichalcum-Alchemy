@@ -2,7 +2,6 @@ package orichalcum.alchemy.recipe.factory
 {
 	import flash.utils.describeType;
 	import flash.utils.Dictionary;
-	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
@@ -14,7 +13,7 @@ package orichalcum.alchemy.recipe.factory
 	public class RecipeFactory implements IDisposable
 	{
 		private var _alchemist:IAlchemist;
-		private var _typeRecipes:Dictionary;
+		private var _recipesByClassName:Dictionary;
 		
 		public function get reflector():IReflector 
 		{
@@ -24,7 +23,7 @@ package orichalcum.alchemy.recipe.factory
 		public function RecipeFactory(alchemist:IAlchemist)
 		{
 			_alchemist = alchemist;
-			_typeRecipes = new Dictionary;
+			_recipesByClassName = new Dictionary;
 			
 			/**
 			 * Defensively priming cache with basic types
@@ -33,24 +32,24 @@ package orichalcum.alchemy.recipe.factory
 			const emptyRecipe:Dictionary = new Dictionary;
 			for each(var type:Class in basicTypes)
 			{
-				_typeRecipes[reflector.getTypeName(type)] = emptyRecipe;
+				_recipesByClassName[reflector.getTypeName(type)] = emptyRecipe;
 			}
 		}
 		
 		public function dispose():void 
 		{
 			_alchemist = null;
-			_typeRecipes = null;
+			_recipesByClassName = null;
 		}
 		
 		public function getRecipeForClass(classOrInstance:*):Dictionary
 		{
-			return getRecipeByClassName(getQualifiedClassName(classOrInstance));
+			return getRecipeByClassName(reflector.getTypeName(classOrInstance));
 		}
 		
 		public function getRecipeByClassName(qualifiedClassName:String):Dictionary
 		{
-			return _typeRecipes[qualifiedClassName] ||= createRecipe(qualifiedClassName);
+			return _recipesByClassName[qualifiedClassName] ||= createRecipe(qualifiedClassName);
 		}
 		
 		public function createRecipe(qualifiedClassName:String):Dictionary
@@ -63,7 +62,7 @@ package orichalcum.alchemy.recipe.factory
 			 * But it is convenient and efficient to catch this error here.
 			 */
 			if (superclasses.length() == 0)
-				throw new AlchemyError('Alchemists cannot create "{0}" because it is an interface and cannot be instantiated.', qualifiedClassName);
+				throw new AlchemyError('Cannot create "{}" because it is an interface and cannot be instantiated.', qualifiedClassName);
 			
 			const superclassName:String = superclasses[0].toString();
 			
@@ -78,7 +77,7 @@ package orichalcum.alchemy.recipe.factory
 			const recipe:Dictionary = new Dictionary;
 			for each(var processor:IIngredientProcessor in _alchemist.processors)
 			{
-				processor.create(typeName, typeDescription, recipe, _alchemist);
+				processor.introspect(typeName, typeDescription, recipe, _alchemist);
 			}
 			return recipe;
 		}

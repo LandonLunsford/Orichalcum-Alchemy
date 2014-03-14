@@ -2,24 +2,24 @@ package orichalcum.alchemy.alchemist
 {
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
-	import orichalcum.alchemy.evaluator.IEvaluator;
-	import orichalcum.utility.StringUtil;
+	import orichalcum.alchemy.error.AlchemyError;
 
 	
 	public class InstanceFactory 
 	{
 		
-		public function create(type:Class, alchemist:IEvaluator, ingredients:Dictionary):*
+		public function create(type:Class, alchemist:IAlchemist, ingredients:Dictionary):*
 		{
 			if (type == null)
 				throw new ArgumentError('Argument "type" passed to method "createInstance" must not be null.');
 			
-			// need to delegate to process...
-			
+			/**
+			 * Coupling with ConstructorArgumentProcessor
+			 * I probably need to delegate this creation tag to the processor...
+			 * But how to do this nicely...
+			 */
 			const constructorArguments:Array = ingredients['constructorArguments'];
 			
-			//trace('InstanceFactory.create()', type, alchemist, ingredients, ingredients.constructorArguments);
-				
 			if (constructorArguments && constructorArguments.length)
 			{
 				switch(constructorArguments.length)
@@ -192,7 +192,7 @@ package orichalcum.alchemy.alchemist
 						alchemist.evaluate(constructorArguments[14]),
 						alchemist.evaluate(constructorArguments[15]));
 				}
-				throw new ArgumentError(StringUtil.substitute('Type "{0}" requires over {1} constructor arguments. Consider refactoring.', getQualifiedClassName(type), 16));
+				throw new AlchemyError('Type "{}" requires over {} constructor arguments. Consider refactoring.', getQualifiedClassName(type), 16);
 			}
 			return new type;
 		}

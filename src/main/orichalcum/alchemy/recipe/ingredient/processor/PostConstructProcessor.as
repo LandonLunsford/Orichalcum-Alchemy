@@ -16,7 +16,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			_metatagName = metatagName ? metatagName : 'PostConstruct';
 		}
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
+		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
 		{
 			const methods:XMLList = typeDescription.factory[0].method;
 			const postConstructs:XMLList = methods.(@declaredBy == typeName).metadata.(@name == _metatagName);
@@ -56,6 +56,18 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			/**
 			 * Does nothing
 			 */
+		}
+		
+		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		
+		public function configure(xml:XML, alchemist:IAlchemist):void 
+		{
+			// process xml bean
 		}
 		
 	}

@@ -11,10 +11,10 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	public class EventHandlerProcessor implements IIngredientProcessor
 	{
 		
-		private const MULTIPLE_METATAGS_ERROR_MESSAGE:String = 'Multiple "[{0}]" metatags defined in class "{2}".';
-		private const MULTIPLE_METATAGS_FOR_MEMBER_ERROR_MESSAGE:String = 'Multiple "[{0}]" metatags defined for member "{1}" of class "{2}".';
-		private const MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE:String = 'Multiple "{0}" attributes found on "[{1}]" metatag for member "{2}" in class "{3}".';
-		private const NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE:String = 'Required attribute "{0}" not found on "[{1}]" metatag for "{2}" in class "{3}".';
+		private const MULTIPLE_METATAGS_ERROR_MESSAGE:String = 'Multiple "[{}]" metatags defined in class "{}".';
+		private const MULTIPLE_METATAGS_FOR_MEMBER_ERROR_MESSAGE:String = 'Multiple "[{}]" metatags defined for member "{}" of class "{}".';
+		private const MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE:String = 'Multiple "{}" attributes found on "[{}]" metatag for member "{}" in class "{}".';
+		private const NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE:String = 'Required attribute "{}" not found on "[{}]" metatag for "{}" in class "{}".';
 		
 		private var _metatagName:String;
 		private var _key:String = 'eventHandlers';
@@ -24,7 +24,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			_metatagName = metatagName ? metatagName : 'EventHandler';
 		}
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
+		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
 			const methods:XMLList = typeDescription.factory[0].method;
 			const eventHandlerMetatags:XMLList = methods.metadata.(@name == _metatagName);
@@ -64,6 +64,9 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				var stopImmediatePropagationArgs:XMLList = metatagArgs.(@key == 'stopImmediatePropagation');
 				if (stopImmediatePropagationArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, 'stopImmediatePropagation', _metatagName, handler.listenerName, typeName);
 				
+				var relayArgs:XMLList = metatagArgs.(@key == 'relay');
+				if (relayArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, 'relay', _metatagName, handler.listenerName, typeName);
+				
 				if (eventArgs.length() > 0)
 				{
 					handler.type = eventArgs[0].@value[0].toString();
@@ -81,6 +84,9 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				{
 					handler.targetPath = targetAndEvent[0];
 				}
+				
+				if (relayArgs.length() > 0)
+					handler.relayPath = relayArgs[0].@value[0].toString();
 				
 				if (priorityArgs.length() > 0)
 					handler.priority = int(priorityArgs.@value[0]);
@@ -125,48 +131,73 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		{
 			for each(var eventHandler:EventHandler in recipe[_key])
 			{
-				
-				//if (instance is ClassWithEventHandlerMetatags)
-					//trace(instance, eventHandler.targetPath, eventHandler, ObjectUtil.find(instance, eventHandler.targetPath));
-				
 				var target:Object = ObjectUtil.find(instance, eventHandler.targetPath);
-				var eventDispatcher:IEventDispatcher = target as IEventDispatcher;
+				var targetAsEventDispatcher:IEventDispatcher = target as IEventDispatcher;
 				
-				if (eventDispatcher == null)
+				if (targetAsEventDispatcher == null)
 				{
 					if (target === instance)
 					{
-						throw new AlchemyError('Class "{0}" must implement "flash.events::IEventDispatcher" in order to have an event handler with no target specified.', getQualifiedClassName(instance));
+						throw new AlchemyError('Class "{}" must implement "flash.events::IEventDispatcher" in order to have an event handler with no target specified.', getQualifiedClassName(instance));
 					}
 					else
 					{
-						throw new AlchemyError('Variable or child named "{0}" could not be found on "{1}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
+						throw new AlchemyError('Variable or child named "{}" could not be found on "{}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
 					}
 				}
 				
 				if (!(eventHandler.listenerName in instance))
 				{
-					throw new AlchemyError('Unable to bind method "{0}" to event type "{1}". Method "{0}" not found on "{2}".', eventHandler.listenerName, eventHandler.type, getQualifiedClassName(instance));
+					throw new AlchemyError('Unable to bind method "{}" to event type "{}". Method "{}" not found on "{}".', eventHandler.listenerName, eventHandler.type, eventHandler.listenerName, getQualifiedClassName(instance));
 				}
 				
+				if (eventHandler.relayPath)
+				{
+					const relay:Object = ObjectUtil.find(instance, eventHandler.relayPath);
+					const relayAsEventDispatcher:IEventDispatcher = relay as IEventDispatcher;
+					if (relayAsEventDispatcher == null)
+					{
+						if (relayAsEventDispatcher === instance)
+						{
+							throw new AlchemyError('Class "{}" must implement "flash.events::IEventDispatcher" in order to have an event handler with no target specified.', getQualifiedClassName(instance));
+						}
+						else
+						{
+							throw new AlchemyError('Variable or child named "{}" could not be found on "{}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
+						}
+					}
+					else if (relayAsEventDispatcher == targetAsEventDispatcher)
+					{
+						throw new AlchemyError('EventHandler target and relay must not be the same. This will cause an infinite loop.');
+					}
+					eventHandler.relay = relayAsEventDispatcher;
+				}
+				
+				eventHandler.target = targetAsEventDispatcher;
 				eventHandler.listener = instance[eventHandler.listenerName];
-				eventDispatcher.addEventListener(eventHandler.type, eventHandler.handle, eventHandler.useCapture, eventHandler.priority);
+				eventHandler.bind();
 			}
 		}
 		
 		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
 			for each(var eventHandler:EventHandler in recipe[_key])
-			{
-				var target:IEventDispatcher = ObjectUtil.find(instance, eventHandler.targetPath) as IEventDispatcher;
-				
-				if (target.hasEventListener(eventHandler.type))
-				{
-					target.removeEventListener(eventHandler.type, eventHandler.handle);
-				}
+			{				
+				eventHandler.isBound && eventHandler.unbind();
 			}
 		}
 		
+		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		
+		public function configure(xml:XML, alchemist:IAlchemist):void 
+		{
+			// process xml bean
+		}
 	}
 
 }

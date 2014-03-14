@@ -4,6 +4,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.provider.factory.reference;
+	import orichalcum.alchemy.recipe.ingredient.Properties;
 	import orichalcum.alchemy.recipe.ingredient.Property;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.utility.ObjectUtil;
@@ -18,7 +19,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			_metatagName = metatagName ? metatagName : 'Inject';
 		}
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
+		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
 			const reflector:IReflector = alchemist.reflector;
 			const typeFactory:XML = typeDescription.factory[0];
@@ -49,10 +50,20 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function add(recipe:Dictionary, ingredient:Object):void
 		{
-			const property:Property = ingredient as Property;
-			if (property)
+			if (ingredient is Property)
 			{
-				(recipe[_key] ||= {})[property.name] = property.value;
+				const property:Property = ingredient as Property;
+				var recipeProperties:Object = (recipe[_key] ||= {});
+				recipeProperties[property.name] = property.value;
+			}
+			else if (ingredient is Properties)
+			{
+				const properties:Properties = ingredient as Properties;
+				recipeProperties = (recipe[_key] ||= {});
+				for (var name:* in properties)
+				{
+					recipeProperties[name] = properties[name];
+				}
 			}
 		}
 		
@@ -81,6 +92,17 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			}
 		}
 		
+		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		
+		public function configure(xml:XML, alchemist:IAlchemist):void 
+		{
+			// process xml bean
+		}
 	}
 
 }

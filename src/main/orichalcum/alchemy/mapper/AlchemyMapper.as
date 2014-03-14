@@ -3,16 +3,8 @@ package orichalcum.alchemy.mapper
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.provider.factory.factory;
-	import orichalcum.alchemy.provider.factory.pool;
-	import orichalcum.alchemy.provider.factory.reference;
-	import orichalcum.alchemy.provider.factory.singleton;
-	import orichalcum.alchemy.provider.factory.type;
-	import orichalcum.alchemy.provider.factory.value;
-	import orichalcum.alchemy.recipe.ingredient.EventHandler;
 	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
-	import orichalcum.reflection.IReflector;
-	import orichalcum.utility.StringUtil;
+	import orichalcum.utility.Strings;
 
 	public class AlchemyMapper implements IAlchemyMapper
 	{
@@ -31,8 +23,6 @@ package orichalcum.alchemy.mapper
 			_providers = providers;
 			_recipes = recipes;
 		}
-		
-		/* INTERFACE orichalcum.alchemy.mapper.IMapper */
 		
 		public function to(providerValueOrReference:*):IAlchemyMapper
 		{
@@ -66,8 +56,9 @@ package orichalcum.alchemy.mapper
 		private function get recipe():Dictionary
 		{
 			if (_recipe)
+			{
 				return _recipe;
-			
+			}
 			if (_id in _recipes)
 			{
 				onRecipeOverwrite(_id);
@@ -102,7 +93,7 @@ package orichalcum.alchemy.mapper
 			 * dispatched on a provided eventDispatcher bus. Perhaps in a strict mode
 			 * I could throw an error when overwrites occur.
 			 */
-			trace(StringUtil.substitute(message, substitutions));
+			trace(Strings.interpolate(message, substitutions));
 		}
 
 	}

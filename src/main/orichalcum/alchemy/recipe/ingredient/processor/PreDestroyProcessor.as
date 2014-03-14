@@ -15,7 +15,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			_metatagName = metatagName ? metatagName : 'PreDestroy';
 		}
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
+		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
 		{
 			const methods:XMLList = typeDescription.factory[0].method;
 			const preDestroys:XMLList = methods.(@declaredBy == typeName).metadata.(@name == _metatagName);
@@ -57,6 +57,17 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			recipe[_key] && (instance[recipe[_key]] as Function).call(instance);
 		}
 		
+		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		
+		public function configure(xml:XML, alchemist:IAlchemist):void 
+		{
+			// process xml bean
+		}
 	}
 
 }

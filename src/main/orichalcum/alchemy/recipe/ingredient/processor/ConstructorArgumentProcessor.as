@@ -4,6 +4,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.recipe.ingredient.ConstructorArgument;
+	import orichalcum.alchemy.recipe.ingredient.ConstructorArguments;
 
 	public class ConstructorArgumentProcessor implements IIngredientProcessor
 	{
@@ -16,7 +17,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			_metatagName = metatagName ? metatagName : 'Inject';
 		}
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
+		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
 			const typeFactory:XML = typeDescription.factory[0];
 			const constructorParameterTypes:XMLList = typeFactory.constructor.parameter.@type;
@@ -36,15 +37,21 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function add(recipe:Dictionary, ingredient:Object):void
 		{
-			const constructorArgument:ConstructorArgument = ingredient as ConstructorArgument;
-			if (constructorArgument)
+			if (ingredient is ConstructorArgument)
 			{
-				const constructorArguments:Array = (recipe[_key] ||= []);
-				constructorArguments[
-					constructorArgument.index == -1
-					? constructorArguments.length
-					: constructorArgument.index
-				] = constructorArgument.value;
+				const constructorArgument:ConstructorArgument = ingredient as ConstructorArgument;
+				var recipeConstructorArguments:Array = (recipe[_key] ||= []);
+				const index:int = constructorArgument.index == -1 ? recipeConstructorArguments.length : constructorArgument.index;
+				recipeConstructorArguments[index] = constructorArgument.value;
+			}
+			else if (ingredient is ConstructorArguments)
+			{
+				const constructorArguments:ConstructorArguments = ingredient as ConstructorArguments;
+				recipeConstructorArguments = (recipe[_key] ||= []);
+				for each(var argument:* in constructorArguments.values)
+				{
+					recipeConstructorArguments.push(argument);
+				}
 			}
 		}
 		
@@ -61,13 +68,30 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			// nothing
+			/**
+			 * Do nothing
+			 */
 		}
 		
 		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			// nothing
+			/**
+			 * Do nothing
+			 */
 		}
+		
+		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		
+		public function configure(xml:XML, alchemist:IAlchemist):void 
+		{
+			// process xml bean
+		}
+		
 	}
 
 }

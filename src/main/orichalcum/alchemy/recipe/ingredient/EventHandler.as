@@ -1,21 +1,27 @@
 package orichalcum.alchemy.recipe.ingredient 
 {
 	import flash.events.Event;
+	import flash.events.IEventDispatcher;
 	import orichalcum.lifecycle.IDisposable;
-	import orichalcum.utility.StringUtil;
+	import orichalcum.utility.Strings;
 
 	public class EventHandler implements IDisposable
 	{
 		static private var _delegateArguments:Array = [];
 		
 		/* Set at "activation-time" */
+		//private var _hostName:String;
+		
+		/* Set at "activation-time" */
 		private var _listener:Function;
+		private var _target:IEventDispatcher;
+		private var _relay:IEventDispatcher;
 		
 		/* Set at "creation-time" */
 		private var _type:String;
-		
 		private var _listenerName:String;
 		private var _targetPath:String;
+		private var _relayPath:String;
 		private var _priority:int;
 		private var _useCapture:Boolean;
 		private var _stopPropagation:Boolean;
@@ -29,6 +35,7 @@ package orichalcum.alchemy.recipe.ingredient
 				if ('type' in options) _type = options.type;
 				if ('listenerName' in options) _listenerName = options.listenerName;
 				if ('target' in options) _targetPath = options.target;
+				if ('relay' in options) _relayPath = options.relay;
 				if ('useCapture' in options) _useCapture = options.useCapture;
 				if ('priority' in options) _priority = options.priority;
 				if ('stopPropagation' in options) _stopPropagation = options.stopPropagation;
@@ -37,18 +44,37 @@ package orichalcum.alchemy.recipe.ingredient
 			}
 		}
 		
-		/* INTERFACE orichalcum.provizor.arm.IDisposable */
-		
 		public function dispose():void 
 		{
 			_targetPath = null;
+			_relayPath = null;
 			_type = null;
 			_listener = null;
 			_listenerName = null;
 			_parameters = null;
+			_target = null;
+			_relay = null;
 		}
 		
-		/* INTERNALS */
+		public function get target():IEventDispatcher 
+		{
+			return _target;
+		}
+		
+		public function set target(value:IEventDispatcher):void 
+		{
+			_target = value;
+		}
+		
+		public function get relay():IEventDispatcher 
+		{
+			return _relay;
+		}
+		
+		public function set relay(value:IEventDispatcher):void 
+		{
+			_relay = value;
+		}
 		
 		public function get targetPath():String
 		{
@@ -58,6 +84,16 @@ package orichalcum.alchemy.recipe.ingredient
 		public function set targetPath(value:String):void
 		{
 			_targetPath = value;
+		}
+		
+		public function get relayPath():String
+		{
+			return _relayPath;
+		}
+		
+		public function set relayPath(value:String):void
+		{
+			_relayPath = value;
 		}
 		
 		public function get type():String 
@@ -142,9 +178,9 @@ package orichalcum.alchemy.recipe.ingredient
 		
 		public function toString():String
 		{
-			return StringUtil.substitute(
-				'<event-handler event="{0}" listener="{1}" target="{2}" parameters="{3}" useCapture="{4}" priority="{5}" stopPropagation="{6}" stopImmediatePropagation="{7}"/>'
-				, type, listenerName, targetPath, parameters, useCapture, priority, stopPropagation, stopImmediatePropagation);
+			return Strings.interpolate(
+				'<event-handler event="{}" listener="{}" target="{}" relay="{}" parameters="{}" useCapture="{}" priority="{}" stopPropagation="{}" stopImmediatePropagation="{}"/>'
+				, type, listenerName, targetPath, relayPath, parameters, useCapture, priority, stopPropagation, stopImmediatePropagation);
 		}
 		
 		public function handle(event:Event):void
@@ -168,6 +204,30 @@ package orichalcum.alchemy.recipe.ingredient
 					? listener.apply(null, getArguments(event)) // should not be null, but the listener methods owner
 					: listener(event);
 			}
+			
+			relay && relay.dispatchEvent(event);
+		}
+		
+		public function get isBound():Boolean
+		{
+			return target && target.hasEventListener(type);
+		}
+		
+		public function bind():void
+		{
+			target.addEventListener(type, handle, useCapture, priority);
+		}
+		
+		public function unbind():void
+		{
+			target.removeEventListener(type, handle);
+					
+			/**
+			 * Release runtime references
+			 */
+			target = null;
+			relay = null;
+			listener = null;
 		}
 		
 		/* PRIVATE PARTS */

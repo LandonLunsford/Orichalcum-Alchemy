@@ -13,7 +13,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			_metatagName = metatagName ? metatagName : 'SignalHandler';
 		}
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
+		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
 		{
 			
 		}
@@ -36,6 +36,18 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
 			
+		}
+		
+		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
+		{
+			/**
+			 * Do nothing
+			 */
+		}
+		
+		public function configure(xml:XML, alchemist:IAlchemist):void 
+		{
+			// process xml bean
 		}
 		
 	}

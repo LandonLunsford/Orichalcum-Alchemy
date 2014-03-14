@@ -1,7 +1,7 @@
 package orichalcum.alchemy.provider 
 {
+	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
-	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 
 	public class ValueProvider implements IProvider, IValueProvider, IDisposable
@@ -32,7 +32,7 @@ package orichalcum.alchemy.provider
 		
 		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
-		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):*
+		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):*
 		{
 			return _value;
 		}

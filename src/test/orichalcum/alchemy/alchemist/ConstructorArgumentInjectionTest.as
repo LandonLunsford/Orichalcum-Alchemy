@@ -2,9 +2,9 @@ package orichalcum.alchemy.alchemist
 {
 	import flash.geom.Point;
 	import org.hamcrest.assertThat;
-	import org.hamcrest.core.isA;
 	import org.hamcrest.object.notNullValue;
 	import org.hamcrest.object.strictlyEqualTo;
+	import orichalcum.alchemy.recipe.ingredient.factory.constructorArgument;
 	import subject.ClassWithOneConstructorParameter;
 	import subject.ClassWithTwoConstructorParameters;
 	import subject.ClassWithTwoConstructorParametersAndTwoConstructorInjects;
@@ -50,7 +50,7 @@ package orichalcum.alchemy.alchemist
 		public function testCreateZeroParameterClassWithOneArgument():void
 		{
 			_alchemist.map(ClassWithZeroConstructorParameters)
-				.withConstructorArgument(new Point);
+				.add(constructorArgument(new Point))
 				
 			_alchemist.conjure(ClassWithZeroConstructorParameters);
 		}
@@ -59,7 +59,7 @@ package orichalcum.alchemy.alchemist
 		public function testCreateOneParameterClassWithOneArgument():void
 		{
 			_alchemist.map(ClassWithOneConstructorParameter)
-				.withConstructorArgument(_constructorArgument0);
+				.add(constructorArgument(_constructorArgument0))
 				
 			const creation:ClassWithOneConstructorParameter = _alchemist.create(ClassWithOneConstructorParameter) as ClassWithOneConstructorParameter;
 			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));
@@ -69,8 +69,8 @@ package orichalcum.alchemy.alchemist
 		public function testCreateTwoParameterClassWithTwoArguments():void
 		{
 			_alchemist.map(ClassWithTwoConstructorParameters)
-				.withConstructorArgument(_constructorArgument0)
-				.withConstructorArgument(_constructorArgument1);
+				.add(constructorArgument(_constructorArgument0))
+				.add(constructorArgument(_constructorArgument1))
 				
 			const creation:ClassWithTwoConstructorParameters = _alchemist.create(ClassWithTwoConstructorParameters) as ClassWithTwoConstructorParameters;
 			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));
@@ -81,7 +81,7 @@ package orichalcum.alchemy.alchemist
 		public function testCreateTwoParameterClassWithOneArgument():void
 		{
 			_alchemist.map(ClassWithTwoConstructorParameters)
-				.withConstructorArgument(_constructorArgument0);
+				.add(constructorArgument(_constructorArgument0))
 				
 			const creation:ClassWithTwoConstructorParameters = _alchemist.create(ClassWithTwoConstructorParameters) as ClassWithTwoConstructorParameters;
 			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));
@@ -108,8 +108,8 @@ package orichalcum.alchemy.alchemist
 		public function testStaticConstructorInjectOverrideWithRuntimeConfiguration():void
 		{
 			_alchemist.map(ClassWithTwoConstructorParametersAndTwoConstructorInjects)
-				.withConstructorArgument(_constructorArgument0)
-				.withConstructorArgument(_constructorArgument1);
+				.add(constructorArgument(_constructorArgument0))
+				.add(constructorArgument(_constructorArgument1))
 				
 			const creation:ClassWithTwoConstructorParametersAndTwoConstructorInjects = _alchemist.create(ClassWithTwoConstructorParametersAndTwoConstructorInjects) as ClassWithTwoConstructorParametersAndTwoConstructorInjects;
 			assertThat(_constructorArgument0, strictlyEqualTo(creation.constructorArgument0));

@@ -1,8 +1,8 @@
 package orichalcum.alchemy.provider 
 {
 	import flash.errors.IllegalOperationError;
+	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
-	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 
 	public class InstanceProvider implements IInstanceProvider, IDisposable
@@ -24,7 +24,7 @@ package orichalcum.alchemy.provider
 		
 		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
-		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):* 
 		{
 			throw new IllegalOperationError('InstanceProvider.provide() is an abstract method and must be overriden.');
 		}

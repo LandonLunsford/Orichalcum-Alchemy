@@ -1,10 +1,10 @@
 package orichalcum.alchemy.alchemist 
 {
+	import flash.utils.Dictionary;
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.isTrue;
 	import org.hamcrest.object.notNullValue;
 	import orichalcum.alchemy.provider.factory.factory;
-	import orichalcum.alchemy.recipe.Recipe;
 
 	public class FactoryMappingTest 
 	{
@@ -63,7 +63,7 @@ package orichalcum.alchemy.alchemist
 		[Test]
 		public function testTwoArgumentFactoryMethod():void
 		{
-			const method:Function = function(activeAlchamist:IAlchemist, activeRecipe:Recipe):*
+			const method:Function = function(activeAlchamist:IAlchemist, activeRecipe:Dictionary):*
 			{
 				_factoryCalled = true;
 				assertThat(activeAlchamist, notNullValue());

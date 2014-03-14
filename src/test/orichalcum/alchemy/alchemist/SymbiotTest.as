@@ -1,14 +1,37 @@
 package orichalcum.alchemy.alchemist 
 {
+	import flash.display.Sprite;
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.strictlyEqualTo;
+	import orichalcum.alchemy.recipe.ingredient.factory.symbiot;
 	import subject.ConstructorSymbiotA;
 	import subject.ConstructorSymbiotB;
+	import subject.SpriteFriend;
 	import subject.SymbiotA;
 
 	
 	public class SymbiotTest 
 	{
+		
+		private var _alchemist:IAlchemist;
+		
+		[Before]
+		public function setup():void
+		{
+			_alchemist = new Alchemist;
+		}
+		
+		/**
+		 * Previously caused infinite loops
+		 */
+		[Test]
+		public function test():void
+		{
+			_alchemist.map(Sprite)
+				.add(symbiot(SpriteFriend))
+			
+			_alchemist.conjure(Sprite);
+		}
 		
 		[Test]
 		public function testInjectionTimeSymbiots():void

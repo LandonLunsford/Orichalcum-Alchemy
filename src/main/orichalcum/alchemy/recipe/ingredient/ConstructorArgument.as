@@ -9,8 +9,8 @@ package orichalcum.alchemy.recipe.ingredient
 		
 		public function ConstructorArgument(value:*, index:int = -1) 
 		{
-			this.index = index;
-			this.value = value;
+			_value = value;
+			_index = index;
 		}
 		
 		public function get value():* 

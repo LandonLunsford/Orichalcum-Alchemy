@@ -1,19 +1,21 @@
 package orichalcum.alchemy.recipe.ingredient.processor 
 {
 	import flash.utils.Dictionary;
+	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
+	import orichalcum.alchemy.recipe.ingredient.PreDestroy;
 
-	public class PreDestroyProcessor 
+	public class PreDestroyProcessor implements IIngredientProcessor
 	{
 		private var _metatagName:String;
 		private var _key:String = 'preDestroy';
 		
-		public function PreDestroyProcessor() 
+		public function PreDestroyProcessor(metatagName:String = null) 
 		{
 			_metatagName = metatagName ? metatagName : 'PreDestroy';
 		}
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary):void 
+		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
 		{
 			const methods:XMLList = typeDescription.factory[0].method;
 			const preDestroys:XMLList = methods.(@declaredBy == typeName).metadata.(@name == _metatagName);
@@ -29,19 +31,30 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			}
 		}
 		
-		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
+		public function add(recipe:Dictionary, ingredient:Object):void
+		{
+			const preDestroy:PreDestroy = ingredient as PreDestroy;
+			if (preDestroy)
+			{
+				recipe[_key] = preDestroy.name;
+			}
+		}
+		
+		public function inherit(parent:Dictionary, child:Dictionary):void 
 		{
 			parent[_key] = child[_key];
 		}
 		
-		public function activate(instance:*, recipe:Dictionary):void 
+		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			
+			/**
+			 * Does nothing
+			 */
 		}
 		
-		public function deactivate(instance:*, recipe:Dictionary):void 
+		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			
+			recipe[_key] && (instance[recipe[_key]] as Function).call(instance);
 		}
 		
 	}

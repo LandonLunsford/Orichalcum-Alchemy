@@ -1,31 +1,32 @@
 package orichalcum.alchemy.mapper 
 {
 	import flash.utils.Dictionary;
+	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.handler.EventHandler;
 	import orichalcum.alchemy.provider.factory.factory;
 	import orichalcum.alchemy.provider.factory.pool;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.singleton;
 	import orichalcum.alchemy.provider.factory.type;
 	import orichalcum.alchemy.provider.factory.value;
-	import orichalcum.alchemy.recipe.Recipe;
+	import orichalcum.alchemy.recipe.ingredient.EventHandler;
+	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.utility.StringUtil;
 
 	public class AlchemyMapper implements IAlchemyMapper
 	{
-		private var _reflector:IReflector;
+		
+		private var _alchemist:IAlchemist;
 		private var _id:String;
 		private var _providers:Dictionary;
 		private var _recipes:Dictionary;
-		private var _recipe:Recipe;
-		private var _constructorArgumentIndex:int;
+		private var _recipe:Dictionary;
 		
 		
-		public function AlchemyMapper(reflector:IReflector, id:String, providers:Dictionary, recipes:Dictionary) 
+		public function AlchemyMapper(alchemist:IAlchemist, id:String, providers:Dictionary, recipes:Dictionary) 
 		{
-			_reflector = reflector;
+			_alchemist = alchemist;
 			_id = id;
 			_providers = providers;
 			_recipes = recipes;
@@ -40,114 +41,29 @@ package orichalcum.alchemy.mapper
 			return this;
 		}
 		
-		public function toValue(any:*):IAlchemyMapper
+		public function add(...args):IAlchemyMapper
 		{
-			return to(value(any));
-		}
-		
-		public function toReference(id:*):IAlchemyMapper
-		{
-			return to(reference(id));
-		}
-		
-		public function asPrototype():IAlchemyMapper
-		{
-			return toPrototype(getClass(_id));
-		}
-		
-		public function toPrototype(clazz:Class):IAlchemyMapper
-		{
-			return to(type(clazz));
-		}
-		
-		public function asSingleton():IAlchemyMapper
-		{
-			return toSingleton(getClass(_id));
-		}
-		
-		public function toSingleton(type:Class):IAlchemyMapper
-		{
-			return to(singleton(type));
-		}
-		
-		public function asPool():IAlchemyMapper
-		{
-			return toPool(getClass(_id));
-		}
-		
-		public function toPool(type:Class):IAlchemyMapper
-		{
-			return to(pool(type));
-		}
-		
-		public function toFactory(factoryMethod:Function):IAlchemyMapper
-		{
-			return to(factory(factoryMethod));
-		}
-		
-		public function withConstructorArguments(...args):IAlchemyMapper 
-		{
-			for (var i:int = 0; i < args.length; i++)
-				withConstructorArgument(args[i], i);
-			return this;
-		}
-		
-		public function withConstructorArgument(value:*, index:int = -1):IAlchemyMapper 
-		{
-			if (index < 0 || index >= _constructorArgumentIndex)
-				index = _constructorArgumentIndex++;
-				
-			recipe.constructorArguments[index] = value;
-			return this;
-		}
-		
-		public function withProperties(properties:Object):IAlchemyMapper 
-		{
-			for (var propertyName:String in properties)
-				withProperty(propertyName, properties[propertyName]);
-			return this;
-		}
-		
-		public function withProperty(name:String, value:*):IAlchemyMapper 
-		{
-			recipe.properties[name] = value;
-			return this;
-		}
-		
-		public function withPostConstruct(functionName:String):IAlchemyMapper 
-		{
-			recipe.postConstruct = functionName;
-			return this;
-		}
-		
-		public function withPreDestroy(functionName:String):IAlchemyMapper 
-		{
-			recipe.preDestroy = functionName;
-			return this;
-		}
-		
-		public function withEventHandler(type:String, listener:String, target:String = null, useCapture:Boolean = false, priority:int = 0, stopPropagation:Boolean = false, stopImmediatePropagation:Boolean = false, parameters:Array = null):IAlchemyMapper 
-		{
-			recipe.eventHandlers.push(new EventHandler(type, listener, target, useCapture, priority, stopPropagation, stopImmediatePropagation, parameters));
-			return this;
-		}
-		
-		public function withFriend(friend:*):IAlchemyMapper
-		{
-			friend && recipe.friends.push(friend);
-			return this;
-		}
-		
-		public function withFriends(...friends):IAlchemyMapper 
-		{
-			for each(var friend:* in friends)
-				withFriend(friend);
+			for each(var potentialIngredient:* in args)
+			{
+				var argument:* = args[0];
+				if (argument is Array)
+				{
+					return add.apply(null, argument as Array);
+				}
+				else if (argument)
+				{
+					for each(var processor:IIngredientProcessor in _alchemist.processors)
+					{
+						processor.add(recipe, argument);
+					}
+				}
+			}
 			return this;
 		}
 		
 		/* PRIVATE PARTS */
 		
-		private function get recipe():Recipe
+		private function get recipe():Dictionary
 		{
 			if (_recipe)
 				return _recipe;
@@ -157,13 +73,13 @@ package orichalcum.alchemy.mapper
 				onRecipeOverwrite(_id);
 				return _recipe = _recipes[_id].empty();
 			}
-			return _recipes[_id] = _recipe = new Recipe;
+			return _recipes[_id] = _recipe = new Dictionary;
 		}
 		
 		private function getClass(id:String):Class 
 		{
-			if (_reflector.isType(id))
-				return _reflector.getType(id);
+			if (_alchemist.reflector.isType(id))
+				return _alchemist.reflector.getType(id);
 				
 			throw new AlchemyError('Argument "id" ({0}) passed to method "map" must represent a valid public class when using the "asPrototype|asSingleton|asMultiton" methods.', id);
 		}

@@ -1,9 +1,9 @@
 package orichalcum.alchemy.alchemist 
 {
 	import flash.events.IEventDispatcher;
+	import flash.utils.Dictionary;
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
-	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.reflection.IReflector;
 	
 	public interface IAlchemist extends IEventDispatcher, IEvaluator
@@ -30,7 +30,7 @@ package orichalcum.alchemy.alchemist
 		 * @param	recipe Custom recipe used to override the mapped recipe
 		 * @return	An instance of the object type mapped to the ID
 		 */
-		function conjure(id:*, recipe:Recipe = null):*;
+		function conjure(id:*, recipe:Dictionary = null):*;
 		
 		/**
 		 * Creates, injects, calls post-construct hook and returns an object mapped to the ID
@@ -40,7 +40,7 @@ package orichalcum.alchemy.alchemist
 		 * @param	id Internally used to prevent circular dependencies from causeing an infinite loop - set at your own risk
 		 * @return	An instance of the object type mapped to the id
 		 */
-		function create(type:Class, recipe:Recipe = null, id:* = null):Object;
+		function create(type:Class, recipe:Dictionary = null, id:* = null):Object;
 		
 		/**
 		 * Injects and binds an object based on the object's class metatags and class-mapped recipes

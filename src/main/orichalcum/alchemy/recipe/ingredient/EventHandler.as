@@ -4,7 +4,7 @@ package orichalcum.alchemy.recipe.ingredient
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.utility.StringUtil;
 
-	public class EventHandler implements IEventHandler, IDisposable
+	public class EventHandler implements IDisposable
 	{
 		static private var _delegateArguments:Array = [];
 		
@@ -22,16 +22,19 @@ package orichalcum.alchemy.recipe.ingredient
 		private var _stopImmediatePropagation:Boolean;
 		private var _parameters:Array;
 		
-		public function EventHandler(options:Object)
+		public function EventHandler(options:Object = null)
 		{
-			_type = options.type;
-			_listenerName = options.listenerName;
-			_targetPath = options.target;
-			_useCapture = options.useCapture;
-			_priority = options.priority;
-			_stopPropagation = options.stopPropagation;
-			_stopImmediatePropagation = options.stopImmediatePropagation;
-			_parameters = options.parameters;
+			if (options)
+			{
+				if ('type' in options) _type = options.type;
+				if ('listenerName' in options) _listenerName = options.listenerName;
+				if ('target' in options) _targetPath = options.target;
+				if ('useCapture' in options) _useCapture = options.useCapture;
+				if ('priority' in options) _priority = options.priority;
+				if ('stopPropagation' in options) _stopPropagation = options.stopPropagation;
+				if ('stopImmediatePropagation' in options) _stopImmediatePropagation = options.stopImmediatePropagation;
+				if ('parameters' in options) _parameters = options.parameters;
+			}
 		}
 		
 		/* INTERFACE orichalcum.provizor.arm.IDisposable */

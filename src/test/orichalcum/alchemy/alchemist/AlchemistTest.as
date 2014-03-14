@@ -18,7 +18,9 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.provider.factory.type;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.singleton;
-	import orichalcum.alchemy.recipe.Recipe;
+	import orichalcum.alchemy.recipe.ingredient.factory.constructorArgument;
+	import orichalcum.alchemy.recipe.ingredient.factory.preDestroy;
+	import orichalcum.alchemy.recipe.ingredient.factory.property;
 	import subject.ClassWithAllMetatags;
 	import subject.ClassWithMemberAndSetterInject;
 	import subject.ClassWithPreDestroy;
@@ -65,7 +67,7 @@ package orichalcum.alchemy.alchemist
 		{
 			_alchemist.conjure(Number(1));
 		}
-				
+			
 		[Test(expects = "Error")]
 		public function testConjureBoolean():void
 		{
@@ -131,31 +133,27 @@ package orichalcum.alchemy.alchemist
 			assertNotNull(target.setterInject);
 		}
 		
-		
 		[Test]
 		public function testShit():void
 		{
 			_alchemist.map(Point).to(singleton(Point))
-				.withConstructorArgument(1)
-				.withConstructorArgument(1);
+				.add(constructorArgument(1))
+				.add(constructorArgument(1))
+				
 			assertEquals(1, _alchemist.conjure(Point).x);
 			assertEquals(1, _alchemist.conjure(Point).y);
 			
 			_alchemist.map(Matrix).to(new Matrix)
-				.withProperty('a', 1)
-				.withPreDestroy('invert');
+				.add(property('a', 1))
+				.add(preDestroy('invert'))
+				
 			assertEquals(1, _alchemist.conjure(Matrix).a);
 			
 			_alchemist.map('a').to(type(Rectangle));
-			
-			
-			
 			_alchemist.map('b').to(reference('a'))
-				.withProperty('x', 1);
+				.add(property('x', 1));
 				
-				
-			assertFalse(_alchemist.conjure('a')===_alchemist.conjure('b'));
-				
+			assertFalse(_alchemist.conjure('a') === _alchemist.conjure('b'));
 			assertEquals(0, _alchemist.conjure('a').x);
 			assertEquals(1, _alchemist.conjure('b').x);
 			
@@ -173,7 +171,7 @@ package orichalcum.alchemy.alchemist
 		{
 			_alchemist.map(ClassWithPreDestroyMetatag);
 			const creation:ClassWithPreDestroyMetatag = _alchemist.conjure(ClassWithPreDestroyMetatag) as ClassWithPreDestroyMetatag;
-			_alchemist.map(ClassWithPreDestroyMetatag).withPreDestroy('otherPreDestroy');
+			_alchemist.map(ClassWithPreDestroyMetatag).add(preDestroy('otherPreDestroy'))
 			_alchemist.destroy(creation);
 		}
 		

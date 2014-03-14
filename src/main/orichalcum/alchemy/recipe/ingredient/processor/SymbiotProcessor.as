@@ -1,20 +1,29 @@
 package orichalcum.alchemy.recipe.ingredient.processor 
 {
 	import flash.utils.Dictionary;
+	import orichalcum.alchemy.alchemist.IAlchemist;
+	import orichalcum.alchemy.recipe.ingredient.Symbiot;
 
 	public class SymbiotProcessor implements IIngredientProcessor
 	{
 		
 		private var _key:String = 'symbiots';
+		private var _friendsByInstance:Dictionary = new Dictionary;
 		
-		public function SymbiotProcessor() 
+		public function create(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			// nothing
+			/**
+			 * Does nothing
+			 */
 		}
 		
-		public function create(typeName:String, typeDescription:XML, recipe:Dictionary):void 
+		public function add(recipe:Dictionary, ingredient:Object):void
 		{
-			// nothing
+			const symbiot:Symbiot = ingredient as Symbiot;
+			if (symbiot)
+			{
+				(recipe[_key] ||= []).push(symbiot.id);
+			}
 		}
 		
 		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
@@ -29,14 +38,25 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			}
 		}
 		
-		public function activate(instance:*, recipe:Dictionary):void 
+		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
-			
+			for each(var friendId:* in recipe[_key])
+			{
+				(_friendsByInstance[instance] ||= []).push(alchemist.conjure(friendId));
+			}
 		}
 		
-		public function deactivate(instance:*, recipe:Dictionary):void 
+		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
-			
+			const friends:* = _friendsByInstance[instance];
+			if (friends)
+			{
+				for each(var friend:* in friends)
+				{
+					alchemist.destroy(friend);
+				}
+				delete _friendsByInstance[instance];
+			}
 		}
 		
 	}

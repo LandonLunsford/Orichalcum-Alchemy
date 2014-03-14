@@ -1,7 +1,7 @@
 package orichalcum.alchemy.provider 
 {
+	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
-	import orichalcum.alchemy.recipe.Recipe;
 
 	public class PrototypeProvider extends InstanceProvider
 	{
@@ -15,7 +15,7 @@ package orichalcum.alchemy.provider
 		
 		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
-		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):* 
 		{
 			return activeAlchemist.create(type, activeRecipe, id);
 		}

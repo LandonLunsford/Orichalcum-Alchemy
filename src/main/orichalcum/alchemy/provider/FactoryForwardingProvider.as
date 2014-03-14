@@ -1,9 +1,9 @@
 package orichalcum.alchemy.provider
 {
 	import flash.system.ApplicationDomain;
+	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 
 	/**
@@ -54,7 +54,7 @@ package orichalcum.alchemy.provider
 		
 		/* INTERFACE orichalcum.alchemy.provider.IProvider */
 		
-		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):*
+		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):*
 		{
 			if (_factoryMethod == null)
 			{

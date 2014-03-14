@@ -16,7 +16,6 @@ package orichalcum.alchemy.alchemist
 		
 		private var _alchemist:Alchemist;
 		
-		
 		[Before]
 		public function setup():void
 		{

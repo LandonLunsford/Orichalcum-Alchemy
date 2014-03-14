@@ -1,7 +1,7 @@
 package orichalcum.alchemy.provider 
 {
+	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
-	import orichalcum.alchemy.recipe.Recipe;
 
 	/**
 	 * This class will require the Alchemist to keep a conjuredInstance to Provider map in order to
@@ -17,7 +17,7 @@ package orichalcum.alchemy.provider
 			super(type);
 		}
 		
-		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):* 
 		{
 			return pool.length
 				? activeAlchemist.inject(pool.pop())

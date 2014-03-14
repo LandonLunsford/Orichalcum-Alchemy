@@ -3,6 +3,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.isFalse;
 	import org.hamcrest.object.isTrue;
+	import orichalcum.alchemy.recipe.ingredient.factory.postConstruct;
 	import subject.ClassWithPostConstruct;
 	import subject.ClassWithPostConstructMetatag;
 
@@ -26,6 +27,7 @@ package orichalcum.alchemy.alchemist
 			assertThat(creation.postConstructCalled, isTrue());
 		}
 		
+		[Ignore] // new requirement
 		[Test]
 		public function testMetadataConfiguredPostConstructNotCalledByInject():void
 		{
@@ -37,17 +39,18 @@ package orichalcum.alchemy.alchemist
 		public function testRuntimeConfiguredPostConstructCalledByCreate():void
 		{
 			_alchemist.map(ClassWithPostConstruct)
-				.withPostConstruct(_postConstruct);
+				.add(postConstruct(_postConstruct))
 			
 			const creation:ClassWithPostConstruct = _alchemist.create(ClassWithPostConstruct) as ClassWithPostConstruct;
 			assertThat(creation.postConstructCalled, isTrue());
 		}
 		
+		[Ignore] // new requirement
 		[Test]
 		public function testRuntimeConfiguredPostConstructNotCalledByInject():void
 		{
 			_alchemist.map(ClassWithPostConstruct)
-				.withPostConstruct(_postConstruct);
+				.add(postConstruct(_postConstruct))
 				
 			const creation:ClassWithPostConstruct = _alchemist.inject(new ClassWithPostConstruct) as ClassWithPostConstruct;
 			assertThat(creation.postConstructCalled, isFalse());
@@ -57,7 +60,7 @@ package orichalcum.alchemy.alchemist
 		public function testRuntimeConfiguredPostConstructOverridesMetadataConfiguredPostConstruct():void
 		{
 			_alchemist.map(ClassWithPostConstructMetatag)
-				.withPostConstruct('otherPostConstruct');
+				.add(postConstruct('otherPostConstruct'))
 				
 			const creation:ClassWithPostConstructMetatag = _alchemist.create(ClassWithPostConstructMetatag) as ClassWithPostConstructMetatag;
 			assertThat(creation.postConstructCalled, isFalse());

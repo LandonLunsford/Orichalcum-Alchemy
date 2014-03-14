@@ -4,6 +4,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.notNullValue;
 	import org.hamcrest.object.strictlyEqualTo;
+	import orichalcum.alchemy.recipe.ingredient.factory.property;
 	import subject.ClassWithTwoQualifiedSetterInjections;
 	import subject.ClassWithTwoSetterInjections;
 	import subject.ClassWithTwoSetters;
@@ -44,8 +45,8 @@ package orichalcum.alchemy.alchemist
 		public function testCreateClassWithTwoRuntimeConfiguredSetterInjects():void
 		{
 			_alchemist.map(ClassWithTwoSetters)
-				.withProperty('setter0', _setter0)
-				.withProperty('setter1', _setter1);
+				.add(property('setter0', _setter0))
+				.add(property('setter1', _setter1))
 				
 			const creation:ClassWithTwoSetters = _alchemist.create(ClassWithTwoSetters) as ClassWithTwoSetters
 			assertThat(_setter0, strictlyEqualTo(creation.setter0));
@@ -58,7 +59,7 @@ package orichalcum.alchemy.alchemist
 			const override0:Point = new Point;
 			
 			_alchemist.map(ClassWithTwoQualifiedSetterInjections)
-				.withProperty('setter0', override0);
+				.add(property('setter0', override0))
 			
 			const creation:ClassWithTwoQualifiedSetterInjections = _alchemist.create(ClassWithTwoQualifiedSetterInjections) as ClassWithTwoQualifiedSetterInjections;
 			assertThat(override0, strictlyEqualTo(creation.setter0));

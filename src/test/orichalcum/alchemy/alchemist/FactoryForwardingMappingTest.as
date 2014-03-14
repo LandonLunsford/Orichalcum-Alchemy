@@ -7,7 +7,6 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.object.notNullValue;
 	import orichalcum.alchemy.provider.factory.factory;
 	import orichalcum.alchemy.provider.FactoryForwardingProvider;
-	import orichalcum.alchemy.recipe.Recipe;
 
 	public class FactoryForwardingMappingTest 
 	{

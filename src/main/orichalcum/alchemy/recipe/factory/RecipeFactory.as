@@ -6,7 +6,6 @@ package orichalcum.alchemy.recipe.factory
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
-	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
 
@@ -26,9 +25,10 @@ package orichalcum.alchemy.recipe.factory
 			return _alchemist.reflector;
 		}
 		
-		public function RecipeFactory(reflector:IReflector, _alchemist:IAlchemist)
+		public function RecipeFactory(alchemist:IAlchemist)
 		{
 			_typeRecipes = new Dictionary;
+			_alchemist = alchemist;
 			
 			/**
 			 * Defensively priming cache with basic types
@@ -89,7 +89,7 @@ package orichalcum.alchemy.recipe.factory
 				
 			if (reflector.isNativeType(superclassName))
 			{
-				return createRecipeFromFactory(qualifiedClassName, factory);
+				return createRecipeFromFactory(qualifiedClassName, typeDescription);
 			}
 			else
 			{
@@ -107,7 +107,7 @@ package orichalcum.alchemy.recipe.factory
 				
 		}
 		
-		private function _inherit(destination:Dictionary, source:Recipe):void 
+		private function _inherit(destination:Dictionary, source:Dictionary):void 
 		{
 			for each(var processor:IIngredientProcessor in _alchemist.processors)
 			{
@@ -120,7 +120,7 @@ package orichalcum.alchemy.recipe.factory
 			const recipe:Dictionary = new Dictionary;
 			for each(var processor:IIngredientProcessor in _alchemist.processors)
 			{
-				processor.create(typeName, typeDescription, recipe);
+				processor.create(typeName, typeDescription, recipe, _alchemist);
 			}
 			return recipe;
 		}

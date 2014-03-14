@@ -9,6 +9,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.object.strictlyEqualTo;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.type;
+	import orichalcum.alchemy.recipe.ingredient.factory.constructorArgument;
 	import subject.ClassWithAllMetatags;
 
 	public class ReferenceMappingTest 
@@ -68,7 +69,7 @@ package orichalcum.alchemy.alchemist
 			const newConstructorInject:Point = new Point(99, 99);
 			_alchemist.map(_id).to(type(ClassWithAllMetatags));
 			_alchemist.map(referenceId).to(reference(_id))
-				.withConstructorArgument(newConstructorInject);
+				.add(constructorArgument(newConstructorInject))
 			
 			const originalConstructorInject:Point = _alchemist.conjure(_id).constructorInject;
 			assertThat(originalConstructorInject, notNullValue());

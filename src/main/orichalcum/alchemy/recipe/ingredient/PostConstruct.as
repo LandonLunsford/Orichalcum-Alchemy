@@ -8,7 +8,7 @@ package orichalcum.alchemy.recipe.ingredient
 		public function PostConstruct(name:String) 
 		{
 			//Assert.notNull(name, "")
-			this.name = name;
+			_name = name;
 		}
 		
 		public function get name():String 

@@ -4,6 +4,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.notNullValue;
 	import org.hamcrest.object.strictlyEqualTo;
+	import orichalcum.alchemy.recipe.ingredient.factory.property;
 	import subject.ClassWithTwoQualifiedVariableInjects;
 	import subject.ClassWithTwoVariableInjects;
 	import subject.ClassWithTwoVariables;
@@ -44,8 +45,8 @@ package orichalcum.alchemy.alchemist
 		public function testCreateClassWithTwoRuntimeConfiguredVariableInjects():void
 		{
 			_alchemist.map(ClassWithTwoVariables)
-				.withProperty('variable0', _variable0)
-				.withProperty('variable1', _variable1);
+				.add(property('variable0', _variable0))
+				.add(property('variable1', _variable1))
 				
 			const creation:ClassWithTwoVariables = _alchemist.create(ClassWithTwoVariables) as ClassWithTwoVariables;
 			assertThat(_variable0, strictlyEqualTo(creation.variable0));
@@ -58,7 +59,7 @@ package orichalcum.alchemy.alchemist
 			const override0:Point = new Point;
 			
 			_alchemist.map(ClassWithTwoQualifiedVariableInjects)
-				.withProperty('variable0', override0);
+				.add(property('variable0', override0))
 			
 			const creation:ClassWithTwoQualifiedVariableInjects = _alchemist.create(ClassWithTwoQualifiedVariableInjects) as ClassWithTwoQualifiedVariableInjects;
 			assertThat(override0, strictlyEqualTo(creation.variable0));

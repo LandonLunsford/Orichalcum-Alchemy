@@ -6,7 +6,6 @@ package suite
 	import orichalcum.alchemy.alchemist.EventHandlerTest;
 	import orichalcum.alchemy.alchemist.FactoryForwardingMappingTest;
 	import orichalcum.alchemy.alchemist.FactoryMappingTest;
-	import orichalcum.alchemy.alchemist.FriendTest;
 	import orichalcum.alchemy.alchemist.PoolMappingTest;
 	import orichalcum.alchemy.alchemist.PostConstructTest;
 	import orichalcum.alchemy.alchemist.PreDestroyTest;
@@ -34,33 +33,31 @@ package suite
 	[RunWith("org.flexunit.runners.Suite")]
 	public class ComprehensiveTestSuite
 	{
-		public var alchemistExtensionTest:AlchemistExtensionTest;
-		public var alchemistTest:AlchemistTest;
+		//public var alchemistExtensionTest:AlchemistExtensionTest;
+		//public var alchemistTest:AlchemistTest;
 		
-		public var constructorArgumentInjectionTest:ConstructorArgumentInjectionTest;
-		public var eventHandlerTest:EventHandlerTest;
-		public var variableInjectionTest:VariableInjectionTest;
-		public var setterInjectionTest:SetterInjectionTest;
-		public var postConstructTest:PostConstructTest;
-		public var preDestroyTest:PreDestroyTest;
+		//public var constructorArgumentInjectionTest:ConstructorArgumentInjectionTest;
+		//public var eventHandlerTest:EventHandlerTest;
+		//public var variableInjectionTest:VariableInjectionTest;
+		//public var setterInjectionTest:SetterInjectionTest;
+		//public var postConstructTest:PostConstructTest;
+		//public var preDestroyTest:PreDestroyTest;
+		//
+		//public var valueMappingTest:ValueMappingTest;
+		//public var referenceMappingTest:ReferenceMappingTest;
+		//public var factoryForwardingMappingTest:FactoryForwardingMappingTest;
+		//public var factoryMappingTest:FactoryMappingTest;
+		//public var prototypeMappingTest:PrototypeMappingTest;
+		//public var singletonMappingTest:SingletonMappingTest;
+		//public var poolMappingTest:PoolMappingTest;
 		
-		public var valueMappingTest:ValueMappingTest;
-		public var referenceMappingTest:ReferenceMappingTest;
-		public var factoryForwardingMappingTest:FactoryForwardingMappingTest;
-		public var factoryMappingTest:FactoryMappingTest;
-		public var prototypeMappingTest:PrototypeMappingTest;
-		public var singletonMappingTest:SingletonMappingTest;
-		public var poolMappingTest:PoolMappingTest;
+		// these must be rewritten
+		//public var emptyRecipeTest:EmptyRecipeTest;
+		//public var fullRecipeTest:FullRecipeTest;
+		//public var compoundRecipeTest:CompoundRecipeTest;
+		//public var recipeFactoryTest:RecipeFactoryTest;
+		//public var xmlConfigurationMapperTest:XmlConfigurationMapperTest;
 		
-		public var emptyRecipeTest:EmptyRecipeTest;
-		public var fullRecipeTest:FullRecipeTest;
-		public var compoundRecipeTest:CompoundRecipeTest;
-		
-		public var recipeFactoryTest:RecipeFactoryTest;
-		
-		public var xmlConfigurationMapperTest:XmlConfigurationMapperTest;
-		
-		public var friendTest:FriendTest;
 		public var symbiotTest:SymbiotTest;
 		
 	}

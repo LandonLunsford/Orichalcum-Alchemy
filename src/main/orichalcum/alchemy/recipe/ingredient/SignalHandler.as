@@ -4,7 +4,7 @@ package orichalcum.alchemy.recipe.ingredient
 	public class SignalHandler 
 	{
 		
-		public function SignalHandler(options:Object) 
+		public function SignalHandler(options:Object = null) 
 		{
 			
 		}

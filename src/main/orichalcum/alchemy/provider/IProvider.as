@@ -1,7 +1,7 @@
 package orichalcum.alchemy.provider 
 {
+	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
-	import orichalcum.alchemy.recipe.Recipe;
 
 	public interface IProvider 
 	{
@@ -11,7 +11,7 @@ package orichalcum.alchemy.provider
 		 * @param	activeRecipe The recipe mapped to the provision
 		 * @return	The provision it is responsible for providing.
 		 */
-		function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):*;
+		function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):*;
 		
 		/**
 		 * Destruction phase hook

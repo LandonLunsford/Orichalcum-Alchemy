@@ -9,6 +9,11 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.object.nullValue;
 	import org.hamcrest.object.strictlyEqualTo;
 	import orichalcum.alchemy.provider.factory.value;
+	import orichalcum.alchemy.recipe.ingredient.factory.constructorArgument;
+	import orichalcum.alchemy.recipe.ingredient.factory.eventHandler;
+	import orichalcum.alchemy.recipe.ingredient.factory.postConstruct;
+	import orichalcum.alchemy.recipe.ingredient.factory.preDestroy;
+	import orichalcum.alchemy.recipe.ingredient.factory.property;
 
 	public class ValueMappingTest 
 	{
@@ -111,11 +116,11 @@ package orichalcum.alchemy.alchemist
 		public function testMapToInjectedPrimitive():void
 		{
 			_alchemist.map(_id).to(true)
-				.withConstructorArgument(1)
-				.withProperty('x', 1)
-				.withEventHandler('click', 'go')
-				.withPostConstruct('init')
-				.withPreDestroy('dispose');
+				.add(constructorArgument(1))
+				.add(property('x', 1))
+				.add(eventHandler({event:'click', listenerName:'go'}))
+				.add(postConstruct('init'))
+				.add(preDestroy('dispose'))
 				
 			assertThat(_alchemist.conjure(_id));
 		}
@@ -136,11 +141,11 @@ package orichalcum.alchemy.alchemist
 					,initialized: false
 					,disposed: false
 				})
-				.withConstructorArgument(1)
-				.withProperty('x', 1)
-				.withEventHandler('complete', 'go', 'bindee')
-				.withPostConstruct('init')
-				.withPreDestroy('dispose');
+				.add(constructorArgument(1))
+				.add(property('x', 1))
+				.add(eventHandler({event:'click', listenerName:'go', target:'bindee'}))
+				.add(postConstruct('init'))
+				.add(preDestroy('dispose'))
 				
 			const object:Object = _alchemist.conjure('poo');
 			assertThat(object.initialized, isFalse());

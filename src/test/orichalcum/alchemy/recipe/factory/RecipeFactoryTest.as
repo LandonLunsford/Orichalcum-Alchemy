@@ -1,11 +1,11 @@
 package orichalcum.alchemy.recipe.factory 
 {
+	import flash.utils.Dictionary;
 	import org.flexunit.asserts.assertFalse;
 	import org.flexunit.asserts.assertTrue;
 	import org.hamcrest.object.notNullValue;
-	import orichalcum.alchemy.language.bundle.LanguageBundle;
+	import orichalcum.alchemy.alchemist.Alchemist;
 	import orichalcum.alchemy.recipe.factory.RecipeFactory;
-	import orichalcum.alchemy.recipe.Recipe;
 	import orichalcum.reflection.Reflector;
 	import subject.ClassWithAllMetatags;
 	import subject.ClassWithNoMetatags;
@@ -14,13 +14,13 @@ package orichalcum.alchemy.recipe.factory
 	{
 		
 		static private var _recipeFactory:RecipeFactory;
-		static private var _hasEverything:Recipe;
-		static private var _hasNothing:Recipe;
+		static private var _hasEverything:Dictionary;
+		static private var _hasNothing:Dictionary;
 		
 		[BeforeClass]
 		static public function setup():void
 		{
-			_recipeFactory = new RecipeFactory(Reflector.getInstance(), new LanguageBundle);
+			_recipeFactory = new RecipeFactory(new Alchemist);
 			_hasEverything = _recipeFactory.getRecipeForClass(ClassWithAllMetatags);
 			_hasNothing = _recipeFactory.getRecipeForClass(ClassWithNoMetatags);
 		}

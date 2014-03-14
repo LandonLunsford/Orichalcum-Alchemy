@@ -64,6 +64,10 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				var stopImmediatePropagationArgs:XMLList = metatagArgs.(@key == 'stopImmediatePropagation');
 				if (stopImmediatePropagationArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, 'stopImmediatePropagation', _metatagName, handler.listenerName, typeName);
 				
+				var onceArgs:XMLList = metatagArgs.(@key == 'once');
+				if (onceArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, 'once', _metatagName, handler.listenerName, typeName);
+				
+				
 				var relayArgs:XMLList = metatagArgs.(@key == 'relay');
 				if (relayArgs.length() > 1) throw new AlchemyError(MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE, 'relay', _metatagName, handler.listenerName, typeName);
 				
@@ -105,6 +109,10 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				handler.stopImmediatePropagation = (keylessArgs.(@value == 'stopImmediatePropagation')).length() > 0
 					|| stopImmediatePropagationArgs.length() > 0
 					&& stopImmediatePropagationArgs.@value.toString() == 'true';
+					
+				handler.once = (keylessArgs.(@value == 'once')).length() > 0
+					|| onceArgs.length() > 0
+					&& onceArgs.@value.toString() == 'true';
 				
 				(recipe[_key] ||= []).push(handler);
 			}
@@ -112,10 +120,9 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function add(recipe:Dictionary, ingredient:Object):void
 		{
-			const eventHandler:EventHandler = ingredient as EventHandler;
-			if (eventHandler)
+			if (ingredient is EventHandler)
 			{
-				(recipe[_key] ||= []).push(eventHandler);
+				(recipe[_key] ||= []).push(ingredient);
 			}
 		}
 		

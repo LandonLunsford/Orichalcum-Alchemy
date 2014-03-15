@@ -12,14 +12,13 @@ package orichalcum.alchemy.recipe.ingredient
 		private var _slotPath:String;
 		private var _once:Boolean;
 		
-		public function SignalHandler(options:Object = null) 
+		public function SignalHandler(signalPath:String, slotPath:String, once:Boolean = false) 
 		{
-			if (options)
-			{
-				if ('signal' in options) this.signalPath = options.signal;
-				if ('slot' in options) this.slotPath = options.slot;
-				if ('once' in options) this.once = options.once;
-			}
+			//Assert.notNull(signalPath, '');
+			//Assert.notNull(slotPath, '');
+			_signalPath = signalPath;
+			_slotPath = slotPath;
+			_once = once;
 		}
 		
 		public function get signal():ISignal 

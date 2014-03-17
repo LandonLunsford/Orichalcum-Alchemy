@@ -8,7 +8,6 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.mapper.AlchemyMapper;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.provider.IProvider;
-	import orichalcum.alchemy.recipe.factory.RecipeFactory;
 	import orichalcum.alchemy.recipe.ingredient.processor.ConstructorArgumentProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.EventHandlerProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;

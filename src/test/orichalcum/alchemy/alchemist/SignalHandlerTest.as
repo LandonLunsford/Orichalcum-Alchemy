@@ -1,20 +1,46 @@
 package orichalcum.alchemy.alchemist
 {
+	import org.hamcrest.assertThat;
+	import org.hamcrest.object.isFalse;
+	import org.hamcrest.object.isTrue;
 	import orichalcum.alchemy.alchemist.Alchemist;
 	import orichalcum.alchemy.alchemist.IAlchemist;
+	import orichalcum.signals.ISignal;
 	import subject.ClassWithSignalHandlerMetatags;
 
 	public class SignalHandlerTest 
 	{
 		
-		[Test]
-		public function test():void
+		private var _alchemist:IAlchemist;
+		private var _slotHost:ClassWithSignalHandlerMetatags;
+		
+		[Before]
+		public function before():void
 		{
-			const alchemist:IAlchemist = new Alchemist;
-			const mediator:ClassWithSignalHandlerMetatags = alchemist.conjure(ClassWithSignalHandlerMetatags) as ClassWithSignalHandlerMetatags;
-			
-			trace('-----------sig test-------------', mediator.target.signal.has(mediator.target_signal));
-
+			_alchemist = new Alchemist;
+			_slotHost = _alchemist.conjure(ClassWithSignalHandlerMetatags) as ClassWithSignalHandlerMetatags;
+		}
+		
+		[After]
+		public function after():void
+		{
+			_alchemist = null;
+		}
+		
+		[Test]
+		public function testAddOnActivate():void
+		{
+			const signal:ISignal = _slotHost.target.signal;
+			assertThat(signal.hasListeners, isTrue());
+		}
+		
+		[Test]
+		public function testRemoveOnDeactivate():void
+		{
+			const signal:ISignal = _slotHost.target.signal;
+			assertThat(signal.hasListeners, isTrue());
+			_alchemist.destroy(_slotHost);
+			assertThat(signal.hasListeners, isFalse());
 		}
 		
 	}

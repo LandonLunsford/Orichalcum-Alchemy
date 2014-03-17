@@ -1,4 +1,4 @@
-package orichalcum.alchemy.recipe.factory 
+package orichalcum.alchemy.alchemist 
 {
 	import flash.utils.describeType;
 	import flash.utils.Dictionary;

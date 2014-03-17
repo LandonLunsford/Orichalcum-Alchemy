@@ -32,7 +32,10 @@ package subject
 		public function target_onComplete():void {}
 		
 		[EventHandler(event = 'complete', target = 'root.child.grandchild')]
-		public function grandchild_onComplete():void {}
+		public function grandchild_onComplete():void { }
+	
+		[EventHandler]
+		public function target_click():void {}
 		
 	}
 

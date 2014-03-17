@@ -8,11 +8,11 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	public class PreDestroyProcessor implements IIngredientProcessor
 	{
 		private var _metatagName:String;
-		private var _key:String = 'preDestroy';
+		private var _ingredientId:String = 'preDestroy';
 		
-		public function PreDestroyProcessor(metatagName:String = null) 
+		public function PreDestroyProcessor(metatagName:String = 'PreDestroy') 
 		{
-			_metatagName = metatagName ? metatagName : 'PreDestroy';
+			_metatagName = metatagName;
 		}
 		
 		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
@@ -27,7 +27,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				
 			if (preDestroys.length() > 0)
 			{
-				recipe[_key] = preDestroys[0].parent().@name;
+				recipe[_ingredientId] = preDestroys[0].parent().@name;
 			}
 		}
 		
@@ -36,13 +36,13 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			const preDestroy:PreDestroy = ingredient as PreDestroy;
 			if (preDestroy)
 			{
-				recipe[_key] = preDestroy.name;
+				recipe[_ingredientId] = preDestroy.name;
 			}
 		}
 		
 		public function inherit(parent:Dictionary, child:Dictionary):void 
 		{
-			parent[_key] = child[_key];
+			parent[_ingredientId] = child[_ingredientId];
 		}
 		
 		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
@@ -54,7 +54,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			recipe[_key] && (instance[recipe[_key]] as Function).call(instance);
+			recipe[_ingredientId] && (instance[recipe[_ingredientId]] as Function).call(instance);
 		}
 		
 		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 

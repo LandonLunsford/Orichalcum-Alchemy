@@ -12,23 +12,13 @@ package suite
 	import orichalcum.alchemy.alchemist.PrototypeMappingTest;
 	import orichalcum.alchemy.alchemist.ReferenceMappingTest;
 	import orichalcum.alchemy.alchemist.SetterInjectionTest;
+	import orichalcum.alchemy.alchemist.SignalHandlerTest;
 	import orichalcum.alchemy.alchemist.SingletonMappingTest;
 	import orichalcum.alchemy.alchemist.SymbiotTest;
 	import orichalcum.alchemy.alchemist.ValueMappingTest;
 	import orichalcum.alchemy.alchemist.VariableInjectionTest;
-	import orichalcum.alchemy.configuration.xml.mapper.XmlConfigurationMapperTest;
-	import orichalcum.alchemy.recipe.CompoundRecipeTest;
-	import orichalcum.alchemy.recipe.EmptyRecipeTest;
-	import orichalcum.alchemy.recipe.factory.RecipeFactoryTest;
-	import orichalcum.alchemy.recipe.FullRecipeTest;
-
-	/*
-	 * Testing Debt:
-	 * 1. Bindee that doesnt impl IEventDispatcher
-	 * 2. Inheritance Model test
-	 * 		(referencial recipe linking)
-	 * 		(instance fallback on class def recipe linking)
-	 */
+	
+	
 	[Suite]
 	[RunWith("org.flexunit.runners.Suite")]
 	public class ComprehensiveTestSuite
@@ -38,10 +28,12 @@ package suite
 		
 		public var constructorArgumentInjectionTest:ConstructorArgumentInjectionTest;
 		public var eventHandlerTest:EventHandlerTest;
+		public var signalHandlerTest:SignalHandlerTest;
 		public var variableInjectionTest:VariableInjectionTest;
 		public var setterInjectionTest:SetterInjectionTest;
 		public var postConstructTest:PostConstructTest;
 		public var preDestroyTest:PreDestroyTest;
+		public var symbiotTest:SymbiotTest;
 		
 		public var valueMappingTest:ValueMappingTest;
 		public var referenceMappingTest:ReferenceMappingTest;
@@ -52,14 +44,7 @@ package suite
 		public var poolMappingTest:PoolMappingTest;
 		
 		// these must be rewritten
-		//public var emptyRecipeTest:EmptyRecipeTest;
-		//public var fullRecipeTest:FullRecipeTest;
-		//public var compoundRecipeTest:CompoundRecipeTest;
-		//public var recipeFactoryTest:RecipeFactoryTest;
 		//public var xmlConfigurationMapperTest:XmlConfigurationMapperTest;
-		
-		public var symbiotTest:SymbiotTest;
-		
 	}
 
 }

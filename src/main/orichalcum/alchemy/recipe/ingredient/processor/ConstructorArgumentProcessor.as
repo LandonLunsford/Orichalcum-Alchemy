@@ -10,11 +10,11 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	{
 		
 		private var _metatagName:String;
-		private var _key:String = 'constructorArguments';
+		private var _ingredientId:String = 'constructorArguments';
 		
-		public function ConstructorArgumentProcessor(metatagName:String = null) 
+		public function ConstructorArgumentProcessor(metatagName:String = 'Inject') 
 		{
-			_metatagName = metatagName ? metatagName : 'Inject';
+			_metatagName = metatagName;
 		}
 		
 		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
@@ -27,11 +27,11 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			
 			for (var i:int = 0; i < totalArgumentInjections; i++)
 			{
-				(recipe[_key] ||= [])[i] = reference(constructorArgumentInjections[i].toString());
+				(recipe[_ingredientId] ||= [])[i] = reference(constructorArgumentInjections[i].toString());
 			}
 			for (; i < totalRequiredConstructorParameters; i++)
 			{
-				(recipe[_key] ||= [])[i] = reference(constructorParameterTypes[i].toString());
+				(recipe[_ingredientId] ||= [])[i] = reference(constructorParameterTypes[i].toString());
 			}
 		}
 		
@@ -40,14 +40,14 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			if (ingredient is ConstructorArgument)
 			{
 				const constructorArgument:ConstructorArgument = ingredient as ConstructorArgument;
-				var recipeConstructorArguments:Array = (recipe[_key] ||= []);
+				var recipeConstructorArguments:Array = (recipe[_ingredientId] ||= []);
 				const index:int = constructorArgument.index == -1 ? recipeConstructorArguments.length : constructorArgument.index;
 				recipeConstructorArguments[index] = constructorArgument.value;
 			}
 			else if (ingredient is ConstructorArguments)
 			{
 				const constructorArguments:ConstructorArguments = ingredient as ConstructorArguments;
-				recipeConstructorArguments = (recipe[_key] ||= []);
+				recipeConstructorArguments = (recipe[_ingredientId] ||= []);
 				for each(var argument:* in constructorArguments.values)
 				{
 					recipeConstructorArguments.push(argument);
@@ -57,12 +57,12 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
 		{
-			const childConstructorArguments:Array = childRecipe[_key];
+			const childConstructorArguments:Array = childRecipe[_ingredientId];
 			if (!childConstructorArguments) return;
 			
 			for (var i:int = 0; i < childConstructorArguments.length; i++)
 			{
-				(parentRecipe[_key] ||= [])[i] = childConstructorArguments[i];
+				(parentRecipe[_ingredientId] ||= [])[i] = childConstructorArguments[i];
 			}
 		}
 		

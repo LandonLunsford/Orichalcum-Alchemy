@@ -17,11 +17,11 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		private const NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE:String = 'Required attribute "{}" not found on "[{}]" metatag for "{}" in class "{}".';
 		
 		private var _metatagName:String;
-		private var _key:String = 'eventHandlers';
+		private var _ingredientId:String = 'eventHandlers';
 		
-		public function EventHandlerProcessor(metatagName:String = null) 
+		public function EventHandlerProcessor(metatagName:String = 'EventHandler') 
 		{
-			_metatagName = metatagName ? metatagName : 'EventHandler';
+			_metatagName = metatagName;
 		}
 		
 		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
@@ -120,7 +120,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				}
 			
 				
-				(recipe[_key] ||= []).push(handler);
+				(recipe[_ingredientId] ||= []).push(handler);
 			}
 		}
 		
@@ -128,24 +128,25 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		{
 			if (ingredient is EventHandler)
 			{
-				(recipe[_key] ||= []).push(ingredient);
+				(recipe[_ingredientId] ||= []).push(ingredient);
 			}
 		}
 		
 		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
 		{
-			for each(var eventHandler:EventHandler in childRecipe[_key])
+			for each(var ingredient:* in childRecipe[_ingredientId])
 			{
-				(parentRecipe[_key] ||= []).push(eventHandler);
+				(parentRecipe[_ingredientId] ||= []).push(ingredient);
 			}
 		}
 		
 		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			for each(var eventHandler:EventHandler in recipe[_key])
+			for each(var handler:EventHandler in recipe[_ingredientId])
 			{
-				var target:Object = ObjectUtil.find(instance, eventHandler.targetPath);
+				var target:Object = ObjectUtil.find(instance, handler.targetPath);
 				var targetAsEventDispatcher:IEventDispatcher = target as IEventDispatcher;
+				var relayAsEventDispatcher:IEventDispatcher;
 				
 				if (targetAsEventDispatcher == null)
 				{
@@ -155,25 +156,25 @@ package orichalcum.alchemy.recipe.ingredient.processor
 					}
 					else
 					{
-						throw new AlchemyError('Variable or child named "{}" could not be found on "{}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
+						throw new AlchemyError('Variable or child named "{}" could not be found on "{}". Check to make sure that it is public and/or named correctly.', handler.targetPath, instance);
 					}
 				}
 				
-				if (!(eventHandler.listenerName in instance))
+				if (!(handler.listenerName in instance))
 				{
-					throw new AlchemyError('Unable to bind method "{}" to event type "{}". Method "{}" not found on "{}".', eventHandler.listenerName, eventHandler.type, eventHandler.listenerName, getQualifiedClassName(instance));
+					throw new AlchemyError('Unable to bind method "{}" to event type "{}". Method "{}" not found on "{}".', handler.listenerName, handler.type, handler.listenerName, getQualifiedClassName(instance));
 				}
 				
-				if (eventHandler.relayPath)
+				if (handler.relayPath)
 				{
-					if (eventHandler.relayPath == '__alchemist__')
+					if (handler.relayPath == '__alchemist__')
 					{
-						eventHandler.relay = alchemist;
+						relayAsEventDispatcher = alchemist;
 					}
 					else
 					{
-						const relay:Object = ObjectUtil.find(instance, eventHandler.relayPath);
-						const relayAsEventDispatcher:IEventDispatcher = relay as IEventDispatcher;
+						var relay:Object = ObjectUtil.find(instance, handler.relayPath);
+						relayAsEventDispatcher = relay as IEventDispatcher;
 						if (relayAsEventDispatcher == null)
 						{
 							if (relayAsEventDispatcher === instance)
@@ -182,28 +183,25 @@ package orichalcum.alchemy.recipe.ingredient.processor
 							}
 							else
 							{
-								throw new AlchemyError('Variable or child named "{}" could not be found on "{}". Check to make sure that it is public and/or named correctly.', eventHandler.targetPath, instance);
+								throw new AlchemyError('Variable or child named "{}" could not be found on "{}". Check to make sure that it is public and/or named correctly.', handler.targetPath, instance);
 							}
 						}
 						else if (relayAsEventDispatcher == targetAsEventDispatcher)
 						{
 							throw new AlchemyError('EventHandler target and relay must not be the same. This will cause an infinite loop.');
 						}
-						eventHandler.relay = relayAsEventDispatcher;
 					}
 				}
 				
-				eventHandler.target = targetAsEventDispatcher;
-				eventHandler.listener = instance[eventHandler.listenerName];
-				eventHandler.bind();
+				handler.bind(targetAsEventDispatcher, instance[handler.listenerName], relayAsEventDispatcher);
 			}
 		}
 		
 		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
-			for each(var eventHandler:EventHandler in recipe[_key])
+			for each(var handler:EventHandler in recipe[_ingredientId])
 			{				
-				eventHandler.isBound && eventHandler.unbind();
+				handler.isBound && handler.unbind();
 			}
 		}
 		

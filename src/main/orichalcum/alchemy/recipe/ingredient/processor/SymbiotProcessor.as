@@ -7,8 +7,8 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	public class SymbiotProcessor implements IIngredientProcessor
 	{
 		
-		private var _key:String = 'symbiots';
-		private var _friendsByInstance:Dictionary = new Dictionary;
+		private var _ingredientId:String = 'symbiots';
+		private var _symbiotsByInstance:Dictionary = new Dictionary;
 		
 		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
 		{
@@ -22,14 +22,14 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			const symbiot:Symbiot = ingredient as Symbiot;
 			if (symbiot)
 			{
-				(recipe[_key] ||= []).push(symbiot.id);
+				(recipe[_ingredientId] ||= []).push(symbiot.id);
 			}
 		}
 		
 		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
 		{
-			const friends:Array = (parentRecipe[_key] ||= []);
-			for each(var friend:* in childRecipe[_key])
+			const friends:Array = (parentRecipe[_ingredientId] ||= []);
+			for each(var friend:* in childRecipe[_ingredientId])
 			{
 				if (friends.indexOf(friend) < 0)
 				{
@@ -40,22 +40,22 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
-			for each(var friendId:* in recipe[_key])
+			for each(var symbiotId:* in recipe[_ingredientId])
 			{
-				(_friendsByInstance[instance] ||= []).push(alchemist.conjure(friendId));
+				(_symbiotsByInstance[instance] ||= []).push(alchemist.conjure(symbiotId));
 			}
 		}
 		
 		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 
 		{
-			const friends:* = _friendsByInstance[instance];
+			const friends:* = _symbiotsByInstance[instance];
 			if (friends)
 			{
 				for each(var friend:* in friends)
 				{
 					alchemist.destroy(friend);
 				}
-				delete _friendsByInstance[instance];
+				delete _symbiotsByInstance[instance];
 			}
 		}
 		public function provide(instance:*, recipe:Dictionary, alchemist:IAlchemist):void 

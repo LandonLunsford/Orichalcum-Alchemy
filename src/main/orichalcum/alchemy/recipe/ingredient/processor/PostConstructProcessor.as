@@ -9,11 +9,11 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	public class PostConstructProcessor implements IIngredientProcessor
 	{
 		private var _metatagName:String;
-		private var _key:String = 'postConstruct';
+		private var _ingredientId:String = 'postConstruct';
 		
-		public function PostConstructProcessor(metatagName:String = null) 
+		public function PostConstructProcessor(metatagName:String = 'PostConstruct') 
 		{
-			_metatagName = metatagName ? metatagName : 'PostConstruct';
+			_metatagName = metatagName;
 		}
 		
 		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
@@ -28,7 +28,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				
 			if (postConstructs.length() > 0)
 			{
-				recipe[_key] = postConstructs[0].parent().@name;
+				recipe[_ingredientId] = postConstructs[0].parent().@name;
 			}
 		}
 		
@@ -37,18 +37,18 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			const postConstruct:PostConstruct = ingredient as PostConstruct;
 			if (postConstruct)
 			{
-				recipe[_key] = postConstruct.name;
+				recipe[_ingredientId] = postConstruct.name;
 			}
 		}
 		
 		public function inherit(parent:Dictionary, child:Dictionary):void 
 		{
-			parent[_key] = child[_key];
+			parent[_ingredientId] = child[_ingredientId];
 		}
 		
 		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			recipe[_key] && (instance[recipe[_key]] as Function).call(instance);
+			recipe[_ingredientId] && (instance[recipe[_ingredientId]] as Function).call(instance);
 		}
 		
 		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void

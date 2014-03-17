@@ -116,7 +116,6 @@ package orichalcum.alchemy.alchemist
 		 */
 		public function Alchemist(...mappings)
 		{
-			
 			_recipeFactory = new RecipeFactory(this);
 			
 			mappings && mapAll(mappings);
@@ -298,7 +297,7 @@ package orichalcum.alchemy.alchemist
 		 */
 		private function getRecipeForClassName(qualifiedClassName:String, recipeFlyweight:Dictionary, runtimeConfiguredRecipe:Dictionary = null):Dictionary
 		{
-			return getMergedRecipe(recipeFlyweight, _recipeFactory.getRecipeByClassName(qualifiedClassName), getRecipe(qualifiedClassName), runtimeConfiguredRecipe);
+			return getMergedRecipe(recipeFlyweight, _recipeFactory.getRecipeForClassNamed(qualifiedClassName), getRecipe(qualifiedClassName), runtimeConfiguredRecipe);
 		}
 		
 		/**
@@ -326,8 +325,6 @@ package orichalcum.alchemy.alchemist
 			runtimeInstanceRecipe && _inherit(recipe, runtimeInstanceRecipe);
 			return recipe;
 		}
-		
-		
 		
 		/**
 		 * @private

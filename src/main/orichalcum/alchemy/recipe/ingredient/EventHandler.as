@@ -193,9 +193,12 @@ package orichalcum.alchemy.recipe.ingredient
 			return target && target.hasEventListener(type);
 		}
 		
-		public function bind():void
+		public function bind(target:IEventDispatcher, listener:Function, relay:IEventDispatcher = null):void
 		{
-			target.addEventListener(type, handle, useCapture, priority);
+			this.target = target;
+			this.listener = listener;
+			this.relay = relay;
+			this.target.addEventListener(type, handle, useCapture, priority);
 		}
 		
 		public function unbind():void

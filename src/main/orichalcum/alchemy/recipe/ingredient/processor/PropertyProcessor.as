@@ -12,11 +12,11 @@ package orichalcum.alchemy.recipe.ingredient.processor
 	public class PropertyProcessor implements IIngredientProcessor
 	{
 		private var _metatagName:String;
-		private var _key:String = 'properties';
+		private var _ingredientId:String = 'properties';
 		
-		public function PropertyProcessor(metatagName:String = null) 
+		public function PropertyProcessor(metatagName:String = 'Inject') 
 		{
-			_metatagName = metatagName ? metatagName : 'Inject';
+			_metatagName = metatagName;
 		}
 		
 		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void 
@@ -35,11 +35,11 @@ package orichalcum.alchemy.recipe.ingredient.processor
 				
 				if (propertyInjections.arg.length() > 0)
 				{
-					(recipe[_key] ||= {})[propertyName] = reference(propertyInjections.arg[0].@value.toString());
+					(recipe[_ingredientId] ||= {})[propertyName] = reference(propertyInjections.arg[0].@value.toString());
 				}
 				else if (reflector.isComplexType(propertyType)) 
 				{
-					(recipe[_key] ||= {})[propertyName] = reference(propertyType);
+					(recipe[_ingredientId] ||= {})[propertyName] = reference(propertyType);
 				}
 				if (propertyInjections.length() > 1 || propertyInjections.arg.length() > 1)
 				{
@@ -53,13 +53,13 @@ package orichalcum.alchemy.recipe.ingredient.processor
 			if (ingredient is Property)
 			{
 				const property:Property = ingredient as Property;
-				var recipeProperties:Object = (recipe[_key] ||= {});
+				var recipeProperties:Object = (recipe[_ingredientId] ||= {});
 				recipeProperties[property.name] = property.value;
 			}
 			else if (ingredient is Properties)
 			{
 				const properties:Properties = ingredient as Properties;
-				recipeProperties = (recipe[_key] ||= {});
+				recipeProperties = (recipe[_ingredientId] ||= {});
 				for (var name:* in properties)
 				{
 					recipeProperties[name] = properties[name];
@@ -69,12 +69,12 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
 		{
-			ObjectUtil.extend((parentRecipe[_key] ||= {}), childRecipe[_key]);
+			ObjectUtil.extend((parentRecipe[_ingredientId] ||= {}), childRecipe[_ingredientId]);
 		}
 		
 		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			const properties:Object = recipe[_key];
+			const properties:Object = recipe[_ingredientId];
 			for (var propertyName:String in properties)
 			{
 				instance[propertyName] = alchemist.evaluate(properties[propertyName]);
@@ -83,7 +83,7 @@ package orichalcum.alchemy.recipe.ingredient.processor
 		
 		public function deactivate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			for (var propertyName:String in recipe[_key])
+			for (var propertyName:String in recipe[_ingredientId])
 			{
 				if (instance[propertyName] is Object)
 				{

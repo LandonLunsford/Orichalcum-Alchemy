@@ -1,6 +1,7 @@
 package 
 {
 	import flash.display.Sprite;
+	import flash.utils.describeType;
 	import org.flexunit.internals.TraceListener;
 	import org.flexunit.runner.FlexUnitCore;
 	import suite.ComprehensiveTestSuite;
@@ -12,6 +13,7 @@ package
 			const core:FlexUnitCore = new FlexUnitCore;
 			core.addListener(new TraceListener);
 			core.run(ComprehensiveTestSuite);
+			
 		}
 		
 	}

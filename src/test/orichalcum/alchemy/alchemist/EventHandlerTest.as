@@ -3,6 +3,7 @@ package orichalcum.alchemy.alchemist
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.MouseEvent;
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.isFalse;
 	import org.hamcrest.object.isTrue;
@@ -72,6 +73,13 @@ package orichalcum.alchemy.alchemist
 			assertThat(creation.hasEventListener(Event.COMPLETE), isFalse());
 			assertThat(creation.target.hasEventListener(Event.COMPLETE), isFalse());
 			assertThat((creation.root.getChildByName('child') as DisplayObjectContainer).getChildByName('grandchild').hasEventListener(Event.COMPLETE), isFalse());
+		}
+		
+		[Test]
+		public function testSimpleTargetUnderscoreEventAPI():void
+		{
+			const creation:ClassWithEventHandlerMetatags = _alchemist.create(ClassWithEventHandlerMetatags) as ClassWithEventHandlerMetatags;
+			assertThat(creation.target.hasEventListener(MouseEvent.CLICK));
 		}
 		
 	}

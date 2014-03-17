@@ -1,6 +1,7 @@
 package orichalcum.alchemy.recipe.ingredient 
 {
 	import orichalcum.signals.ISignal;
+	import orichalcum.utility.Strings;
 
 	public class SignalHandler 
 	{
@@ -76,8 +77,10 @@ package orichalcum.alchemy.recipe.ingredient
 			return _signal && _signal.has(_handle);
 		}
 		
-		public function bind():void
+		public function bind(signal:ISignal, slot:Function):void
 		{
+			_signal = signal;
+			_slot = slot;
 			_signal.add(_handle);
 		}
 		
@@ -92,6 +95,11 @@ package orichalcum.alchemy.recipe.ingredient
 		{
 			_slot.apply(null, args);
 			_once && unbind();
+		}
+		
+		public function toString():String
+		{
+			return Strings.interpolate('{"signal":"{}", "slot":"{}", "once":{}}', signalPath, slotPath, once);
 		}
 		
 	}

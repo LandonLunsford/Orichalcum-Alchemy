@@ -2,12 +2,11 @@ package orichalcum.alchemy.alchemist
 {
 	import flash.events.IEventDispatcher;
 	import flash.utils.Dictionary;
-	import orichalcum.alchemy.evaluator.IEvaluator;
-	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.lifecycle.IAlchemyLifecycle;
+	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.reflection.IReflector;
 	
-	public interface IAlchemist extends IEventDispatcher, IEvaluator
+	public interface IAlchemist extends IEventDispatcher
 	{
 		
 		/**
@@ -56,6 +55,15 @@ package orichalcum.alchemy.alchemist
 		 * @return	the instance passed as an argument
 		 */
 		function destroy(instance:Object):Object;
+		
+		/**
+		 * Parses the value of the argument depending on whether it is an IProvider, reference or value
+		 * @param	providerReferenceOrValue
+		 * @return	provider.provide() if the argument is IProvider,
+		 * 		alchemist.conjure(reference) if the argument is a reference
+		 * 		argument if the value is none of the above.
+		 */
+		function evaluate(providerReferenceOrValue:*):*;
 		
 		/**
 		 * Creates a child alchemist which will fallback on its parent's mappings

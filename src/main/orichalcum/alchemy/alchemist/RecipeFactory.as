@@ -5,21 +5,14 @@ package orichalcum.alchemy.alchemist
 	import flash.utils.getQualifiedSuperclassName;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
 	import orichalcum.datastructure.Maps;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
-
 
 	public class RecipeFactory implements IDisposable
 	{
 		private var _alchemist:IAlchemist;
 		private var _recipesByClassName:Dictionary;
-		
-		public function get reflector():IReflector 
-		{
-			return _alchemist.reflector;
-		}
 		
 		public function RecipeFactory(alchemist:IAlchemist)
 		{
@@ -41,6 +34,11 @@ package orichalcum.alchemy.alchemist
 		{
 			_alchemist = null;
 			_recipesByClassName = null;
+		}
+		
+		public function get reflector():IReflector 
+		{
+			return _alchemist.reflector;
 		}
 		
 		public function getRecipeForClassNamed(qualifiedClassName:String):Dictionary

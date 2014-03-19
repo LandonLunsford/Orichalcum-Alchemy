@@ -1,11 +1,8 @@
 package orichalcum.alchemy.alchemist 
 {
-	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher;
 	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
-	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.lifecycle.IAlchemyLifecycle;
 	import orichalcum.alchemy.mapper.AlchemyMapper;
@@ -13,7 +10,6 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.provider.IProvider;
 	import orichalcum.alchemy.recipe.ingredient.processor.ConstructorArgumentProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.EventHandlerProcessor;
-	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.MultiprocessProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.PostConstructProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.PreDestroyProcessor;
@@ -28,11 +24,10 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
+	import orichalcum.utility.ObjectUtil;
 	
 	public class Alchemist extends EventDispatcher implements IDisposable, IAlchemist
 	{
-		
-		
 		
 		/**
 		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
@@ -78,7 +73,6 @@ package orichalcum.alchemy.alchemist
 			new ProviderlessValueResolver
 		];
 		
-		
 		/**
 		 * Reflection utility
 		 * @private
@@ -92,13 +86,8 @@ package orichalcum.alchemy.alchemist
 		private var _recipeFactory:RecipeFactory;
 		
 		/**
-		 * Contains all mapped providers
-		 * 
-		 * @warning Nasty truth is this contains the following
-		 * 1. IProvider
-		 * 2. "{expression}"
-		 * 3. Instances directly
-		 * 
+		 * Contains all mappings
+		 * This includes IProvider, "{stringExpressions}" or values
 		 * @private
 		 */
 		private var _mappings:Dictionary = new Dictionary;
@@ -138,8 +127,6 @@ package orichalcum.alchemy.alchemist
 		 * thisAlchemist = parentAlchemist.extend()
 		 * @private
 		 */
-		//private const DEFAULT_PARENT:AlchemistBase = new AlchemistBase;
-		//private var _parent:Alchemist = DEFAULT_PARENT;
 		private var _parent:Alchemist;
 		
 		public function get parent():Alchemist 
@@ -183,39 +170,59 @@ package orichalcum.alchemy.alchemist
 			_resolvers = value;
 		}
 		
-		
-		
-		/**
-		 * @param list of XML mapping configurations
-		 */
-		public function Alchemist(...mappings)
+		public function Alchemist()
 		{
 			_recipeFactory = new RecipeFactory(this);
 			
-			mappings && mapAll(mappings);
-			map(getQualifiedClassName(this)).to(this);
+			/**
+			 * Maps itself as a value for the IAlchemist interface
+			 */
+			map(IAlchemist).to(this);
 		}
 		
 		public function dispose():void
 		{
-			for (var providerName:String in _mappings)
+			for (var mappingId:String in _mappings)
 			{
-				_mappings[providerName] is IDisposable && (_mappings[providerName] as IDisposable).dispose();
-				delete _mappings[providerName];
+				_mappings[mappingId] is IDisposable && (_mappings[mappingId] as IDisposable).dispose();
+				delete _mappings[mappingId];
 			}
-			for (var recipeName:String in _recipes)
+			for (var recipeId:String in _recipes)
 			{
-				_recipes[recipeName] is IDisposable && (_recipes[recipeName] as IDisposable).dispose();
-				delete _recipes[recipeName];
+				_recipes[recipeId] is IDisposable && (_recipes[recipeId] as IDisposable).dispose();
+				delete _recipes[recipeId];
 			}
 			_recipeFactory is IDisposable && (_recipeFactory as IDisposable).dispose();
-			_parent = null;
+			
+			_recipeFlyweights = null;
+			_creator = null;
+			_lifecycle = null;
+			_resolvers = null;
+			_reflector = null;
+			_recipeFactory = null;
 			_mappings = null;
 			_recipes = null;
+			_providersByInstance = null;
+			_recipesByInstance = null;
+			_symbiotsByInstance = null;
+			_instancesInProcessById = null;
+			_parent = null;
+		}
+		
+		public function extend():IAlchemist
+		{
+			const child:Alchemist = new Alchemist;
+			child._parent = this;
+			return child;
 		}
 		
 		public function map(id:*):IAlchemyMapper
 		{
+			/**
+			 * This method cannot function with a null Id
+			 */
+			id || throwError('Argument "id" passed to method Alchemist.conjure() must not be null.');
+			
 			return new AlchemyMapper(this, normalizeId(id), _mappings, _recipes);
 		}
 		
@@ -227,23 +234,51 @@ package orichalcum.alchemy.alchemist
 		
 		public function conjure(id:*, recipe:Dictionary = null):*
 		{
+			/**
+			 * This method cannot function with a null Id
+			 */
+			id || throwError('Argument "id" passed to method Alchemist.conjure() must not be null.');
+			
 			const validId:String = normalizeId(id);
 			
-			/*
-			 *	Allows support for symbiots with cyclical property injections
+			/**
+			 * Allows support for symbiots with cyclical property injections
 			 */
-			if (_instancesInProcessById[validId])
+			if (validId in _instancesInProcessById)
 				return _instancesInProcessById[validId];
 			
-			const mapping:* = getMapping(validId);
-			const instance:* = resolve(validId, mapping, recipe ||= getRecipe(validId));
+			/**
+			 * Fallback on mapped recipe when it is not explicitley set
+			 */
+			if (recipe == null)
+				recipe = getRecipe(validId);
 			
+			/**
+			 * It is important to remember that a mapping can be a provider,
+			 * expression or even a plain value
+			 */
+			const mapping:* = getMapping(validId);
+			
+			/**
+			 * This is the reference to the resolved value of an expression or provider
+			 */
+			const instance:* = resolve(validId, mapping, recipe);
+			
+			/**
+			 * Remember the instance's provider to invoke its destroy hook on a call to destroy(instance)
+			 */
 			if (mapping is IProvider)
 				_providersByInstance[instance] = mapping;
 			
+			/**
+			 * Remember the instance's recipe for use in the lifecycle deactivate phase in destroy()
+			 */
 			if (recipe)
 				_recipesByInstance[instance] = recipe;
 			
+			/**
+			 * Execute lifecyle provide phase
+			 */
 			lifecycle.provide(instance, recipe, this);
 			
 			return instance;
@@ -259,9 +294,7 @@ package orichalcum.alchemy.alchemist
 			for each(var resolver:IDependencyResolver in resolvers)
 			{
 				if (resolver.resolves(id, mapping))
-				{
 					return resolver.resolve(id, mapping, recipe, this);
-				}
 			}
 			
 			throwError('Alchemist cannot resolve mapping "{}" id "{}".', mapping, id);
@@ -269,55 +302,128 @@ package orichalcum.alchemy.alchemist
 		
 		public function create(type:Class, recipe:Dictionary = null, id:* = null):Object
 		{
+			
+			/**
+			 * This method requires that the type argument is not null to function
+			 */
 			type || throwError('Argument "type" passed to method Alchemist.create() must not be null.');
 			
-			const recipeFlyweight:Dictionary = getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe);
-			const instance:* = _creator.create(type, this, recipeFlyweight);
+			/**
+			 * Get the merged recipe for the type
+			 */
+			recipe = getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe);
+			
+			/**
+			 * Instantiate tye type based on the recipe
+			 */
+			const instance:* = _creator.create(type, this, recipe);
+			
+			/**
+			 * Remember the current instance being processed.
+			 * This is to prevent infinite loops when objects are found to have
+			 * symbiotic or circular relationships at injection or activation time.
+			 */
 			_instancesInProcessById[id] = instance;
-			lifecycle.activate(instance, recipeFlyweight, this);
+			
+			/**
+			 * Execute activation lifecycle phase
+			 */
+			lifecycle.activate(instance, recipe, this);
+			
+			/**
+			 * Forget the current instance is being processed after the activation phase has passed
+			 */
 			delete _instancesInProcessById[id];
+			
+			/**
+			 * Return the flyweight recipe used in recipe computation for reuse
+			 */
 			returnRecipeFlyweight();
+			
+			/**
+			 * Return the newly instantiated and injected instance
+			 */
 			return instance;
 		}
 		
 		public function inject(instance:Object):Object
 		{
+			
+			/**
+			 * A null instance here usually means there is an issue in your (or my) code
+			 */
 			instance || throwError('Argument "instance" passed to method Alchemist.inject() must not be null.');
 			
-			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
+			/**
+			 * Get the merged recipe for the type
+			 */
 			const recipe:Dictionary = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
+			
+			/**
+			 * Determine the type of the instance through reflection
+			 */
+			const type:Class = _reflector.getTypeDefinition(instance);
+			
+			/**
+			 * Execute activation lifecycle phase
+			 */
 			lifecycle.activate(instance, recipe, this);
+			
+			/**
+			 * Return the flyweight recipe used in recipe computation for reuse
+			 */
 			returnRecipeFlyweight();
+			
+			/**
+			 * Return the injected instance
+			 */
 			return instance;
 		}
 		
 		public function destroy(instance:Object):Object
 		{
+			
+			/**
+			 * A null instance here usually means there is an issue in your (or my) code
+			 */
 			instance || throwError('Argument "instance" passed to method Alchemist.destroy() must not be null.');
 			
-			_providersByInstance[instance] && _providersByInstance[instance].destroy(instance);
+			/**
+			 * Execute the provider's destroy hook
+			 */
+			instance in _providersByInstance && _providersByInstance[instance].destroy(instance);
 			
-			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
+			/**
+			 * Get the merged recipe for the type
+			 */
 			const recipe:Dictionary = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
+			
+			/**
+			 * Determine the type of the instance through reflection
+			 */
+			const type:Class = _reflector.getTypeDefinition(instance);
+			
+			/**
+			 * Execute deactivation lifecycle phase
+			 */
 			lifecycle.deactivate(instance, recipe, this);
+			
+			/**
+			 * Return the flyweight recipe used in recipe computation for reuse
+			 */
 			returnRecipeFlyweight();
+			
+			/**
+			 * Return the destroyed instance
+			 */
 			return instance;
 		}
-		
-		public function extend():IAlchemist
-		{
-			const child:Alchemist = new Alchemist;
-			child._parent = this;
-			return child;
-		}
-		
-		/* PRIVATE PARTS */
 		
 		/**
 		 * Recursively looks up any provider mapped to the id through this alchemist and its ancestor chain.
 		 * @param	id The custom name or qualified class name used to map the provider
 		 */
-		public function getMapping(id:String):* // @warning ugly
+		public function getMapping(id:String):*
 		{
 			if (id in _mappings)
 				return _mappings[id];
@@ -346,17 +452,26 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * @private
 		 */
-		private function getRecipeForClassOrInstance(classOrInstance:Object, recipeFlyweight:Dictionary, runtimeConfiguredRecipe:Dictionary = null):Dictionary 
+		private function getRecipeForClassOrInstance(classOrInstance:Object, recipeFlyweight:Dictionary, runtimeRecipe:Dictionary = null):Dictionary 
 		{
-			return getRecipeForClassName(getQualifiedClassName(classOrInstance), recipeFlyweight, runtimeConfiguredRecipe);
+			return getRecipeForClassName(
+				_reflector.getTypeName(classOrInstance),
+				recipeFlyweight,
+				runtimeRecipe
+			);
 		}
 		
 		/**
 		 * @private
 		 */
-		private function getRecipeForClassName(qualifiedClassName:String, recipeFlyweight:Dictionary, runtimeConfiguredRecipe:Dictionary = null):Dictionary
+		private function getRecipeForClassName(qualifiedClassName:String, recipeFlyweight:Dictionary, runtimeRecipe:Dictionary = null):Dictionary
 		{
-			return getMergedRecipe(recipeFlyweight, _recipeFactory.getRecipeForClassNamed(qualifiedClassName), getRecipe(qualifiedClassName), runtimeConfiguredRecipe);
+			return getMergedRecipe(
+				recipeFlyweight,
+				_recipeFactory.getRecipeForClassNamed(qualifiedClassName),
+				getRecipe(qualifiedClassName),
+				runtimeRecipe
+			);
 		}
 		
 		/**
@@ -365,20 +480,11 @@ package orichalcum.alchemy.alchemist
 		private function getMergedRecipe(recipeFlyweight:Dictionary, staticTypeRecipe:Dictionary, runtimeTypeRecipe:Dictionary, runtimeInstanceRecipe:Dictionary):Dictionary
 		{
 			/*
-			 * Because of recursive nature of the algorithm a
-			 * flyweight *pool* must be used to compensate for
+			 * Because of the recursive nature of the conjure/inject algorithm
+			 * a flyweight *pool* must be used to compensate for
 			 * the function requiring a new recipe every recursive call.
 			 */
-			//const recipe:Recipe = recipeFlyweight ? recipeFlyweight.empty() : new Recipe;
-			if (recipeFlyweight)
-			{
-				for (var key:* in recipeFlyweight)
-				{
-					delete recipeFlyweight[key];
-				}
-			}
-			
-			const recipe:Dictionary = recipeFlyweight ? recipeFlyweight : new Dictionary;
+			const recipe:Dictionary = recipeFlyweight ? ObjectUtil.clean(recipeFlyweight) as Dictionary : new Dictionary;
 			staticTypeRecipe && lifecycle.inherit(recipe, staticTypeRecipe);
 			runtimeTypeRecipe && lifecycle.inherit(recipe, runtimeTypeRecipe);
 			runtimeInstanceRecipe && lifecycle.inherit(recipe, runtimeInstanceRecipe);
@@ -404,8 +510,6 @@ package orichalcum.alchemy.alchemist
 		 */
 		private function normalizeId(id:*):String
 		{
-			id || throwError('Argument "id" must not be null.');
-			
 			var validId:String;
 			
 			if (id is String)
@@ -441,14 +545,6 @@ package orichalcum.alchemy.alchemist
 		private function returnRecipeFlyweight():void
 		{
 			_recipeFlyweightsIndex--;
-		}
-		
-		/**
-		 * @private
-		 */
-		private function mapAll(mappings:Array):void 
-		{
-			//(new XmlConfigurationMapper(_reflector, _languageBundle)).map(this, mappings);
 		}
 		
 		/**

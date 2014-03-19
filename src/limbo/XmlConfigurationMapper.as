@@ -1,4 +1,4 @@
-package orichalcum.alchemy.configuration.xml.mapper
+package orichalcum.alchemy.mapper
 {
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;

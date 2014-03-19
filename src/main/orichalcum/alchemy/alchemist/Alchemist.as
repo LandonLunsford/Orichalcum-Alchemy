@@ -494,20 +494,6 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * @private
 		 */
-		private function conjureUnmappedType(qualifiedClassName:String, recipe:Dictionary):* 
-		{
-			/*
-			 * I really dont want to map here because the user doesnt explicitely map it,
-			 * and if they overwrite they will be warned
-			 * what I want is to just create the instance with the factory cached recipe (not an extension)
-			 * because there will be no modification
-			 */
-			return create(_reflector.getType(qualifiedClassName), recipe, qualifiedClassName);
-		}
-		
-		/**
-		 * @private
-		 */
 		private function normalizeId(id:*):String
 		{
 			var validId:String;

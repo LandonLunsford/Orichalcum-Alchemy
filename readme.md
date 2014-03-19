@@ -51,17 +51,16 @@ This featured library is now available for the AS3 developer community under the
 
 ## Getting Started
 
-#### Differences
+### Differences
 - No support for post-construct/pre-construct arguments (it is largely unnecessary and unused, and therefore it was dropped from the spec)
 - No "optional" setting for metadata-configured injections (e.g. [Inject(optional)])
 Give me one use case where a "dependency" is optional.
 For the equivalent functionality please use the AS3 runtime dependency configuration API over the metatag API (e.g. map(id).to(something).add(optionalIngredient))
 
-#### Installation
+### Installation
 	alchemist = new Alchemist;
 
-#### Conjure Unmapped Type
-	const unmapped:UnmappedType = alchemist.conjure(UnmappedType) as UnmappedType;
+### Mapping
 
 #### Value Mapping
 	alchemist.map('library.power.level').to(10000)
@@ -102,12 +101,18 @@ For the equivalent functionality please use the AS3 runtime dependency configura
 #### Custom Provider Mapping
 	alchemist.map(Provision).to(new MyCustomProvider)
 
-#### Custom Provider Mapping
-	alchemist.map(Provision).to(new MyCustomProvider)
+#### Constructor Argument Mapping
+	alchemist.map(Point).to(type(Point))
+		.add(constructorArguments(100, 200))
+	
+### Conjuring
+
+#### Conjure Unmapped Type
+	const unmapped:UnmappedType = alchemist.conjure(UnmappedType) as UnmappedType;
 
 #### Side Notes
-It is interesting to note that in Orichalcum alchemy
+It is interesting to note that the following two mappings are identical to the alchemist
+
 	alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
-is the same as
 	alchemist.map('flash.display::IEventDispatcher').to(singleton(EventDispatcher))
 

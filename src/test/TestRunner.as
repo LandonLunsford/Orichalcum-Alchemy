@@ -13,7 +13,6 @@ package
 			const core:FlexUnitCore = new FlexUnitCore;
 			core.addListener(new TraceListener);
 			core.run(ComprehensiveTestSuite);
-			
 		}
 		
 	}

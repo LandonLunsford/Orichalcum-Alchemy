@@ -1,10 +1,10 @@
 package orichalcum.alchemy.alchemist 
 {
 
-	public class XMLConfiguredAlchemist extends Alchemist
+	public class XmlConfiguredAlchemist extends Alchemist
 	{
 		
-		public function XMLConfiguredAlchemist(configuration:XML) 
+		public function XmlConfiguredAlchemist(configuration:XML) 
 		{
 			super();
 			

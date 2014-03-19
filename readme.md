@@ -5,11 +5,11 @@ Orichalcum-Alchemy
 
 <p>
 Hi I'm Orichalcum Alchemy!
-But you can call him Orichalchemy for short.
+But you can call me Orichalchemy for short.
 </p>
 <p>
-I am literally an IoC <i>container</i>!
-Cheers!
+I am literally an IoC Container!
+<i>HAR HAR</i>
 </p>
 ## Backgound
 
@@ -19,37 +19,35 @@ This featured library is now available for the AS3 developer community under the
 <br>
 
 ## Features
-- XML, Metatag and AS3 dependency configuration*
-- Dependency mapping inheritance model*
-- Class-specific or Instance-level dependency configuration
+- <b>XML, Metatag and AS3 dependency configuration</b>
+- <b>Dependency mapping inheritance model</b>
+- Class-specific AND Instance-level dependency configuration
 - Value mapping
 - Reference mapping
+- <b>Reference mapping by {expressions}</b>
 - Singleton mapping
 - Prototype mapping
 - Interface mapping
 - Abstract class mapping
 - Factory method mapping
 - Custom provider mapping
-- Pool mapping*
+- <b>Pool mapping</b>
 - Automatic dependency resolution for unmapped objects requested from an alchemist
-- Simple and clean API*
-
-*= distinguishing features
-
+- <b>Simple and fluent API</b>
+- <b>Ability to easily create custom metadata/ingredient processor and dependency resolution plugins</b>
 
 ## Known Limitations and Gotchas
 
-1. Constructor Injections + Circluar Dependencies == infinite loop! This can be easily resolved by using property injections and a post construct lifecycle hook.
+1. Constructor Injections + Circluar Dependencies == infinite loop! This can be easily resolved by using property injections and the post construct lifecycle hook.
 2. When using XML configuration, make sure to include referenced classes so the flash compiler will include them in the swf! This can be done by one of two ways:
 	1. Add an "import your.configuration.referenced.Class;" statement somewhere in your code.
 	2. If your class is in a library you can use the "included library" option when compiling.
 
-
 ## Coming Soon
 1. User guide
-2. ASDocs
+2. Improved ASDocs
 3. Even more test coverage!
-4. Performance tests against other leading AS3 IoC solutions like SwiftSuspenders and Swiz!
+4. Performance tests against other leading AS3 IoC solutions like SwiftSuspenders, Swiz and Parsley!
 
 ## Getting Started
 
@@ -57,4 +55,4 @@ This featured library is now available for the AS3 developer community under the
 - No support for post-construct/pre-construct arguments (it is largely unnecessary and unused, and therefore it was dropped from the spec)
 - No "optional" setting for metadata-configured injections (e.g. [Inject(optional)])
 Give me one use case where a "dependency" is optional.
-For identical functionality please use the AS3 dependency configuration API over the metatag API
+For the equivalent functionality please use the AS3 runtime dependency configuration API over the metatag API (e.g. map(id).to(something).add(optionalIngredient))

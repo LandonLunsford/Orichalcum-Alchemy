@@ -4,6 +4,7 @@ package orichalcum.alchemy.alchemist
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.evaluator.IEvaluator;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
+	import orichalcum.alchemy.lifecycle.IAlchemyLifecycle;
 	import orichalcum.reflection.IReflector;
 	
 	public interface IAlchemist extends IEventDispatcher, IEvaluator
@@ -66,14 +67,16 @@ package orichalcum.alchemy.alchemist
 		
 		/**
 		 * Sets the parent of the context for dependency heirarchies
+		 * I would like to do this but it forces me to expose internal methods
 		 */
+		//function get parent():IAlchemist;
 		//function set parent(value:IAlchemist):void;
-		
-		function get processors():Array;
-		function set processors(value:Array):void;
 		
 		function get reflector():IReflector;
 		function set reflector(value:IReflector):void;
+		
+		function get lifecycle():IAlchemyLifecycle;
+		
 	}
 
 }

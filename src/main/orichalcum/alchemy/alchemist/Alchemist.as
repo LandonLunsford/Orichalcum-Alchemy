@@ -1,21 +1,26 @@
 package orichalcum.alchemy.alchemist 
 {
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
 	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
 	import orichalcum.alchemy.error.AlchemyError;
+	import orichalcum.alchemy.lifecycle.IAlchemyLifecycle;
 	import orichalcum.alchemy.mapper.AlchemyMapper;
 	import orichalcum.alchemy.mapper.IAlchemyMapper;
 	import orichalcum.alchemy.provider.IProvider;
 	import orichalcum.alchemy.recipe.ingredient.processor.ConstructorArgumentProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.EventHandlerProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
+	import orichalcum.alchemy.recipe.ingredient.processor.MultiprocessProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.PostConstructProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.PreDestroyProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.PropertyProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.SignalHandlerProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.SymbiotProcessor;
+	import orichalcum.alchemy.resolver.IDependencyResolver;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
@@ -23,7 +28,60 @@ package orichalcum.alchemy.alchemist
 	public class Alchemist extends EventDispatcher implements IDisposable, IAlchemist
 	{
 		
+		
+		
+		/**
+		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
+		 * The caller of the recursive-compound-recipe-consuming-function must return the recipe flyweight after use.
+		 * @private
+		 */
+		private var _recipeFlyweights:Array = [];
+		
+		/**
+		 * Used to manage the recipe flyweight pool
+		 * @private
+		 */
+		private var _recipeFlyweightsIndex:int;
+		
+		/**
+		 * Creational lifecylce processes
+		 * @private
+		 */
+		private var _creator:InstanceFactory = new InstanceFactory;
+		
+		/**
+		 * lifecylce processes
+		 * @private
+		 */
+		private var _lifecycle:IAlchemyLifecycle = new MultiprocessProcessor([
+			new ConstructorArgumentProcessor,
+			new PropertyProcessor,
+			new PostConstructProcessor,
+			new PreDestroyProcessor,
+			new EventHandlerProcessor,
+			new SignalHandlerProcessor,
+			new SymbiotProcessor
+		]);
+		
+		/**
+		 * Dependency resolvers
+		 * @private
+		 */
+		private var _resolvers:Vector.<IDependencyResolver> = new <IDependencyResolver>[
+			//new MappedDependencyResolver(this),
+			//new UnmappedDependencyResolver
+		];
+		
+		/**
+		 * Should expose this for customization
+		 * @private
+		 */
 		private var expressionQualifier:RegExp = /^{.*}$/;
+		
+		/**
+		 * Should expose this for customization
+		 * @private
+		 */
 		private var expressionRemovals:RegExp = /{|}|\s/gm;
 		
 		/**
@@ -39,20 +97,13 @@ package orichalcum.alchemy.alchemist
 		private var _recipeFactory:RecipeFactory;
 		
 		/**
-		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
-		 * The caller of the recursive-compound-recipe-consuming-function must return the recipe flyweight after use.
-		 * @private
-		 */
-		static private var _recipeFlyweights:Array = [];
-		
-		/**
-		 * Used to manage the recipe flyweight pool
-		 * @private
-		 */
-		static private var _recipeFlyweightsIndex:int;
-		
-		/**
 		 * Contains all mapped providers
+		 * 
+		 * @warning Nasty truth is this contains the following
+		 * 1. IProvider
+		 * 2. "{expression}"
+		 * 3. Instances directly
+		 * 
 		 * @private
 		 */
 		private var _providers:Dictionary = new Dictionary;
@@ -82,20 +133,9 @@ package orichalcum.alchemy.alchemist
 		private var _symbiotsByInstance:Dictionary = new Dictionary;
 		
 		/**
-		 * Creational lifecylce processes
-		 * @private
+		 * @private used to prevent infinite loops for circular dependencies
 		 */
-		private var _creator:InstanceFactory = new InstanceFactory;
-		
-		private var _processors:Array = [
-			new ConstructorArgumentProcessor,
-			new PropertyProcessor,
-			new PostConstructProcessor,
-			new PreDestroyProcessor,
-			new EventHandlerProcessor,
-			new SignalHandlerProcessor,
-			new SymbiotProcessor
-		];
+		private var _instancesInProcessById:Dictionary = new Dictionary;
 		
 		/**
 		 * The backward reference to the source of the this Alchemist
@@ -103,12 +143,52 @@ package orichalcum.alchemy.alchemist
 		 * thisAlchemist = parentAlchemist.extend()
 		 * @private
 		 */
+		//private const DEFAULT_PARENT:AlchemistBase = new AlchemistBase;
+		//private var _parent:Alchemist = DEFAULT_PARENT;
 		private var _parent:Alchemist;
 		
-		/**
-		 * @private used to prevent infinite loops for circular dependencies
-		 */
-		private var _instancesInProcessById:Dictionary = new Dictionary;
+		public function get parent():Alchemist 
+		{
+			return _parent;
+		}
+		
+		public function set parent(value:Alchemist):void 
+		{
+			//_parent = value == null ? DEFAULT_PARENT : value;
+			_parent = value;
+		}
+		
+		public function get lifecycle():IAlchemyLifecycle 
+		{
+			return _lifecycle;
+		}
+		
+		public function set lifecycle(value:IAlchemyLifecycle):void 
+		{
+			_lifecycle = value;
+		}
+		
+		public function get reflector():IReflector 
+		{
+			return _reflector;
+		}
+		
+		public function set reflector(value:IReflector):void 
+		{
+			_reflector = value;
+		}
+		
+		public function get resolvers():Vector.<IDependencyResolver> 
+		{
+			return _resolvers;
+		}
+		
+		public function set resolvers(value:Vector.<IDependencyResolver>):void 
+		{
+			_resolvers = value;
+		}
+		
+		
 		
 		/**
 		 * @param list of XML mapping configurations
@@ -141,7 +221,7 @@ package orichalcum.alchemy.alchemist
 		
 		public function map(id:*):IAlchemyMapper
 		{
-			return new AlchemyMapper(this, getValidId(id), _providers, _recipes);
+			return new AlchemyMapper(this, normalizeId(id), _providers, _recipes);
 		}
 		
 		public function unmap(id:*):void
@@ -152,33 +232,56 @@ package orichalcum.alchemy.alchemist
 		
 		public function conjure(id:*, recipe:Dictionary = null):*
 		{
-			const validId:String = getValidId(id);
+			const validId:String = normalizeId(id);
 			
+			/*
+			 *	Support symbiots with cyclical property injections
+			 */
 			if (_instancesInProcessById[validId])
+			{
 				return _instancesInProcessById[validId];
+			}
 			
+			//const instance:*instance = resolveId(validId);
+
+			var instance:*;
 			const provider:* = getProvider(validId);
-			var provision:*;
 			
-			if (provider === NotFound)
+			/**
+			 * Changing this to null causes 20 errors...
+			 */
+			if (provider == NotFound)
 			{
 				_reflector.isType(validId) || throwError('Alchemist has no provider mapped to "{}"', validId);
-				provision = conjureUnmappedType(validId);
+				instance = conjureUnmappedType(validId);
 			}
 			else
 			{
-				provision = evaluateWithRecipe(validId, provider, recipe ||= getRecipe(validId));
-				provider && (_providersByInstance[provision] = provider);
+				instance = evaluateWithRecipe(validId, provider, recipe ||= getRecipe(validId));
+				provider && (_providersByInstance[instance] = provider);
 			}
 			
-			recipe && (_recipesByInstance[provision] = recipe);
+			recipe && (_recipesByInstance[instance] = recipe);
 			
-			for each(var processor:IIngredientProcessor in _processors)
+			lifecycle.provide(instance, recipe, this);
+			
+			return instance;
+		}
+		
+		private function resolveId(id:String):* 
+		{
+			for each(var resolver:IDependencyResolver in resolvers)
 			{
-				//processor.provide(instance, recipe, this);
+				/**
+				 * 
+				 */
+				if (resolver.resolves(id))
+				{
+					return resolver.resolve(id);
+				}
 			}
 			
-			return provision;	
+			throwError('Alchemist has no provider mapped to "{}"', id);
 		}
 		
 		public function create(type:Class, recipe:Dictionary = null, id:* = null):Object
@@ -188,11 +291,7 @@ package orichalcum.alchemy.alchemist
 			const recipeFlyweight:Dictionary = getRecipeForClassOrInstance(type, getRecipeFlyweight(), recipe);
 			const instance:* = _creator.create(type, this, recipeFlyweight);
 			_instancesInProcessById[id] = instance;
-			for (var i:int = 0; i < _processors.length; i++)
-			{
-				var processor:IIngredientProcessor = _processors[i];
-				processor.activate(instance, recipeFlyweight, this);
-			}
+			lifecycle.activate(instance, recipeFlyweight, this);
 			delete _instancesInProcessById[id];
 			returnRecipeFlyweight();
 			return instance;
@@ -204,13 +303,7 @@ package orichalcum.alchemy.alchemist
 			
 			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
 			const recipe:Dictionary = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
-			
-			for (var i:int = 0; i < _processors.length; i++)
-			{
-				var processor:IIngredientProcessor = _processors[i];
-				processor.activate(instance, recipe, this);
-			}
-			
+			lifecycle.activate(instance, recipe, this);
 			returnRecipeFlyweight();
 			return instance;
 		}
@@ -219,18 +312,11 @@ package orichalcum.alchemy.alchemist
 		{
 			instance || throwError('Argument "instance" passed to method Alchemist.destroy() must not be null.');
 			
-			//_applyDestroyFilters(instance);
 			_providersByInstance[instance] && (_providersByInstance[instance] as IProvider).destroy(instance);
 			
 			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
 			const recipe:Dictionary = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
-			
-			for (var i:int = _processors.length - 1; i >= 0; i--)
-			{
-				var processor:IIngredientProcessor = _processors[i];
-				processor.deactivate(instance, recipe, this);
-			}
-			
+			lifecycle.deactivate(instance, recipe, this);
 			returnRecipeFlyweight();
 			return instance;
 		}
@@ -242,8 +328,6 @@ package orichalcum.alchemy.alchemist
 			return child;
 		}
 		
-		/* INTERFACE orichalcum.alchemy.evaluator.IEvaluator */
-		
 		public function evaluate(providerReferenceOrValue:*):*
 		{
 			return evaluateWithRecipe(null, providerReferenceOrValue, null);
@@ -254,9 +338,8 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * Recursively looks up any provider mapped to the id through this alchemist and its ancestor chain.
 		 * @param	id The custom name or qualified class name used to map the provider
-		 * @private
 		 */
-		private function getProvider(id:String):*
+		public function getProvider(id:String):* // @warning ugly
 		{
 			if (id in _providers)
 				return _providers[id];
@@ -270,9 +353,8 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * Recursively looks up any recipe mapped to the id through this alchemist and its ancestor chain.
 		 * @param	id The custom name or qualified class name used to map the recipe
-		 * @private
 		 */
-		private function getRecipe(id:String):Dictionary
+		public function getRecipe(id:String):Dictionary
 		{
 			if (id in _recipes)
 				return _recipes[id];
@@ -319,9 +401,9 @@ package orichalcum.alchemy.alchemist
 			}
 			
 			const recipe:Dictionary = recipeFlyweight ? recipeFlyweight : new Dictionary;
-			staticTypeRecipe && _inherit(recipe, staticTypeRecipe);
-			runtimeTypeRecipe && _inherit(recipe, runtimeTypeRecipe);
-			runtimeInstanceRecipe && _inherit(recipe, runtimeInstanceRecipe);
+			staticTypeRecipe && lifecycle.inherit(recipe, staticTypeRecipe);
+			runtimeTypeRecipe && lifecycle.inherit(recipe, runtimeTypeRecipe);
+			runtimeInstanceRecipe && lifecycle.inherit(recipe, runtimeInstanceRecipe);
 			return recipe;
 		}
 		
@@ -358,7 +440,7 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * @private
 		 */
-		private function getValidId(id:*):String
+		private function normalizeId(id:*):String
 		{
 			id || throwError('Argument "id" must not be null.');
 			
@@ -415,40 +497,10 @@ package orichalcum.alchemy.alchemist
 			throw new AlchemyError(message, substitutions);
 		}
 		
-		private function _inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void
-		{
-			for each(var processor:IIngredientProcessor in _processors)
-			{
-				processor.inherit(parentRecipe, childRecipe);
-			}
-		}
-		
-		public function get processors():Array 
-		{
-			return _processors;
-		}
-		
-		public function set processors(value:Array):void 
-		{
-			_processors = value;
-		}
-		
-		public function get reflector():IReflector 
-		{
-			return _reflector;
-		}
-		
-		public function set reflector(value:IReflector):void 
-		{
-			_reflector = value;
-		}
-		
-		
-		
-		
 	}
 
 }
+
 
 /**
  * A unique class must be used to represent the absence of a provision|provider

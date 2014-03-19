@@ -75,21 +75,13 @@ package orichalcum.alchemy.alchemist
 		public function createRecipeFromFactory(typeName:String, typeDescription:XML):Dictionary
 		{
 			const recipe:Dictionary = new Dictionary;
-			const metadataByName:Dictionary = new Dictionary;
-			// @TODO prep the metadata
-			for each(var processor:IIngredientProcessor in _alchemist.processors)
-			{
-				processor.introspect(typeName, typeDescription, recipe, _alchemist);
-			}
+			_alchemist.lifecycle.introspect(typeName, typeDescription, recipe, _alchemist);
 			return recipe;
 		}
 		
 		private function _inherit(destination:Dictionary, source:Dictionary):Dictionary 
 		{
-			for each(var processor:IIngredientProcessor in _alchemist.processors)
-			{
-				processor.inherit(destination, source);
-			}
+			_alchemist.lifecycle.inherit(destination, source);
 			return destination;
 		}
 		

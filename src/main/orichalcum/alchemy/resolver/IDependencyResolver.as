@@ -9,6 +9,11 @@ package orichalcum.alchemy.resolver
 		 * to look up named values in resource files
 		 * [Inject("my.message.in.bundle")]
 		 */
+		 
+		function resolves(id:String):Boolean;
+		
+		function resolve(id:String):*;
+		
 	}
 
 }

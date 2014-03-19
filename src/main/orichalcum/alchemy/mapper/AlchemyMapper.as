@@ -42,10 +42,7 @@ package orichalcum.alchemy.mapper
 				}
 				else if (argument)
 				{
-					for each(var processor:IIngredientProcessor in _alchemist.processors)
-					{
-						processor.add(recipe, argument);
-					}
+					_alchemist.lifecycle.add(recipe, argument);
 				}
 			}
 			return this;

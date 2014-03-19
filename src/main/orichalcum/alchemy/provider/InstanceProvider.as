@@ -15,14 +15,10 @@ package orichalcum.alchemy.provider
 			_type = type;
 		}
 		
-		/* INTERFACE orichalcum.lifecylce.IDisposable */
-		
 		public function dispose():void 
 		{
 			_type = null;
 		}
-		
-		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
 		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):* 
 		{
@@ -33,8 +29,6 @@ package orichalcum.alchemy.provider
 		{
 			return provision;
 		}
-		
-		/* INTERFACE orichalcum.alchemist.guise.IInstanceProvider */
 		
 		public function get type():Class
 		{

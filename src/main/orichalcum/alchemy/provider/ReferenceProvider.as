@@ -18,14 +18,10 @@ package orichalcum.alchemy.provider
 			_reference = getValidId(id);
 		}
 		
-		/* INTERFACE orichalcum.lifecycle.IDisposable */
-		
 		public function dispose():void 
 		{
 			_reference = null;
 		}
-		
-		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
 		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):*
 		{
@@ -37,8 +33,9 @@ package orichalcum.alchemy.provider
 			return provision;
 		}
 		
-		/* PRIVATE PARTS */
-		
+		/**
+		 * Duplicate code
+		 */
 		private function getValidId(id:*):String 
 		{
 			if (id is String)

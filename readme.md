@@ -30,9 +30,9 @@ This featured library is now available for the AS3 developer community under the
 - Interface mapping
 - Abstract class mapping (just because you can doesnt mean you should in this case)
 - Factory method mapping
-- <b>Custom provider mapping</b>
 - <b>Pool mapping</b>
-- Automatic dependency resolution for unmapped objects requested from an alchemist
+- <b>Custom provider mapping</b>
+- <b>Automatic dependency resolution for unmapped objects requested from an alchemist</b>
 - <b>Simple and fluent API</b>
 - <b>Ability to easily create custom metadata/ingredient processor and dependency resolution plugins</b>
 
@@ -58,9 +58,10 @@ Give me one use case where a "dependency" is optional.
 For the equivalent functionality please use the AS3 runtime dependency configuration API over the metatag API (e.g. map(id).to(something).add(optionalIngredient))
 
 #### Installation
-<code>
-alchemist = new Alchemist;
-</code>
+	alchemist = new Alchemist;
+
+#### Conjure Unmapped Type
+	const unmapped:UnmappedType = alchemist.conjure(UnmappedType) as UnmappedType;
 
 #### Value Mapping
 	alchemist.map('library.power.level').to(10000)
@@ -79,8 +80,34 @@ alchemist = new Alchemist;
 	alchemist.map(Ant).to(prototype(Ant))
 	alchemist.map(Ant).to(type(Ant))
 
-It is interesting to note that in Orichalcum alchemy:
+#### Interface Mapping
 	alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
-is the same as:
+	
+#### Factory Method Mapping
+	alchemist.map(Product).to(factory(Factory.create))
+	alchemist.map(Product).to(factory(function():*{ return new Product; }))
+	
+#### Pool Mapping
+	// Pools auto expand when more instances are conjured
+	// and serve as a good way to reuse objects instead of newly instantiating
+	// them every time which will trigger garbage collection cycles
+	alchemist.map(Socket).to(pool(Socket))
+	
+	// Get an instance of socket from the pool
+	const socket:Socket = alchemist.conjure(Socket) as Socket;
+	
+	// Return the socket instance to the pool
+	alchemist.destroy(socket);
+	
+#### Custom Provider Mapping
+	alchemist.map(Provision).to(new MyCustomProvider)
+
+#### Custom Provider Mapping
+	alchemist.map(Provision).to(new MyCustomProvider)
+
+#### Side Notes
+It is interesting to note that in Orichalcum alchemy
+	alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
+is the same as
 	alchemist.map('flash.display::IEventDispatcher').to(singleton(EventDispatcher))
 

@@ -59,9 +59,42 @@ For the equivalent functionality please use the AS3 runtime dependency configura
 
 #### Installation
 <code>
-
 alchemist = new Alchemist;
-
 </code>
 
-####
+#### Value Mapping
+<code>
+alchemist.map('library.power.level').to(10000)
+</code>
+
+#### Reference Mapping
+<code>
+alchemist.map('someId').to(reference('anotherId'))
+alchemist.map(SomeClass).to(reference('anotherId'))
+</code>
+
+#### Reference Mapping via Expression Language
+<code>
+alchemist.map('someId').to('{anotherId}')
+</code>
+
+#### Singleton Mapping
+<code>
+alchemist.map(God).to(singleton(God)) // well if you are Christian anyway
+</code>
+
+#### Prototype Mapping
+<code>
+alchemist.map(Ant).to(prototype(Ant))
+alchemist.map(Ant).to(type(Ant))
+</code>
+
+It is interesting to note that in Orichalcum alchemy:
+<code>
+alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
+</code>
+is the same as:
+<code>
+alchemist.map('flash.display::IEventDispatcher').to(singleton(EventDispatcher))
+</code>
+Are equivalent

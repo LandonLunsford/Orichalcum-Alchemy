@@ -17,8 +17,6 @@ package orichalcum.alchemy.provider
 			_provider = null;
 		}
 		
-		/* INTERFACE orichalcum.alchemist.guise.IProvider */
-		
 		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
 		{
 			_provider = activeAlchemist.conjure(_providerId, activeRecipe);

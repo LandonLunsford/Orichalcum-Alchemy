@@ -36,7 +36,7 @@ package orichalcum.alchemy.alchemist
 		}
 		
 		[Test]
-		public function testMapToUndefined():void
+		public function testMapToUndefinedWrappedInValueProvider():void
 		{
 			_alchemist.map(_id).to(undefined);
 			assertThat(_alchemist.conjure(_id), equalTo(undefined));

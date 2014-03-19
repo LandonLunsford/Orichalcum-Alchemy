@@ -42,8 +42,6 @@ package orichalcum.alchemy.provider
 			_factoryMehtodName = factoryMehtodName;
 			_factoryClassNameOrId = factoryClassNameOrId;
 		}
-
-		/* INTERFACE orichalcum.lifecycle.IDisposable */
 		
 		public function dispose():void 
 		{
@@ -52,8 +50,6 @@ package orichalcum.alchemy.provider
 			_factoryMethod = null;
 		}
 		
-		/* INTERFACE orichalcum.alchemy.provider.IProvider */
-		
 		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):*
 		{
 			if (_factoryMethod == null)
@@ -61,12 +57,12 @@ package orichalcum.alchemy.provider
 				const factory:* = activeAlchemist.conjure(_factoryClassNameOrId);
 				
 				if (!(_factoryMehtodName in factory))
-					throw new AlchemyError('Factory method "{0}" not found on factory "{1}".', _factoryMehtodName, factory);
+					throw new AlchemyError('Factory method "{}" not found on factory "{}".', _factoryMehtodName, factory);
 				
 				_factoryMethod = factory[_factoryMehtodName];
 					
 				if (_factoryMethod == null)
-					throw new AlchemyError('Factory method "{0}" on factory "{1}" is not a function.', _factoryMehtodName, factory);
+					throw new AlchemyError('Factory method "{}" on factory "{}" is not a function.', _factoryMehtodName, factory);
 			}
 			
 			switch (_factoryMethod.length)

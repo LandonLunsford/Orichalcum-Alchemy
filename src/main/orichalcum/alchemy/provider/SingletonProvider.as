@@ -15,15 +15,11 @@ package orichalcum.alchemy.provider
 			super(type);
 		}
 		
-		/* INTERFACE orichalcum.lifecyle.IDisposable */
-		
 		override public function dispose():void 
 		{
 			super.dispose();
 			_instance = null;
 		}
-		
-		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
 		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):*
 		{

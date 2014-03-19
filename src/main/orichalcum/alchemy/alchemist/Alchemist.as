@@ -20,7 +20,11 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.recipe.ingredient.processor.PropertyProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.SignalHandlerProcessor;
 	import orichalcum.alchemy.recipe.ingredient.processor.SymbiotProcessor;
+	import orichalcum.alchemy.resolver.ExpressionResolver;
 	import orichalcum.alchemy.resolver.IDependencyResolver;
+	import orichalcum.alchemy.resolver.ProviderlessTypeResolver;
+	import orichalcum.alchemy.resolver.ProviderlessValueResolver;
+	import orichalcum.alchemy.resolver.ProviderResolver;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
@@ -68,21 +72,12 @@ package orichalcum.alchemy.alchemist
 		 * @private
 		 */
 		private var _resolvers:Vector.<IDependencyResolver> = new <IDependencyResolver>[
-			//new MappedDependencyResolver(this),
-			//new UnmappedDependencyResolver
+			new ProviderResolver,
+			new ProviderlessTypeResolver,
+			new ExpressionResolver,
+			new ProviderlessValueResolver
 		];
 		
-		/**
-		 * Should expose this for customization
-		 * @private
-		 */
-		private var expressionQualifier:RegExp = /^{.*}$/;
-		
-		/**
-		 * Should expose this for customization
-		 * @private
-		 */
-		private var expressionRemovals:RegExp = /{|}|\s/gm;
 		
 		/**
 		 * Reflection utility
@@ -106,7 +101,7 @@ package orichalcum.alchemy.alchemist
 		 * 
 		 * @private
 		 */
-		private var _providers:Dictionary = new Dictionary;
+		private var _mappings:Dictionary = new Dictionary;
 		
 		/**
 		 * Contains all mapped recipes
@@ -203,10 +198,10 @@ package orichalcum.alchemy.alchemist
 		
 		public function dispose():void
 		{
-			for (var providerName:String in _providers)
+			for (var providerName:String in _mappings)
 			{
-				_providers[providerName] is IDisposable && (_providers[providerName] as IDisposable).dispose();
-				delete _providers[providerName];
+				_mappings[providerName] is IDisposable && (_mappings[providerName] as IDisposable).dispose();
+				delete _mappings[providerName];
 			}
 			for (var recipeName:String in _recipes)
 			{
@@ -215,18 +210,18 @@ package orichalcum.alchemy.alchemist
 			}
 			_recipeFactory is IDisposable && (_recipeFactory as IDisposable).dispose();
 			_parent = null;
-			_providers = null;
+			_mappings = null;
 			_recipes = null;
 		}
 		
 		public function map(id:*):IAlchemyMapper
 		{
-			return new AlchemyMapper(this, normalizeId(id), _providers, _recipes);
+			return new AlchemyMapper(this, normalizeId(id), _mappings, _recipes);
 		}
 		
 		public function unmap(id:*):void
 		{
-			delete _providers[id];
+			delete _mappings[id];
 			delete _recipes[id];
 		}
 		
@@ -235,53 +230,41 @@ package orichalcum.alchemy.alchemist
 			const validId:String = normalizeId(id);
 			
 			/*
-			 *	Support symbiots with cyclical property injections
+			 *	Allows support for symbiots with cyclical property injections
 			 */
 			if (_instancesInProcessById[validId])
-			{
 				return _instancesInProcessById[validId];
-			}
 			
-			//const instance:*instance = resolveId(validId);
-
-			var instance:*;
-			const provider:* = getProvider(validId);
+			const mapping:* = getMapping(validId);
+			const instance:* = resolve(validId, mapping, recipe ||= getRecipe(validId));
 			
-			/**
-			 * Changing this to null causes 20 errors...
-			 */
-			if (provider == NotFound)
-			{
-				_reflector.isType(validId) || throwError('Alchemist has no provider mapped to "{}"', validId);
-				instance = conjureUnmappedType(validId);
-			}
-			else
-			{
-				instance = evaluateWithRecipe(validId, provider, recipe ||= getRecipe(validId));
-				provider && (_providersByInstance[instance] = provider);
-			}
+			if (mapping is IProvider)
+				_providersByInstance[instance] = mapping;
 			
-			recipe && (_recipesByInstance[instance] = recipe);
+			if (recipe)
+				_recipesByInstance[instance] = recipe;
 			
 			lifecycle.provide(instance, recipe, this);
 			
 			return instance;
 		}
 		
-		private function resolveId(id:String):* 
+		public function evaluate(providerReferenceOrValue:*):*
+		{
+			return resolve(null, providerReferenceOrValue, null);
+		}
+		
+		private function resolve(id:String, mapping:*, recipe:Dictionary):* 
 		{
 			for each(var resolver:IDependencyResolver in resolvers)
 			{
-				/**
-				 * 
-				 */
-				if (resolver.resolves(id))
+				if (resolver.resolves(id, mapping))
 				{
-					return resolver.resolve(id);
+					return resolver.resolve(id, mapping, recipe, this);
 				}
 			}
 			
-			throwError('Alchemist has no provider mapped to "{}"', id);
+			throwError('Alchemist cannot resolve mapping "{}" id "{}".', mapping, id);
 		}
 		
 		public function create(type:Class, recipe:Dictionary = null, id:* = null):Object
@@ -312,7 +295,7 @@ package orichalcum.alchemy.alchemist
 		{
 			instance || throwError('Argument "instance" passed to method Alchemist.destroy() must not be null.');
 			
-			_providersByInstance[instance] && (_providersByInstance[instance] as IProvider).destroy(instance);
+			_providersByInstance[instance] && _providersByInstance[instance].destroy(instance);
 			
 			const type:Class = _reflector.getType(_reflector.getTypeName(instance));
 			const recipe:Dictionary = getRecipeForClassOrInstance(instance, getRecipeFlyweight(), _recipesByInstance[instance]);
@@ -328,26 +311,21 @@ package orichalcum.alchemy.alchemist
 			return child;
 		}
 		
-		public function evaluate(providerReferenceOrValue:*):*
-		{
-			return evaluateWithRecipe(null, providerReferenceOrValue, null);
-		}
-		
 		/* PRIVATE PARTS */
 		
 		/**
 		 * Recursively looks up any provider mapped to the id through this alchemist and its ancestor chain.
 		 * @param	id The custom name or qualified class name used to map the provider
 		 */
-		public function getProvider(id:String):* // @warning ugly
+		public function getMapping(id:String):* // @warning ugly
 		{
-			if (id in _providers)
-				return _providers[id];
+			if (id in _mappings)
+				return _mappings[id];
 				
 			if (_parent)
-				return _parent.getProvider(id);
+				return _parent.getMapping(id);
 			
-			return NotFound;
+			return Unmapped;
 		}
 		
 		/**
@@ -410,7 +388,7 @@ package orichalcum.alchemy.alchemist
 		/**
 		 * @private
 		 */
-		private function conjureUnmappedType(qualifiedClassName:String):* 
+		private function conjureUnmappedType(qualifiedClassName:String, recipe:Dictionary):* 
 		{
 			/*
 			 * I really dont want to map here because the user doesnt explicitely map it,
@@ -418,23 +396,7 @@ package orichalcum.alchemy.alchemist
 			 * what I want is to just create the instance with the factory cached recipe (not an extension)
 			 * because there will be no modification
 			 */
-			return create(_reflector.getType(qualifiedClassName), getRecipe(qualifiedClassName), qualifiedClassName);
-		}
-		
-		/**
-		 * Evaluating the contents of the provider map at "conjure-time" not only provides for a better user API
-		 * but also minimizes the libraries data footprint by avoiding excessive wrapping of values/references with providers
-		 * @private
-		 */
-		private function evaluateWithRecipe(id:*, providerReferenceOrValue:*, recipe:Dictionary = null):*
-		{
-			if (providerReferenceOrValue is IProvider)
-				return (providerReferenceOrValue as IProvider).provide(id, this, recipe);
-				
-			if (providerReferenceOrValue is String && expressionQualifier.test(providerReferenceOrValue))
-				return conjure((providerReferenceOrValue as String).replace(expressionRemovals, ''));
-			
-			return providerReferenceOrValue;
+			return create(_reflector.getType(qualifiedClassName), recipe, qualifiedClassName);
 		}
 		
 		/**

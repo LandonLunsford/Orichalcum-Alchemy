@@ -1,5 +1,7 @@
 package orichalcum.alchemy.resolver 
 {
+	import flash.utils.Dictionary;
+	import orichalcum.alchemy.alchemist.IAlchemist;
 	
 	public interface IDependencyResolver 
 	{
@@ -10,9 +12,9 @@ package orichalcum.alchemy.resolver
 		 * [Inject("my.message.in.bundle")]
 		 */
 		 
-		function resolves(id:String):Boolean;
+		function resolves(id:String, mapping:*):Boolean;
 		
-		function resolve(id:String):*;
+		function resolve(id:String, mapping:*, recipe:Dictionary, alchemist:IAlchemist):*;
 		
 	}
 

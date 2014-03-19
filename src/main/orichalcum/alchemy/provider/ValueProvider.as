@@ -16,21 +16,15 @@ package orichalcum.alchemy.provider
 			_value = value;
 		}
 		
-		/* INTERFACE orichalcum.alchemy.provider.IValueProvider */
-		
 		public function get value():* 
 		{
 			return _value;
 		}
 		
-		/* INTERFACE orichalcum.lifecycle.IDisposable */
-		
 		public function dispose():void 
 		{
 			_value = null;
 		}
-		
-		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
 		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):*
 		{
@@ -41,7 +35,6 @@ package orichalcum.alchemy.provider
 		{
 			return provision;
 		}
-		
 		
 	}
 

@@ -13,8 +13,6 @@ package orichalcum.alchemy.provider
 			super(type);
 		}
 		
-		/* INTERFACE orichalcum.alchemist.guise.IProvider */
-		
 		override public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):* 
 		{
 			return activeAlchemist.create(type, activeRecipe, id);

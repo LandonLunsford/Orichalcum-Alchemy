@@ -29,8 +29,6 @@ package orichalcum.alchemy.provider
 			return pool[pool.length] = provision;
 		}
 		
-		/* PRIVATE PARTS */
-		
 		private function get pool():Array
 		{
 			return _pool ||= [];

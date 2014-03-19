@@ -63,38 +63,24 @@ alchemist = new Alchemist;
 </code>
 
 #### Value Mapping
-<code>
-alchemist.map('library.power.level').to(10000)
-</code>
+	alchemist.map('library.power.level').to(10000)
 
 #### Reference Mapping
-<code>
-alchemist.map('someId').to(reference('anotherId'))
-alchemist.map(SomeClass).to(reference('anotherId'))
-</code>
+	alchemist.map('someId').to(reference('anotherId'))
+	alchemist.map(SomeClass).to(reference('anotherId'))
 
 #### Reference Mapping via Expression Language
-<code>
-alchemist.map('someId').to('{anotherId}')
-</code>
+	alchemist.map('someId').to('{anotherId}')
 
 #### Singleton Mapping
-<code>
-alchemist.map(God).to(singleton(God)) // well if you are Christian anyway
-</code>
+	alchemist.map(God).to(singleton(God)) // well if you are Christian anyway
 
 #### Prototype Mapping
-<code>
-alchemist.map(Ant).to(prototype(Ant))
-alchemist.map(Ant).to(type(Ant))
-</code>
+	alchemist.map(Ant).to(prototype(Ant))
+	alchemist.map(Ant).to(type(Ant))
 
 It is interesting to note that in Orichalcum alchemy:
-<code>
-alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
-</code>
+	alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
 is the same as:
-<code>
-alchemist.map('flash.display::IEventDispatcher').to(singleton(EventDispatcher))
-</code>
-Are equivalent
+	alchemist.map('flash.display::IEventDispatcher').to(singleton(EventDispatcher))
+

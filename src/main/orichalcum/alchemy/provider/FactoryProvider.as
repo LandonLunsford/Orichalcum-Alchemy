@@ -22,14 +22,10 @@ package orichalcum.alchemy.provider
 			_factoryMethod = factoryMethod;
 		}
 		
-		/* INTERFACE orichalcum.lifecycle.IDisposable */
-		
 		public function dispose():void
 		{
 			_factoryMethod = null;
 		}
-		
-		/* INTERFACE orichalcum.alchemist.guise.IProvider */
 		
 		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Dictionary):*
 		{

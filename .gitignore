@@ -3,4 +3,4 @@ obj/
 src/deprecated/
 target/
 _pom.xml
-orichalcum-alchemy.lxml
+*.lxml

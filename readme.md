@@ -102,8 +102,37 @@ For the equivalent functionality please use the AS3 runtime dependency configura
 	alchemist.map(Provision).to(new MyCustomProvider)
 
 #### Constructor Argument Mapping
+
 	alchemist.map(Point).to(type(Point))
 		.add(constructorArguments(100, 200))
+		
+	alchemist.map(Point).to(type(Point))
+		.add(constructorArgument(100))
+		.add(constructorArgument(200))
+		
+#### Property (public field/setter) Mapping
+
+	alchemist.map(Point).to(type(Point))
+		.add(properties({
+			x: 100,
+			y: 200
+		}))
+
+	alchemist.map(Point).to(type(Point))
+		.add(property('x', 100))
+		.add(property('y', 200))
+		
+#### PostConstruct Mapping
+
+	alchemist.map(Matrix).to(new Matrix(2, 0, 0, 1))
+		.add(postConstruct('invert'))
+		
+#### PreDestroy Mapping
+
+	alchemist.map(BitmapData).to(type(BitmapData))
+		.add(preDestroy('dispose'))
+		
+		
 	
 ### Conjuring
 

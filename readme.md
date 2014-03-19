@@ -59,7 +59,9 @@ For the equivalent functionality please use the AS3 runtime dependency configura
 
 #### Installation
 <code>
+
 alchemist = new Alchemist;
+
 </code>
 
 ####

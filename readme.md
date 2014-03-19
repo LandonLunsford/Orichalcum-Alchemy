@@ -21,16 +21,16 @@ This featured library is now available for the AS3 developer community under the
 ## Features
 - <b>XML, Metatag and AS3 dependency configuration</b>
 - <b>Dependency mapping inheritance model</b>
-- Class-specific AND Instance-level dependency configuration
+- <b>Class-specific AND Instance-level dependency configuration</b>
 - Value mapping
 - Reference mapping
 - <b>Reference mapping by {expressions}</b>
 - Singleton mapping
 - Prototype mapping
 - Interface mapping
-- Abstract class mapping
+- Abstract class mapping (just because you can doesnt mean you should in this case)
 - Factory method mapping
-- Custom provider mapping
+- <b>Custom provider mapping</b>
 - <b>Pool mapping</b>
 - Automatic dependency resolution for unmapped objects requested from an alchemist
 - <b>Simple and fluent API</b>
@@ -51,8 +51,15 @@ This featured library is now available for the AS3 developer community under the
 
 ## Getting Started
 
-### Differences
+#### Differences
 - No support for post-construct/pre-construct arguments (it is largely unnecessary and unused, and therefore it was dropped from the spec)
 - No "optional" setting for metadata-configured injections (e.g. [Inject(optional)])
 Give me one use case where a "dependency" is optional.
 For the equivalent functionality please use the AS3 runtime dependency configuration API over the metatag API (e.g. map(id).to(something).add(optionalIngredient))
+
+#### Installation
+<code>
+alchemist = new Alchemist;
+</code>
+
+####

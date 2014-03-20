@@ -61,7 +61,7 @@ For the equivalent functionality please use the AS3 runtime dependency configura
 ```actionscript
 alchemist = new Alchemist;
 ```
-### Mapping
+### Mapping at Runtime
 
 #### Value Mapping
 ```actionscript

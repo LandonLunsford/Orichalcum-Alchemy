@@ -78,7 +78,7 @@ alchemist.map('someId').to('{anotherId}')
 ```
 #### Singleton Mapping
 ```actionscript
-alchemist.map(God).to(singleton(God)) // well if you are Christian anyway
+alchemist.map(God).to(singleton(God)) // well for Christian programs anyway
 ```
 #### Prototype Mapping
 ```actionscript

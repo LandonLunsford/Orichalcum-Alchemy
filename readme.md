@@ -102,14 +102,14 @@ For the equivalent functionality please use the AS3 runtime dependency configura
 	alchemist.map(Provision).to(new MyCustomProvider)
 
 #### Constructor Argument Mapping
-
-	alchemist.map(Point).to(type(Point))
-		.add(constructorArguments(100, 200))
-		
-	alchemist.map(Point).to(type(Point))
-		.add(constructorArgument(100))
-		.add(constructorArgument(200))
-		
+```actionscript
+alchemist.map(Point).to(type(Point))
+	.add(constructorArguments(100, 200))
+	
+alchemist.map(Point).to(type(Point))
+	.add(constructorArgument(100))
+	.add(constructorArgument(200))
+```		
 #### Property (public field/setter) Mapping
 
 	alchemist.map(Point).to(type(Point))

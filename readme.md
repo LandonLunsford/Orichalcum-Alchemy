@@ -143,7 +143,7 @@ alchemist.map(BitmapData).to(type(BitmapData))
 	.add(preDestroy('dispose'))
 ```		
 ### Metadata Mapping API
-#### Property/Setter Mapping
+#### Property injetion by type
 ```actionscript
 package
 {
@@ -160,6 +160,26 @@ package
 		{
 			_privateVariable = value;
 		}
+	}
+}
+```
+#### Property injetion by type
+```actionscript
+package
+{
+	public class PropertyInjected
+	{
+		/**
+		 * This is supported but generally I try to avoid this because it is an
+		 * example of "reaching out" which is the opposite of inversion of control
+		 * To work around this I suggest using the Runtime mapping API likeso:
+		 * alchemist.map(PropertyInjected)
+		 *	.to(type(PropertyInjected))
+		 *	.add(properties({publicVariable: someValueOrProvider}));
+		 */
+		[Inject("dependencyId")]
+		public var publicVariable:*;
+		
 	}
 }
 ```

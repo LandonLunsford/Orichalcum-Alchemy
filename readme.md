@@ -152,7 +152,10 @@ package
 		[Inject]
 		public var publicVariable:PublicVariableType;
 		
-		//Cannot inject private, protected or internal variables
+		/**
+		 * Cannot inject private, protected or internal variables.
+		 * So inject the exposed setter instead.
+		 */
 		private var _privateVariable:SetterVariableType;
 		
 		[Inject]
@@ -163,12 +166,13 @@ package
 	}
 }
 ```
-#### Property injetion by type
+#### Property injetion by name
 ```actionscript
 package
 {
 	public class PropertyInjected
 	{
+	
 		/**
 		 * This is supported but generally I try to avoid this because it is an
 		 * example of "reaching out" which is the opposite of inversion of control

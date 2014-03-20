@@ -61,7 +61,7 @@ For the equivalent functionality please use the AS3 runtime dependency configura
 ```actionscript
 alchemist = new Alchemist;
 ```
-### Mapping at Runtime
+### Runtime Mapping API
 
 #### Value Mapping
 ```actionscript
@@ -142,8 +142,27 @@ alchemist.map(Matrix).to(new Matrix(2, 0, 0, 1))
 alchemist.map(BitmapData).to(type(BitmapData))
 	.add(preDestroy('dispose'))
 ```		
+### Metadata Mapping API
+#### Property/Setter Mapping
+```actionscript
+package
+{
+	public class PropertyInjected
+	{
+		[Inject]
+		public var publicVariable:PublicVariableType;
 		
-	
+		//Cannot inject private, protected or internal variables
+		private var _privateVariable:SetterVariableType;
+		
+		[Inject]
+		public function set setterVariable(value:SetterVariableType):void
+		{
+			_privateVariable = value;
+		}
+	}
+}
+```
 ### Conjuring
 
 #### Conjure Unmapped Type

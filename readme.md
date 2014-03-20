@@ -58,35 +58,44 @@ Give me one use case where a "dependency" is optional.
 For the equivalent functionality please use the AS3 runtime dependency configuration API over the metatag API (e.g. map(id).to(something).add(optionalIngredient))
 
 ### Installation
+```actionscript
 	alchemist = new Alchemist;
-
+```
 ### Mapping
 
 #### Value Mapping
+```actionscript
 	alchemist.map('library.power.level').to(10000)
-
+```
 #### Reference Mapping
+```actionscript
 	alchemist.map('someId').to(reference('anotherId'))
 	alchemist.map(SomeClass).to(reference('anotherId'))
-
+```
 #### Reference Mapping via Expression Language
+```actionscript
 	alchemist.map('someId').to('{anotherId}')
-
+```
 #### Singleton Mapping
+```actionscript
 	alchemist.map(God).to(singleton(God)) // well if you are Christian anyway
-
+```
 #### Prototype Mapping
+```actionscript
 	alchemist.map(Ant).to(prototype(Ant))
 	alchemist.map(Ant).to(type(Ant))
-
+```
 #### Interface Mapping
+```actionscript
 	alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
-	
+```	
 #### Factory Method Mapping
+```actionscript
 	alchemist.map(Product).to(factory(Factory.create))
 	alchemist.map(Product).to(factory(function():*{ return new Product; }))
-	
+```	
 #### Pool Mapping
+```actionscript
 	// Pools auto expand when more instances are conjured
 	// and serve as a good way to reuse objects instead of newly instantiating
 	// them every time which will trigger garbage collection cycles
@@ -97,10 +106,11 @@ For the equivalent functionality please use the AS3 runtime dependency configura
 	
 	// Return the socket instance to the pool
 	alchemist.destroy(socket);
-	
+```
 #### Custom Provider Mapping
+```actionscript
 	alchemist.map(Provision).to(new MyCustomProvider)
-
+```
 #### Constructor Argument Mapping
 ```actionscript
 alchemist.map(Point).to(type(Point))
@@ -111,7 +121,7 @@ alchemist.map(Point).to(type(Point))
 	.add(constructorArgument(200))
 ```		
 #### Property (public field/setter) Mapping
-
+```actionscript
 	alchemist.map(Point).to(type(Point))
 		.add(properties({
 			x: 100,
@@ -121,27 +131,28 @@ alchemist.map(Point).to(type(Point))
 	alchemist.map(Point).to(type(Point))
 		.add(property('x', 100))
 		.add(property('y', 200))
-		
+```	
 #### PostConstruct Mapping
-
+```actionscript
 	alchemist.map(Matrix).to(new Matrix(2, 0, 0, 1))
 		.add(postConstruct('invert'))
-		
+```		
 #### PreDestroy Mapping
-
+```actionscript
 	alchemist.map(BitmapData).to(type(BitmapData))
 		.add(preDestroy('dispose'))
-		
+```		
 		
 	
 ### Conjuring
 
 #### Conjure Unmapped Type
+```actionscript
 	const unmapped:UnmappedType = alchemist.conjure(UnmappedType) as UnmappedType;
 
 #### Side Notes
 It is interesting to note that the following two mappings are identical to the alchemist
-
+```actionscript
 	alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
 	alchemist.map('flash.display::IEventDispatcher').to(singleton(EventDispatcher))
-
+```

@@ -4,7 +4,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.object.isFalse;
 	import org.hamcrest.object.isTrue;
 	import orichalcum.alchemy.provider.factory.singleton;
-	import orichalcum.alchemy.recipe.ingredient.factory.preDestroy;
+	import orichalcum.alchemy.ingredient.factory.preDestroy;
 	import subject.ClassWithPreDestroy;
 	import subject.ClassWithPreDestroyMetatag;
 

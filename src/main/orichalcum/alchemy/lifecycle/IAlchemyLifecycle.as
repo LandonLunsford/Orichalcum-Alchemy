@@ -1,6 +1,6 @@
 package orichalcum.alchemy.lifecycle 
 {
-	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
+	import orichalcum.alchemy.ingredient.processor.IIngredientProcessor;
 	
 	public interface IAlchemyLifecycle extends IIngredientProcessor
 	{

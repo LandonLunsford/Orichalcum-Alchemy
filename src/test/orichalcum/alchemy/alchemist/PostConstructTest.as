@@ -3,7 +3,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.isFalse;
 	import org.hamcrest.object.isTrue;
-	import orichalcum.alchemy.recipe.ingredient.factory.postConstruct;
+	import orichalcum.alchemy.ingredient.factory.postConstruct;
 	import subject.ClassWithPostConstruct;
 	import subject.ClassWithPostConstructMetatag;
 

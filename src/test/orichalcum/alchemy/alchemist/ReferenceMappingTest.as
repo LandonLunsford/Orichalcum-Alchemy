@@ -9,7 +9,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.object.strictlyEqualTo;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.type;
-	import orichalcum.alchemy.recipe.ingredient.factory.constructorArgument;
+	import orichalcum.alchemy.ingredient.factory.constructorArgument;
 	import subject.ClassWithAllMetatags;
 
 	public class ReferenceMappingTest 

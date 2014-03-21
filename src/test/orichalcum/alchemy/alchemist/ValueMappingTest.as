@@ -9,11 +9,11 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.object.nullValue;
 	import org.hamcrest.object.strictlyEqualTo;
 	import orichalcum.alchemy.provider.factory.value;
-	import orichalcum.alchemy.recipe.ingredient.factory.constructorArgument;
-	import orichalcum.alchemy.recipe.ingredient.factory.eventHandler;
-	import orichalcum.alchemy.recipe.ingredient.factory.postConstruct;
-	import orichalcum.alchemy.recipe.ingredient.factory.preDestroy;
-	import orichalcum.alchemy.recipe.ingredient.factory.property;
+	import orichalcum.alchemy.ingredient.factory.constructorArgument;
+	import orichalcum.alchemy.ingredient.factory.eventHandler;
+	import orichalcum.alchemy.ingredient.factory.postConstruct;
+	import orichalcum.alchemy.ingredient.factory.preDestroy;
+	import orichalcum.alchemy.ingredient.factory.property;
 
 	public class ValueMappingTest 
 	{

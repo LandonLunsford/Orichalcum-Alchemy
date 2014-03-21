@@ -4,7 +4,7 @@ package orichalcum.alchemy.alchemist
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.notNullValue;
 	import org.hamcrest.object.strictlyEqualTo;
-	import orichalcum.alchemy.recipe.ingredient.factory.constructorArgument;
+	import orichalcum.alchemy.ingredient.factory.constructorArgument;
 	import subject.ClassWithOneConstructorParameter;
 	import subject.ClassWithTwoConstructorParameters;
 	import subject.ClassWithTwoConstructorParametersAndTwoConstructorInjects;

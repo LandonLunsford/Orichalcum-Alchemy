@@ -3,7 +3,7 @@ package orichalcum.alchemy.alchemist
 	import flash.display.Sprite;
 	import org.hamcrest.assertThat;
 	import org.hamcrest.object.strictlyEqualTo;
-	import orichalcum.alchemy.recipe.ingredient.factory.symbiot;
+	import orichalcum.alchemy.ingredient.factory.symbiot;
 	import subject.ConstructorSymbiotA;
 	import subject.ConstructorSymbiotB;
 	import subject.SpriteFriend;

@@ -18,9 +18,9 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.provider.factory.type;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.provider.factory.singleton;
-	import orichalcum.alchemy.recipe.ingredient.factory.constructorArgument;
-	import orichalcum.alchemy.recipe.ingredient.factory.preDestroy;
-	import orichalcum.alchemy.recipe.ingredient.factory.property;
+	import orichalcum.alchemy.ingredient.factory.constructorArgument;
+	import orichalcum.alchemy.ingredient.factory.preDestroy;
+	import orichalcum.alchemy.ingredient.factory.property;
 	import subject.ClassWithAllMetatags;
 	import subject.ClassWithMemberAndSetterInject;
 	import subject.ClassWithPreDestroy;

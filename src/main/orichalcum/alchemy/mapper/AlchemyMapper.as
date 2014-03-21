@@ -3,7 +3,7 @@ package orichalcum.alchemy.mapper
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.recipe.ingredient.processor.IIngredientProcessor;
+	import orichalcum.alchemy.ingredient.processor.IIngredientProcessor;
 	import orichalcum.utility.Strings;
 
 	public class AlchemyMapper implements IAlchemyMapper

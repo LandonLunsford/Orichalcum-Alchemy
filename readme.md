@@ -145,45 +145,78 @@ alchemist.map(BitmapData).to(type(BitmapData))
 ### Metadata Mapping API
 #### Property injetion by type
 ```actionscript
-package
+public class PropertyInjected
 {
-	public class PropertyInjected
+	[Inject]
+	public var publicVariable:PublicVariableType;
+	
+	/**
+	 * Cannot inject private, protected or internal variables.
+	 * So inject the exposed setter instead.
+	 */
+	private var _privateVariable:SetterVariableType;
+	
+	[Inject]
+	public function set setterVariable(value:SetterVariableType):void
 	{
-		[Inject]
-		public var publicVariable:PublicVariableType;
-		
-		/**
-		 * Cannot inject private, protected or internal variables.
-		 * So inject the exposed setter instead.
-		 */
-		private var _privateVariable:SetterVariableType;
-		
-		[Inject]
-		public function set setterVariable(value:SetterVariableType):void
-		{
-			_privateVariable = value;
-		}
+		_privateVariable = value;
 	}
 }
 ```
 #### Property injetion by name
 ```actionscript
-package
+public class PropertyInjected
 {
-	public class PropertyInjected
-	{
+
+	/**
+	 * This is supported but generally I try to avoid this because it is an
+	 * example of "reaching out" which is the opposite of inversion of control
+	 * To work around this I suggest using the Runtime mapping API likeso:
+	 * alchemist.map(PropertyInjected)
+	 *	.to(type(PropertyInjected))
+	 *	.add(properties({publicVariable: someValueOrProvider}));
+	 */
+	[Inject("dependencyId")]
+	public var publicVariable:*;
 	
-		/**
-		 * This is supported but generally I try to avoid this because it is an
-		 * example of "reaching out" which is the opposite of inversion of control
-		 * To work around this I suggest using the Runtime mapping API likeso:
-		 * alchemist.map(PropertyInjected)
-		 *	.to(type(PropertyInjected))
-		 *	.add(properties({publicVariable: someValueOrProvider}));
-		 */
-		[Inject("dependencyId")]
-		public var publicVariable:*;
-		
+}
+```
+#### Event Handlers
+Name your event handlers by the target_eventName convention and BAM!
+The listener is added on creation and removed on destruction for you!
+```actionscript
+public class MainViewMediator
+{
+	[Inject]
+	public var view:MainView;
+	
+	[EventHandler]
+	public function view_click(event:Event):void
+	{
+		trace('The view was clicked!');
+	}
+}
+```
+For more explicit controls:
+```actionscript
+public class MainViewMediator
+{
+	[Inject]
+	public var view:MainView;
+	
+	[EventHandler(
+		target="view",			// listen for the event on the injected view object
+		event="click",			// listen for the MouseEvent.CLICK event
+		params="mouseX,mouseY",		// extract the mouseX,Y from the event object
+		stopImmediatePropagation,	// stop bubbling and other listeners with same priority
+		stopPropagation,		// stop bubbling
+		useCapture,			// use the capture phase
+		priority="1"			// assign a priority
+		once,				// remove the listener after the first trigger
+	)]
+	public function onViewClick(mouseX:Number, mouseY:Number):void
+	{
+		trace('The view was clicked!');
 	}
 }
 ```

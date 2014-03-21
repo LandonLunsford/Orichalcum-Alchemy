@@ -184,6 +184,7 @@ public class PropertyInjected
 #### Event Handlers
 Name your event handlers by the target_eventName convention and BAM!
 The listener is added on creation and removed on destruction for you!
+Or go the explicit route and spell it all out with fancy options!
 ```actionscript
 public class Mediator
 {
@@ -195,26 +196,40 @@ public class Mediator
 	{
 		trace('The view was clicked!');
 	}
+	
+	[EventHandler(
+		// listen for the event on the injected view object
+		target="view",
+		// listen for the MouseEvent.MOUSE_DOWN event
+		event="mouseDown",
+		// extract the mouseX,Y from the event object
+		params="mouseX,mouseY",
+		// stop bubbling and other listeners with same priority
+		stopImmediatePropagation,
+		// stop bubbling
+		stopPropagation,
+		// use the capture phase
+		useCapture,
+		// assign a priority
+		priority="1",
+		// remove the listener after the first trigger
+		once		
+	)]
+	public function onViewMouseDown(mouseX:Number, mouseY:Number):void {}
 }
 ```
-For more explicit controls:
+#### Signal Handlers
 ```actionscript
 public class Mediator
 {
 	[Inject]
 	public var view:View;
 	
-	[EventHandler(
-		target="view",			// listen for the event on the injected view object
-		event="click",			// listen for the MouseEvent.CLICK event
-		params="mouseX,mouseY",		// extract the mouseX,Y from the event object
-		stopImmediatePropagation,	// stop bubbling and other listeners with same priority
-		stopPropagation,		// stop bubbling
-		useCapture,			// use the capture phase
-		priority="1",			// assign a priority
-		once				// remove the listener after the first trigger
-	)]
-	public function onViewClick(mouseX:Number, mouseY:Number):void {}
+	[SignalHandler]
+	public function view_added():void {}
+	
+	[SignalHandler(signal="view.clicked", once)]
+	public function onViewClicked():void {}
 }
 ```
 ### Conjuring

@@ -184,7 +184,7 @@ public class PropertyInjected
 #### Event Handlers
 Name your event handlers by the target_eventName convention and BAM!
 The listener is added on creation and removed on destruction for you!
-Or go the explicit route and spell it all out with fancy options!
+Or use any combination of the advanced options!
 ```actionscript
 public class Mediator
 {

@@ -6,70 +6,77 @@ package orichalcum.reflection.metadata.transform
 	public class MetadataMapper implements IMetadataTransform
 	{
 		
-		private var _mappings:Dictionary;
-		private var _currentMapping:MetadataMapping;
+		private var _hostname:String;
+		private var _arguments:Dictionary = new Dictionary;
 		
-		public function MetadataMapper()
+		public function hostname(property:String):MetadataMapper
 		{
-			_mappings = new Dictionary;
+			_hostname = property;
+			return this;
 		}
 		
-		public function map(property:String):MetadataMapping
+		public function argument(property:String):MetadataArgumentMapper
 		{
-			return _mappings[property] = new MetadataMapping(this);
+			return _arguments[property] = new MetadataArgumentMapper(this);
 		}
 		
 		public function transform(metadata:XML, flyweight:Object = null):* 
 		{
 			const to:Object = flyweight ? flyweight : {};
-				
-			for each(var argument:XML in metadata.arg)
+			
+			if (_hostname)
 			{
-				var key:String = argument.@key.toString();
-				var value:String = argument.@value.toString();
+				to[_hostname] = metadata.parent().@name.toString();
+			}
 				
+			for each(var metadataArgument:XML in metadata.arg)
+			{
+				var key:String = metadataArgument.@key.toString();
+				var value:String = metadataArgument.@value.toString();
+				
+				var argument:MetadataArgumentMapper;
 				var interpretedValue:*;
-				var mapping:MetadataMapping;
 				
 				if (key.length == 0)
 				{
-					mapping = _mappings[value];
-					interpretedValue = mapping && mapping._implicit
-						? mapping._implicit
+					argument = _arguments[value];
+					interpretedValue = argument && argument._implicit
+						? argument._implicit
 						: true;
 						
 					key = value;
 				}
 				else
 				{
-					mapping = _mappings[key];
+					argument = _arguments[key];
 					interpretedValue = Xmls.valueOf(value);
 				}
 				
-				if (mapping == null)
+				if (argument == null)
 				{
 					to[key] = interpretedValue;
 					continue;
 				}
 				
-				if (mapping._format != null)
+				if (argument._format != null)
 				{
-					interpretedValue = mapping._format(to, key, interpretedValue);
+					interpretedValue = argument._format(interpretedValue);
 				}
 				
-				if (interpretedValue == null && mapping._implicit)
+				if (interpretedValue == null && argument._implicit)
 				{
-					mapping._fallback(metadata);
+					argument._fallback(metadata);
 				}
 				
-				if (mapping._rename)
+				if (argument._rename)
 				{
-					key = mapping._rename;
+					key = argument._rename;
 				}
 				
 				to[key] = interpretedValue;
 				
 			}
+			
 			return to;
 		}
 		

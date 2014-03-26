@@ -1,7 +1,7 @@
 package orichalcum.reflection.metadata.transform 
 {
 
-	public class MetadataMapping implements IMetadataTransform
+	public class MetadataArgumentMapper implements IMetadataTransform
 	{
 		
 		internal var _parent:MetadataMapper;
@@ -26,36 +26,36 @@ package orichalcum.reflection.metadata.transform
 		 */
 		internal var _fallback:Function;
 		
-		public function MetadataMapping(parent:MetadataMapper)
+		public function MetadataArgumentMapper(parent:MetadataMapper)
 		{
 			_parent = parent;
 		}
 		
-		public function to(value:String):MetadataMapping
+		public function to(value:String):MetadataArgumentMapper
 		{
 			_rename = value;
 			return this;
 		}
 		
-		public function format(value:Function):MetadataMapping
+		public function format(value:Function):MetadataArgumentMapper
 		{
 			_format = value;
 			return this;
 		}
 		
-		public function implicit(value:*):MetadataMapping
+		public function implicit(value:*):MetadataArgumentMapper
 		{
 			_implicit = value;
 			return this;
 		}
 		
-		public function fallback(value:Function):MetadataMapping
+		public function fallback(value:Function):MetadataArgumentMapper
 		{
 			_fallback = value;
 			return this;
 		}
 		
-		public function map(property:String):MetadataMapping
+		public function argument(property:String):MetadataArgumentMapper
 		{
 			return _parent.map(property);
 		}

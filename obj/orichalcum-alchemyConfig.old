@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'3/19/2014'</value>
+      <value>'3/25/2014'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -39,7 +39,7 @@
     <library-path append="true">
       <path-element>C:\Users\landon\Documents\GitHub\Orichalcum-Alchemy\lib\flexunit-4.1.0-8-as3_4.1.0.16076.swc</path-element>
       <path-element>C:\Users\landon\Documents\GitHub\Orichalcum-Alchemy\lib\hamcrest-as3-only-1.1.3.swc</path-element>
-      <path-element>C:\Users\landon\Documents\GitHub\Orichalcum-Alchemy\lib\orichalcum-commons-1.2.1.swc</path-element>
+      <path-element>C:\Users\landon\Documents\GitHub\Orichalcum-Alchemy\lib\orichalcum-commons-1.2.2.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>

@@ -90,7 +90,7 @@ package orichalcum.alchemy.mapper
 			 * dispatched on a provided eventDispatcher bus. Perhaps in a strict mode
 			 * I could throw an error when overwrites occur.
 			 */
-			trace(Strings.interpolate(message, substitutions));
+			trace(Strings.substitute(message, substitutions));
 		}
 
 	}

@@ -7,6 +7,8 @@ package orichalcum.alchemy.ingredient.processor
 	import orichalcum.alchemy.ingredient.factory.signalHandler;
 	import orichalcum.alchemy.ingredient.metatag.SignalHandlerMetatag;
 	import orichalcum.alchemy.ingredient.SignalHandler;
+	import orichalcum.reflection.metadata.transform.IMetadataTransform;
+	import orichalcum.reflection.metadata.transform.MetadataMapper;
 	import orichalcum.signals.ISignal;
 	import orichalcum.utility.ObjectUtil;
 
@@ -14,6 +16,8 @@ package orichalcum.alchemy.ingredient.processor
 	{
 		private var _metatagName:String;
 		private var _ingredientId:String = 'signalHandlers';
+		private var _signalMapper:IMetadataTransform = new MetadataMapper()
+			.map('signal').to('signalPath')
 		
 		public function SignalHandlerProcessor(metatagName:String = 'SignalHandler') 
 		{

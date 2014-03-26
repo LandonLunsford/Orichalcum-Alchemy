@@ -99,7 +99,7 @@ package orichalcum.alchemy.ingredient
 		
 		public function toString():String
 		{
-			return Strings.interpolate('{"signal":"{}", "slot":"{}", "once":{}}', signalPath, slotPath, once);
+			return Strings.substitute('{"signal":"{}", "slot":"{}", "once":{}}', signalPath, slotPath, once);
 		}
 		
 	}

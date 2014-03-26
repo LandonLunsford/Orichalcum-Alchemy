@@ -1,7 +1,7 @@
 package orichalcum.alchemy.provider 
 {
+	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
-	import orichalcum.alchemy.recipe.Recipe;
 
 	public class ForwardingProvider implements IProvider
 	{
@@ -17,10 +17,10 @@ package orichalcum.alchemy.provider
 			_provider = null;
 		}
 		
-		public function provide(id:*, activeAlchemist:IAlchemist, activeRecipe:Recipe):* 
+		public function provide(id:*, alchemist:IAlchemist, recipe:Dictionary):* 
 		{
-			_provider = activeAlchemist.conjure(_providerId, activeRecipe);
-			return _provider.provide(id, activeAlchemist, activeRecipe);
+			_provider = alchemist.conjure(_providerId, recipe);
+			return _provider.provide(id, alchemist, recipe);
 		}
 		
 		public function destroy(provision:*):* 

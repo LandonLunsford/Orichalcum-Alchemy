@@ -10,15 +10,20 @@ package orichalcum.alchemy.ingredient.metatag
 		private const MULTIPLE_METATAG_ATTRIBUTES_ERROR_MESSAGE:String = 'Multiple "{}" attributes found on "[{}]" metatag for member "{}" in class "{}".';
 		private const NO_REQUIRED_METATAG_ATTRIBUTE_ERROR_MESSAGE:String = 'Required attribute "{}" not found on "[{}]" metatag for "{}" in class "{}".';
 		
-		private var hostName:String;
-		private var metatag:XML;
+		
 		private var signalArgumentKey:String = 'signal';
 		private var onceArgumentKey:String = 'once';
+		private var hostName:String;
+		private var metatag:XML;
+		private var metatagArguments:XMLList;
 		
 		public function SignalHandlerMetatag(hostName:String, metatag:XML) 
 		{
 			this.hostName = hostName;
 			this.metatag = metatag;
+			
+			// preprocess
+			metatagArguments = metatag.arg;
 		}
 		
 		public function get slotPath():String
@@ -50,7 +55,6 @@ package orichalcum.alchemy.ingredient.metatag
 				public function anything():void{}
 			*/
 			
-			const metatagArguments:XMLList = metatag.arg;
 			const metatagArgumentCount:int = metatagArguments.length();
 			const signalArguments:XMLList = metatagArguments.(@key == signalArgumentKey);
 			const signalArgumentCount:int = signalArguments.length();
@@ -91,7 +95,6 @@ package orichalcum.alchemy.ingredient.metatag
 		
 		public function get once():Boolean
 		{
-			const metatagArguments:XMLList = metatag.arg;
 			const onceArguments:XMLList = metatagArguments.(@key == onceArgumentKey);
 			const onceArgumentCount:int = onceArguments.length();
 			

@@ -215,7 +215,7 @@ package orichalcum.alchemy.ingredient
 		
 		public function toString():String
 		{
-			return Strings.interpolate(
+			return Strings.substitute(
 				'<event-handler event="{}" listener="{}" target="{}" relay="{}" parameters="{}" useCapture="{}" priority="{}" stopPropagation="{}" stopImmediatePropagation="{}"/>'
 				, type, listenerName, targetPath, relayPath, parameters, useCapture, priority, stopPropagation, stopImmediatePropagation);
 		}

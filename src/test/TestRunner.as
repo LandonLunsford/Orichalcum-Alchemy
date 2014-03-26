@@ -4,6 +4,7 @@ package
 	import flash.utils.describeType;
 	import org.flexunit.internals.TraceListener;
 	import org.flexunit.runner.FlexUnitCore;
+	import orichalcum.utility.Strings;
 	import suite.ComprehensiveTestSuite;
 
 	public class TestRunner extends Sprite

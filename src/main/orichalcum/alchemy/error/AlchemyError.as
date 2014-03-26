@@ -7,7 +7,7 @@ package orichalcum.alchemy.error
 		
 		public function AlchemyError(message:String = null, ...substitutions) 
 		{
-			super(Strings.interpolate(message || '', substitutions));
+			super(Strings.substitute(message || '', substitutions));
 		}
 		
 	}

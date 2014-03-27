@@ -42,7 +42,10 @@ package orichalcum.alchemy.ingredient.processor
 		
 		public function inherit(parent:Dictionary, child:Dictionary):void 
 		{
-			parent[_ingredientId] = child[_ingredientId];
+			if (_ingredientId in child)
+			{
+				parent[_ingredientId] = child[_ingredientId];
+			}
 		}
 		
 		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void

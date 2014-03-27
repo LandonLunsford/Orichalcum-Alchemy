@@ -17,7 +17,8 @@ package orichalcum.alchemy.ingredient.processor
 		private var _metatagName:String;
 		private var _ingredientId:String = 'signalHandlers';
 		private var _signalMapper:IMetadataTransform = new MetadataMapper()
-			.map('signal').to('signalPath')
+			.hostname('slotPath')
+			.argument('signal').to('signalPath')
 		
 		public function SignalHandlerProcessor(metatagName:String = 'SignalHandler') 
 		{

@@ -17,15 +17,16 @@ package orichalcum.alchemy.ingredient.processor
 		private var _ingredientId:String = 'eventHandlers';
 		private var _alchemistKeyword:String = '__alchemist__';
 		private var _mapper:IMetadataTransform = new MetadataMapper()
-			.map('event')
+			.hostname('listenerName')
+			.argument('event')
 				.to('type')
-			.map('target')
+			.argument('target')
 				.to('targetPath')
-			.map('relay')
+			.argument('relay')
 				.to('relayPath')
 				.implicit(_alchemistKeyword)
-			.map('parameters')
-				.format(function(to:*, key:String, value:String):Array {
+			.argument('parameters')
+				.format(function(value:String):Array {
 					return value.replace(/\s*/gm, '').split(',');
 				})
 		
@@ -47,7 +48,6 @@ package orichalcum.alchemy.ingredient.processor
 			for each(var metadata:XML in eventHandlerMetadata)
 			{
 				var handler:EventHandler = _mapper.transform(metadata, new EventHandler) as EventHandler;
-				handler.listenerName = metadata.parent().@name.toString();
 				
 				/**
 				 * Fall back on implicits in listener name

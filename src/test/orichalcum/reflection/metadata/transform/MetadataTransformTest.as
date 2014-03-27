@@ -30,16 +30,16 @@ package orichalcum.reflection.metadata.transform
 		public function testingMapper():void
 		{
 			const mapper:IMetadataTransform = new MetadataMapper()
-				.map('keyA')
+				.argument('keyA')
 					.to('newKeyA')
-				.map('keyG')
+				.argument('keyG')
 					.to('newKeyG')
-					.format(function(to:*, key:String, value:String):* {
+					.format(function(value:String):* {
 						return value.split(',');
 					})
-				.map('H')
+				.argument('H')
 					.implicit('this')
-				.map('I')
+				.argument('I')
 					.to('i')
 					
 			assertThat(

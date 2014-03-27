@@ -25,25 +25,25 @@ package suite
 	[RunWith("org.flexunit.runners.Suite")]
 	public class ComprehensiveTestSuite
 	{
-		//public var alchemistExtensionTest:AlchemistExtensionTest;
-		//public var alchemistTest:AlchemistTest;
-		//
-		//public var constructorArgumentInjectionTest:ConstructorArgumentInjectionTest;
+		public var alchemistExtensionTest:AlchemistExtensionTest;
+		public var alchemistTest:AlchemistTest;
+		
+		public var constructorArgumentInjectionTest:ConstructorArgumentInjectionTest;
 		public var eventHandlerTest:EventHandlerTest;
 		public var signalHandlerTest:SignalHandlerTest;
-		//public var variableInjectionTest:VariableInjectionTest;
-		//public var setterInjectionTest:SetterInjectionTest;
-		//public var postConstructTest:PostConstructTest;
-		//public var preDestroyTest:PreDestroyTest;
-		//public var symbiotTest:SymbiotTest;
-		//
-		//public var valueMappingTest:ValueMappingTest;
-		//public var referenceMappingTest:ReferenceMappingTest;
-		//public var factoryForwardingMappingTest:FactoryForwardingMappingTest;
-		//public var factoryMappingTest:FactoryMappingTest;
-		//public var prototypeMappingTest:PrototypeMappingTest;
-		//public var singletonMappingTest:SingletonMappingTest;
-		//public var poolMappingTest:PoolMappingTest;
+		public var variableInjectionTest:VariableInjectionTest;
+		public var setterInjectionTest:SetterInjectionTest;
+		public var postConstructTest:PostConstructTest;
+		public var preDestroyTest:PreDestroyTest;
+		public var symbiotTest:SymbiotTest;
+		
+		public var valueMappingTest:ValueMappingTest;
+		public var referenceMappingTest:ReferenceMappingTest;
+		public var factoryForwardingMappingTest:FactoryForwardingMappingTest;
+		public var factoryMappingTest:FactoryMappingTest;
+		public var prototypeMappingTest:PrototypeMappingTest;
+		public var singletonMappingTest:SingletonMappingTest;
+		public var poolMappingTest:PoolMappingTest;
 		
 		public var eventHandlerProcessorTest:EventHandlerProcessorTest;
 		

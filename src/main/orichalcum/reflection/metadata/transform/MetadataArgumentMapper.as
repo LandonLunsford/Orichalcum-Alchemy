@@ -57,7 +57,7 @@ package orichalcum.reflection.metadata.transform
 		
 		public function argument(property:String):MetadataArgumentMapper
 		{
-			return _parent.map(property);
+			return _parent.argument(property);
 		}
 		
 		public function transform(metadata:XML, flyweight:Object = null):*

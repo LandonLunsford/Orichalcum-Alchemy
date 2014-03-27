@@ -4,7 +4,7 @@ package orichalcum.alchemy.resolver
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.alchemist.Unmapped;
 	
-	public class ProviderlessValueResolver implements IDependencyResolver
+	public class ValueResolver implements IDependencyResolver
 	{
 		
 		public function resolves(id:String, mapping:*):Boolean 

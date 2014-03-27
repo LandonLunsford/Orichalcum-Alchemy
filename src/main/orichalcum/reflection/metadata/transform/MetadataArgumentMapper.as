@@ -6,6 +6,8 @@ package orichalcum.reflection.metadata.transform
 		
 		internal var _parent:MetadataMapper;
 		
+		internal var _key:String;
+		
 		/**
 		 * New name on target object
 		 */
@@ -24,11 +26,12 @@ package orichalcum.reflection.metadata.transform
 		/**
 		 * Formating function
 		 */
-		internal var _fallback:Function;
+		internal var _validate:Function;
 		
-		public function MetadataArgumentMapper(parent:MetadataMapper)
+		public function MetadataArgumentMapper(parent:MetadataMapper, key:String)
 		{
 			_parent = parent;
+			_key = key;
 		}
 		
 		public function to(value:String):MetadataArgumentMapper
@@ -49,9 +52,9 @@ package orichalcum.reflection.metadata.transform
 			return this;
 		}
 		
-		public function fallback(value:Function):MetadataArgumentMapper
+		public function validate(value:Function):MetadataArgumentMapper
 		{
-			_fallback = value;
+			_validate = value;
 			return this;
 		}
 		

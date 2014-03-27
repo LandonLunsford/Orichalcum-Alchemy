@@ -57,7 +57,10 @@ package orichalcum.alchemy.alchemist
 			const superclassName:String = getQualifiedSuperclassName(type);
 			
 			if (superclassName == null)
+			{
+				
 				throw new AlchemyError('Cannot create "{}" because it is an interface and cannot be instantiated.', qualifiedClassName);
+			}
 			
 			const typeDescription:XML = describeType(type);
 			

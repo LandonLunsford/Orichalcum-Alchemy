@@ -5,12 +5,12 @@ package orichalcum.alchemy.ingredient.processor
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
 	import orichalcum.alchemy.ingredient.factory.signalHandler;
-	import orichalcum.alchemy.ingredient.metatag.SignalHandlerMetatag;
 	import orichalcum.alchemy.ingredient.SignalHandler;
 	import orichalcum.reflection.metadata.transform.IMetadataTransform;
 	import orichalcum.reflection.metadata.transform.MetadataMapper;
 	import orichalcum.signals.ISignal;
 	import orichalcum.utility.ObjectUtil;
+	import orichalcum.utility.Strings;
 
 	public class SignalHandlerProcessor implements IIngredientProcessor
 	{
@@ -18,7 +18,18 @@ package orichalcum.alchemy.ingredient.processor
 		private var _ingredientId:String = 'signalHandlers';
 		private var _signalMapper:IMetadataTransform = new MetadataMapper()
 			.hostname('slotPath')
-			.argument('signal').to('signalPath')
+			.argument('signal')
+				.to('signalPath')
+				.validate(function(metadata:XML, value:*):* {
+					if (!Strings.isNullOrEmpty(value)) return value;
+					const hostname:String = metadata.parent().@name.toString();
+					const possibleSignalPath:Array = hostname.split('_');
+					if (possibleSignalPath.length < 2)
+						throw new ArgumentError(Strings.substitute(
+							'Argument "{}" not found on metatag "[{}]" for function "{}". Also the host function name does not resemble a path in the form "path_to_signal".',
+							'signal', _metatagName, hostname));
+					return possibleSignalPath.join('.');
+				})
 		
 		public function SignalHandlerProcessor(metatagName:String = 'SignalHandler') 
 		{
@@ -27,10 +38,9 @@ package orichalcum.alchemy.ingredient.processor
 		
 		public function introspect(typeName:String, typeDescription:XML, recipe:Dictionary, alchemist:IAlchemist):void
 		{
-			for each(var signalHandlerMetadata:XML in typeDescription.factory[0].method.metadata.(@name == _metatagName))
+			for each(var metadata:XML in typeDescription.factory[0].method.metadata.(@name == _metatagName))
 			{
-				var metatag:SignalHandlerMetatag = new SignalHandlerMetatag(typeName, signalHandlerMetadata);
-				(recipe[_ingredientId] ||= []).push(signalHandler(metatag.signalPath, metatag.slotPath, metatag.once));
+				(recipe[_ingredientId] ||= []).push(_signalMapper.transform(metadata, new SignalHandler(null, null)));
 			}
 		}
 		

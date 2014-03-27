@@ -43,7 +43,7 @@ package orichalcum.alchemy.ingredient.processor
 				}
 				if (propertyInjections.length() > 1 || propertyInjections.arg.length() > 1)
 				{
-					throw new AlchemyError('Multiple "[{0}]" metatags defined for property "{1}" in class "{2}".', _metatagName, propertyName, typeName);
+					throw new AlchemyError('Multiple "[{}]" metatags defined for property "{}" in class "{}".', _metatagName, propertyName, typeName);
 				}
 			}
 		}

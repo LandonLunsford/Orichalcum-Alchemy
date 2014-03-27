@@ -7,6 +7,7 @@ package orichalcum.alchemy.ingredient
 		
 		public function Symbiot(id:*) 
 		{
+			// assert id is a string or class!
 			_id = id;
 		}
 		

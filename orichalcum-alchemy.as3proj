@@ -54,7 +54,7 @@
   <libraryPaths>
     <element path="lib\flexunit-4.1.0-8-as3_4.1.0.16076.swc" />
     <element path="lib\hamcrest-as3-only-1.1.3.swc" />
-    <element path="lib\orichalcum-commons-1.2.2.swc" />
+    <element path="lib\orichalcum-commons-1.2.4.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

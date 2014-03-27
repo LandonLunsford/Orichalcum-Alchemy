@@ -1,7 +1,9 @@
 package orichalcum.alchemy.alchemist 
 {
 	import flash.display.Sprite;
+	import flash.display.Stage;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
@@ -13,6 +15,8 @@ package orichalcum.alchemy.alchemist
 	import org.flexunit.asserts.assertStrictlyEquals;
 	import org.flexunit.asserts.assertTrue;
 	import org.flexunit.assertThat;
+	import org.hamcrest.object.equalTo;
+	import org.hamcrest.object.strictlyEqualTo;
 	import orichalcum.alchemy.alchemist.Alchemist;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.provider.factory.type;
@@ -27,7 +31,7 @@ package orichalcum.alchemy.alchemist
 	import subject.ClassWithPreDestroyMetatag;
 
 
-	public class AlchemistTest 
+	public class AlchemistTest
 	{
 		
 		private var _alchemist:IAlchemist;
@@ -175,7 +179,31 @@ package orichalcum.alchemy.alchemist
 			_alchemist.destroy(creation);
 		}
 		
+		[Test]
+		public function testInterfaceToProviderMapping():void
+		{
+			_alchemist.map(IEventDispatcher).to(singleton(EventDispatcher))
+			_alchemist.conjure(IEventDispatcher);
+		}
 		
+		[Test]
+		public function testInterfaceToValueMapping():void
+		{
+			const id:* = IEventDispatcher;
+			const value:* = new EventDispatcher;
+			_alchemist.map(id).to(value)
+			assertThat(_alchemist.conjure(id), strictlyEqualTo(value));
+			
+		}
+		
+		[Test]
+		public function testClassToValueMapping():void
+		{
+			const id:* = Stage;
+			const value:* = null;
+			_alchemist.map(id).to(null)
+			assertThat(_alchemist.conjure(id), strictlyEqualTo(value));
+		}
 		
 	}
 

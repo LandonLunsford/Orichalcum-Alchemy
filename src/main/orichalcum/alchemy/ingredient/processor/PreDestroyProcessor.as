@@ -22,12 +22,12 @@ package orichalcum.alchemy.ingredient.processor
 			
 			if (preDestroys.length() > 1)
 			{
-				throw new AlchemyError('Multiple "[{0}]" metatags defined in class "{2}".', _metatagName, typeName);
+				throw new AlchemyError('Multiple "[{}]" metatags defined in class "{}".', _metatagName, typeName);
 			}
 				
 			if (preDestroys.length() > 0)
 			{
-				recipe[_ingredientId] = preDestroys[0].parent().@name;
+				recipe[_ingredientId] = preDestroys[0].parent().@name.toString();
 			}
 		}
 		

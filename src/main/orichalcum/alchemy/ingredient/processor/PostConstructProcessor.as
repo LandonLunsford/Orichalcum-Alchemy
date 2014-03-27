@@ -28,7 +28,7 @@ package orichalcum.alchemy.ingredient.processor
 				
 			if (postConstructs.length() > 0)
 			{
-				recipe[_ingredientId] = postConstructs[0].parent().@name;
+				recipe[_ingredientId] = postConstructs[0].parent().@name.toString();
 			}
 		}
 		

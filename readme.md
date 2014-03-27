@@ -19,7 +19,7 @@ This featured library is now available for the AS3 developer community under the
 <br>
 
 ## Features
-- <b>XML, Metatag and AS3 dependency configuration</b>
+- <b>Metadata and AS3 dependency configuration</b>
 - <b>Dependency mapping inheritance model</b>
 - <b>Class-specific AND Instance-level dependency configuration</b>
 - Value mapping

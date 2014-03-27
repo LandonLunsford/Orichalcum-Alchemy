@@ -69,17 +69,17 @@ package orichalcum.alchemy.mapper
 			if (_alchemist.reflector.isType(id))
 				return _alchemist.reflector.getType(id);
 				
-			throw new AlchemyError('Argument "id" ({0}) passed to method "map" must represent a valid public class when using the "asPrototype|asSingleton|asMultiton" methods.', id);
+			throw new AlchemyError('Argument "id" ({}) passed to method "map" must represent a valid public class when using the "asPrototype|asSingleton|asMultiton" methods.', id);
 		}
 		
 		private function onProviderOverwrite(id:String):void
 		{
-			throwWarning('[WARNING] Provider for "{0}" has been overwritten.', id);
+			throwWarning('[WARNING] Provider for "{}" has been overwritten.', id);
 		}
 		
 		private function onRecipeOverwrite(id:String):void
 		{
-			throwWarning('[WARNING] Recipe for "{0}" has been overwritten.', id);
+			throwWarning('[WARNING] Recipe for "{}" has been overwritten.', id);
 		}
 		
 		private function throwWarning(message:String, ...substitutions):void

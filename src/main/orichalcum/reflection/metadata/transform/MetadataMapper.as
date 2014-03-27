@@ -1,7 +1,7 @@
 package orichalcum.reflection.metadata.transform 
 {
 	import flash.utils.Dictionary;
-	import orichalcum.alchemy.utility.Xmls;
+	import orichalcum.utility.Xmls;
 
 	public class MetadataMapper implements IMetadataTransform
 	{
@@ -15,9 +15,9 @@ package orichalcum.reflection.metadata.transform
 			return this;
 		}
 		
-		public function argument(property:String):MetadataArgumentMapper
+		public function argument(key:String):MetadataArgumentMapper
 		{
-			return _arguments[property] = new MetadataArgumentMapper(this);
+			return _arguments[key] = new MetadataArgumentMapper(this, key);
 		}
 		
 		public function transform(metadata:XML, flyweight:Object = null):* 
@@ -28,7 +28,7 @@ package orichalcum.reflection.metadata.transform
 			{
 				to[_hostname] = metadata.parent().@name.toString();
 			}
-				
+			
 			for each(var metadataArgument:XML in metadata.arg)
 			{
 				var key:String = metadataArgument.@key.toString();
@@ -63,11 +63,6 @@ package orichalcum.reflection.metadata.transform
 					interpretedValue = argument._format(interpretedValue);
 				}
 				
-				if (interpretedValue == null && argument._implicit)
-				{
-					argument._fallback(metadata);
-				}
-				
 				if (argument._rename)
 				{
 					key = argument._rename;
@@ -75,6 +70,15 @@ package orichalcum.reflection.metadata.transform
 				
 				to[key] = interpretedValue;
 				
+			}
+			
+			for each(argument in _arguments)
+			{
+				if (argument._validate != null)
+				{
+					key = argument._rename ? argument._rename : argument._key;
+					to[key] = argument._validate(metadata, to[key]);
+				}
 			}
 			
 			return to;

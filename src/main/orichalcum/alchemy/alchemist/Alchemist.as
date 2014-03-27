@@ -18,8 +18,8 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.ingredient.processor.SymbiotProcessor;
 	import orichalcum.alchemy.resolver.ExpressionResolver;
 	import orichalcum.alchemy.resolver.IDependencyResolver;
-	import orichalcum.alchemy.resolver.ProviderlessTypeResolver;
-	import orichalcum.alchemy.resolver.ProviderlessValueResolver;
+	import orichalcum.alchemy.resolver.UnmappedTypeResolver;
+	import orichalcum.alchemy.resolver.ValueResolver;
 	import orichalcum.alchemy.resolver.ProviderResolver;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
@@ -68,9 +68,9 @@ package orichalcum.alchemy.alchemist
 		 */
 		private var _resolvers:Vector.<IDependencyResolver> = new <IDependencyResolver>[
 			new ProviderResolver,
-			new ProviderlessTypeResolver,
 			new ExpressionResolver,
-			new ProviderlessValueResolver
+			new ValueResolver,
+			new UnmappedTypeResolver
 		];
 		
 		/**
@@ -109,12 +109,6 @@ package orichalcum.alchemy.alchemist
 		 * @private
 		 */
 		private var _recipesByInstance:Dictionary = new Dictionary;
-		
-		/**
-		 * Holds active friends, friends stay active so long as any of their friends is in play (not destroyed)
-		 * @private
-		 */
-		private var _symbiotsByInstance:Dictionary = new Dictionary;
 		
 		/**
 		 * @private used to prevent infinite loops for circular dependencies
@@ -204,7 +198,6 @@ package orichalcum.alchemy.alchemist
 			_recipes = null;
 			_providersByInstance = null;
 			_recipesByInstance = null;
-			_symbiotsByInstance = null;
 			_instancesInProcessById = null;
 			_parent = null;
 		}

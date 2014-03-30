@@ -3,9 +3,9 @@ package orichalcum.alchemy.ingredient.processor
 	import flash.utils.Dictionary;
 	import orichalcum.alchemy.alchemist.IAlchemist;
 	import orichalcum.alchemy.error.AlchemyError;
-	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.alchemy.ingredient.Properties;
 	import orichalcum.alchemy.ingredient.Property;
+	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.utility.ObjectUtil;
 
@@ -53,16 +53,14 @@ package orichalcum.alchemy.ingredient.processor
 			if (ingredient is Property)
 			{
 				const property:Property = ingredient as Property;
-				var recipeProperties:Object = (recipe[_ingredientId] ||= {});
-				recipeProperties[property.name] = property.value;
+				(recipe[_ingredientId] ||= {})[property.name] = property.value;
 			}
 			else if (ingredient is Properties)
 			{
 				const properties:Properties = ingredient as Properties;
-				recipeProperties = (recipe[_ingredientId] ||= {});
-				for (var name:* in properties)
+				for (var name:* in properties.valuesByName)
 				{
-					recipeProperties[name] = properties[name];
+					(recipe[_ingredientId] ||= {})[name] = properties.valuesByName[name];
 				}
 			}
 		}

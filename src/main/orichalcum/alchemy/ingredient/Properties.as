@@ -4,20 +4,18 @@ package orichalcum.alchemy.ingredient
 	public class Properties 
 	{
 		
-		private var _nameValuePairs:Object;
+		private var _valuesByName:Object;
 		
-		public function Properties(nameValuePairs:Object) 
+		public function Properties(valuesByName:Object) 
 		{
-			
 			// Assert.notNull(nameValuePairs, "blah")
-			_nameValuePairs = nameValuePairs;
+			_valuesByName = valuesByName;
 		}
 		
-		public function get nameValuePairs():Object 
+		public function get valuesByName():Object 
 		{
-			return _nameValuePairs;
+			return _valuesByName;
 		}
-		
 		
 	}
 

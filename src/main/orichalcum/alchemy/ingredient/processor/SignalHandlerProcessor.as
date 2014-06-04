@@ -9,7 +9,7 @@ package orichalcum.alchemy.ingredient.processor
 	import orichalcum.reflection.metadata.transform.IMetadataTransform;
 	import orichalcum.reflection.metadata.transform.MetadataMapper;
 	import orichalcum.signals.ISignal;
-	import orichalcum.utility.ObjectUtil;
+	import orichalcum.utility.Objects;
 	import orichalcum.utility.Strings;
 
 	public class SignalHandlerProcessor implements IIngredientProcessor
@@ -52,11 +52,11 @@ package orichalcum.alchemy.ingredient.processor
 			}
 		}
 		
-		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
+		public function inherit(to:Dictionary, from:Dictionary):void 
 		{
-			for each(var ingredient:* in childRecipe[_ingredientId])
+			for each(var ingredient:* in from[_ingredientId])
 			{
-				(parentRecipe[_ingredientId] ||= []).push(ingredient);
+				(to[_ingredientId] ||= []).push(ingredient);
 			}
 		}
 		
@@ -64,7 +64,7 @@ package orichalcum.alchemy.ingredient.processor
 		{
 			for each(var handler:SignalHandler in recipe[_ingredientId])
 			{
-				var target:Object = ObjectUtil.find(instance, handler.signalPath);
+				var target:Object = Objects.find(instance, handler.signalPath);
 				var targetAsSignal:ISignal = target as ISignal;
 				
 				if (targetAsSignal == null)

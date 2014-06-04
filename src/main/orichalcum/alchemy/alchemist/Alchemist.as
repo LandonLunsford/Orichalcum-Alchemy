@@ -21,14 +21,14 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.alchemy.resolver.UnmappedTypeResolver;
 	import orichalcum.alchemy.resolver.ValueResolver;
 	import orichalcum.alchemy.resolver.ProviderResolver;
+	import orichalcum.datastructure.Maps;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
 	import orichalcum.reflection.Reflector;
-	import orichalcum.utility.ObjectUtil;
+	import orichalcum.utility.Objects;
 	
 	public class Alchemist extends EventDispatcher implements IDisposable, IAlchemist
 	{
-		
 		/**
 		 * Used to avoid creating a new recipes every recursive step taken during the conjure|create|inject processes.
 		 * The caller of the recursive-compound-recipe-consuming-function must return the recipe flyweight after use.
@@ -459,6 +459,11 @@ package orichalcum.alchemy.alchemist
 		 */
 		private function getRecipeForClassName(qualifiedClassName:String, recipeFlyweight:Dictionary, runtimeRecipe:Dictionary = null):Dictionary
 		{
+			/**
+			 * _recipeFactory.getRecipeForClassNamed(qualifiedClassName)
+			 * evaluates to the starblockviews recipe
+			 * on second iteration...
+			 */
 			return getMergedRecipe(
 				recipeFlyweight,
 				_recipeFactory.getRecipeForClassNamed(qualifiedClassName),
@@ -477,7 +482,7 @@ package orichalcum.alchemy.alchemist
 			 * a flyweight *pool* must be used to compensate for
 			 * the function requiring a new recipe every recursive call.
 			 */
-			const recipe:Dictionary = recipeFlyweight ? ObjectUtil.clean(recipeFlyweight) as Dictionary : new Dictionary;
+			const recipe:Dictionary = recipeFlyweight ? Objects.clean(recipeFlyweight) as Dictionary : new Dictionary;
 			staticTypeRecipe && lifecycle.inherit(recipe, staticTypeRecipe);
 			runtimeTypeRecipe && lifecycle.inherit(recipe, runtimeTypeRecipe);
 			runtimeInstanceRecipe && lifecycle.inherit(recipe, runtimeInstanceRecipe);
@@ -515,7 +520,17 @@ package orichalcum.alchemy.alchemist
 		 */
 		private function getRecipeFlyweight():Dictionary 
 		{
-			return _recipeFlyweights[_recipeFlyweightsIndex++] ||= new Dictionary;
+			_recipeFlyweightsIndex++;
+			const flyweight:Dictionary = _recipeFlyweights[_recipeFlyweightsIndex];
+			if (flyweight)
+			{
+				Objects.clean(flyweight);
+			}
+			else
+			{
+				_recipeFlyweights[_recipeFlyweightsIndex] = new Dictionary;
+			}
+			return flyweight;
 		}
 		
 		/**

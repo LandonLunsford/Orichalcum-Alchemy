@@ -41,23 +41,17 @@ package orichalcum.alchemy.ingredient.processor
 			}
 		}
 		
-		public function inherit(parent:Dictionary, child:Dictionary):void 
+		public function inherit(to:Dictionary, from:Dictionary):void 
 		{
-			//if (child[_ingredientId] == null)
-			//{
-				//trace('todo!')
-				//throw new ArgumentError();
-			//}
-				
 			/**
 			 * These must be stored in array for all ancestors post constructs to be called and in order!
 			 * This currently allows for only 1 postConstruct for an object and merges backward on priority
 			 * metadata configured [PostConstruct] < Runtime Type configured postConstruct < Runtime instance congigured postConstruct
 			 * All the same goes for PreDestroy
 			 */
-			if (_ingredientId in child)
+			if (_ingredientId in from)
 			{
-				parent[_ingredientId] = child[_ingredientId];
+				to[_ingredientId] = from[_ingredientId];
 			}
 		}
 		

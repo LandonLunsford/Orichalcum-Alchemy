@@ -39,11 +39,11 @@ package orichalcum.alchemy.ingredient.processor
 			}
 		}
 		
-		public function inherit(destination:Dictionary, source:Dictionary):void 
+		public function inherit(to:Dictionary, from:Dictionary):void 
 		{
 			for each(var processor:IIngredientProcessor in _processors)
 			{
-				processor.inherit(destination, source);
+				processor.inherit(to, from);
 			}
 		}
 		

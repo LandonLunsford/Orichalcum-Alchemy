@@ -26,14 +26,17 @@ package orichalcum.alchemy.ingredient.processor
 			}
 		}
 		
-		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
+		public function inherit(to:Dictionary, from:Dictionary):void 
 		{
-			const friends:Array = (parentRecipe[_ingredientId] ||= []);
-			for each(var friend:* in childRecipe[_ingredientId])
+			if (_ingredientId in from)
 			{
-				if (friends.indexOf(friend) < 0)
+				const friends:Array = (to[_ingredientId] ||= []);
+				for each(var friend:* in from[_ingredientId])
 				{
-					friends.push(friend);
+					if (friends.indexOf(friend) < 0)
+					{
+						friends.push(friend);
+					}
 				}
 			}
 		}

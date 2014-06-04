@@ -55,14 +55,14 @@ package orichalcum.alchemy.ingredient.processor
 			}
 		}
 		
-		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
+		public function inherit(to:Dictionary, from:Dictionary):void 
 		{
-			const childConstructorArguments:Array = childRecipe[_ingredientId];
-			if (!childConstructorArguments) return;
+			const fromConstructorArguments:Array = from[_ingredientId];
+			if (!fromConstructorArguments) return;
 			
-			for (var i:int = 0; i < childConstructorArguments.length; i++)
+			for (var i:int = 0; i < fromConstructorArguments.length; i++)
 			{
-				(parentRecipe[_ingredientId] ||= [])[i] = childConstructorArguments[i];
+				(to[_ingredientId] ||= [])[i] = fromConstructorArguments[i];
 			}
 		}
 		

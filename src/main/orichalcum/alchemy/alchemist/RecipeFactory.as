@@ -8,6 +8,7 @@ package orichalcum.alchemy.alchemist
 	import orichalcum.datastructure.Maps;
 	import orichalcum.lifecycle.IDisposable;
 	import orichalcum.reflection.IReflector;
+	import orichalcum.utility.Objects;
 
 	public class RecipeFactory implements IDisposable
 	{
@@ -43,7 +44,9 @@ package orichalcum.alchemy.alchemist
 		
 		public function getRecipeForClassNamed(qualifiedClassName:String):Dictionary
 		{
-			return _recipesByClassName[qualifiedClassName] ||= createRecipe(qualifiedClassName);
+			if (qualifiedClassName in _recipesByClassName)
+				return _recipesByClassName[qualifiedClassName];
+			return _recipesByClassName[qualifiedClassName] = createRecipe(qualifiedClassName);
 		}
 		
 		public function getRecipeForClass(classOrInstance:*):Dictionary
@@ -57,26 +60,50 @@ package orichalcum.alchemy.alchemist
 			const superclassName:String = getQualifiedSuperclassName(type);
 			
 			if (superclassName == null)
-			{
-				
 				throw new AlchemyError('Cannot create "{}" because it is an interface and cannot be instantiated.', qualifiedClassName);
-			}
 			
 			const typeDescription:XML = describeType(type);
 			
 			if (reflector.isNativeType(superclassName))
 				return createRecipeFromFactory(qualifiedClassName, typeDescription);
 			
-			return _inherit(
-				Maps.fromObject(getRecipeForClassNamed(superclassName)),
-				createRecipeFromFactory(qualifiedClassName, typeDescription)
-			);
+			const superClassRecipe:Dictionary = getRecipeForClassNamed(superclassName);
+			
+			/**
+			 * Needs to deep copy
+			 */
+			const superClassRecipeCopy:Dictionary = new Dictionary;
+			for (var key:* in superClassRecipe)
+			{
+				
+				var value:* = superClassRecipe[key];
+				if (value is Array)
+				{
+					value = value.concat();
+				}
+				else if (value is Object)
+				{
+					value = Objects.clone(value);
+				}
+				superClassRecipeCopy[key] = value;
+			}
+			
+			const recipe:Dictionary = createRecipeFromFactory(qualifiedClassName, typeDescription);
+				
+			return _inherit(superClassRecipeCopy, recipe);
 		}
 		
 		public function createRecipeFromFactory(typeName:String, typeDescription:XML):Dictionary
 		{
 			const recipe:Dictionary = new Dictionary;
+			
+			/**
+			 * Debug
+			 */
+			recipe._id = typeName;
+			
 			_alchemist.lifecycle.introspect(typeName, typeDescription, recipe, _alchemist);
+			
 			return recipe;
 		}
 		

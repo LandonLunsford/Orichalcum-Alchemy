@@ -10,7 +10,7 @@ package orichalcum.alchemy.ingredient.processor
 		
 		function add(recipe:Dictionary, ingredient:Object):void;
 		
-		function inherit(destination:Dictionary, source:Dictionary):void;
+		function inherit(to:Dictionary, from:Dictionary):void;
 		
 		function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void
 		

@@ -8,7 +8,7 @@ package orichalcum.alchemy.ingredient.processor
 	import orichalcum.alchemy.ingredient.EventHandler;
 	import orichalcum.reflection.metadata.transform.IMetadataTransform;
 	import orichalcum.reflection.metadata.transform.MetadataMapper;
-	import orichalcum.utility.ObjectUtil;
+	import orichalcum.utility.Objects;
 
 	public class EventHandlerProcessor implements IIngredientProcessor
 	{
@@ -78,11 +78,11 @@ package orichalcum.alchemy.ingredient.processor
 			}
 		}
 		
-		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
+		public function inherit(to:Dictionary, from:Dictionary):void 
 		{
-			for each(var ingredient:* in childRecipe[_ingredientId])
+			for each(var ingredient:* in from[_ingredientId])
 			{
-				(parentRecipe[_ingredientId] ||= []).push(ingredient);
+				(to[_ingredientId] ||= []).push(ingredient);
 			}
 		}
 		
@@ -90,7 +90,7 @@ package orichalcum.alchemy.ingredient.processor
 		{
 			for each(var handler:EventHandler in recipe[_ingredientId])
 			{
-				var target:Object = ObjectUtil.find(instance, handler.targetPath);
+				var target:Object = Objects.find(instance, handler.targetPath);
 				var targetAsEventDispatcher:IEventDispatcher = target as IEventDispatcher;
 				var relayAsEventDispatcher:IEventDispatcher;
 				
@@ -119,7 +119,7 @@ package orichalcum.alchemy.ingredient.processor
 					}
 					else
 					{
-						var relay:Object = ObjectUtil.find(instance, handler.relayPath);
+						var relay:Object = Objects.find(instance, handler.relayPath);
 						relayAsEventDispatcher = relay as IEventDispatcher;
 						if (relayAsEventDispatcher == null)
 						{

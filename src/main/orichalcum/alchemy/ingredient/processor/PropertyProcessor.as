@@ -7,7 +7,7 @@ package orichalcum.alchemy.ingredient.processor
 	import orichalcum.alchemy.ingredient.Property;
 	import orichalcum.alchemy.provider.factory.reference;
 	import orichalcum.reflection.IReflector;
-	import orichalcum.utility.ObjectUtil;
+	import orichalcum.utility.Objects;
 
 	public class PropertyProcessor implements IIngredientProcessor
 	{
@@ -65,9 +65,12 @@ package orichalcum.alchemy.ingredient.processor
 			}
 		}
 		
-		public function inherit(parentRecipe:Dictionary, childRecipe:Dictionary):void 
+		public function inherit(to:Dictionary, from:Dictionary):void 
 		{
-			ObjectUtil.extend((parentRecipe[_ingredientId] ||= {}), childRecipe[_ingredientId]);
+			if (_ingredientId in from)
+			{
+				Objects.extend((to[_ingredientId] ||= {}), from[_ingredientId]);
+			}
 		}
 		
 		public function activate(instance:*, recipe:Dictionary, alchemist:IAlchemist):void

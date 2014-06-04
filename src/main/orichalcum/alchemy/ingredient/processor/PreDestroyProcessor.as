@@ -40,11 +40,11 @@ package orichalcum.alchemy.ingredient.processor
 			}
 		}
 		
-		public function inherit(parent:Dictionary, child:Dictionary):void 
+		public function inherit(to:Dictionary, from:Dictionary):void 
 		{
-			if (_ingredientId in child)
+			if (_ingredientId in from)
 			{
-				parent[_ingredientId] = child[_ingredientId];
+				to[_ingredientId] = from[_ingredientId];
 			}
 		}
 		

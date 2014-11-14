@@ -23,9 +23,9 @@ package subject
 		}
 		
 		[SignalHandler]
-		public function target_threeArgumentSignal(number:Number, string:String, array:Array):void
+		public function target_threeArgumentSignal(array:Array, number:Number, string:String):void
 		{
-			
+			array.push(number, string);
 		}
 		
 		[SignalHandler(signal="target.signal")]

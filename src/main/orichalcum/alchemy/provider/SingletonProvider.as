@@ -25,7 +25,12 @@ package orichalcum.alchemy.provider
 		{
 			return _instance ||= activeAlchemist.create(type, activeRecipe, id);
 		}
-
+		
+		override public function destroy(provision:*):*
+		{
+			_instance = null;
+		}
+		
 	}
 
 }

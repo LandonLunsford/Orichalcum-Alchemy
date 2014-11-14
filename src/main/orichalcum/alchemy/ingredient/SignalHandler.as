@@ -13,6 +13,20 @@ package orichalcum.alchemy.ingredient
 		private var _slotPath:String;
 		private var _once:Boolean;
 		
+		/**
+		 * For this all to work i need a funciton for every arg count
+		 * and it cant be static because of the "once" functionality
+		 */
+		private var _handlesBySlotLength:Array = [
+			_handle,
+			_handle,
+			_handle,
+			_handle,
+			_handle,
+			_handle,
+			_handle,
+		];
+		
 		public function SignalHandler(signalPath:String, slotPath:String, once:Boolean = false) 
 		{
 			//Assert.notNull(signalPath, '');
@@ -74,32 +88,32 @@ package orichalcum.alchemy.ingredient
 		
 		public function get isBound():Boolean
 		{
-			return _signal && _signal.has(_handle);
+			return _signal && _signal.has(_handlesBySlotLength[_slot.length]);
 		}
 		
 		public function bind(signal:ISignal, slot:Function):void
 		{
 			_signal = signal;
 			_slot = slot;
-			_signal.add(_handle);
+			_signal.add(_handlesBySlotLength[_slot.length]);
 		}
 		
 		public function unbind():void
 		{
-			_signal.remove(_handle);
+			_signal.remove(_handlesBySlotLength[_slot.length]);
 			_signal = null;
 			_slot = null;
+		}
+		
+		public function toString():String
+		{
+			return Strings.substitute('{"signal":"{}", "slot":"{}", "once":{}}', signalPath, slotPath, once);
 		}
 		
 		private function _handle(...args):void
 		{
 			_slot.apply(null, args);
 			_once && unbind();
-		}
-		
-		public function toString():String
-		{
-			return Strings.substitute('{"signal":"{}", "slot":"{}", "once":{}}', signalPath, slotPath, once);
 		}
 		
 	}

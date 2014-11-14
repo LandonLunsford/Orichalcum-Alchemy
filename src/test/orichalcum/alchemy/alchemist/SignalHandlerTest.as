@@ -1,6 +1,7 @@
 package orichalcum.alchemy.alchemist
 {
 	import org.hamcrest.assertThat;
+	import org.hamcrest.object.equalTo;
 	import org.hamcrest.object.isFalse;
 	import org.hamcrest.object.isTrue;
 	import orichalcum.alchemy.alchemist.Alchemist;
@@ -41,6 +42,16 @@ package orichalcum.alchemy.alchemist
 			assertThat(signal.hasListeners, isTrue());
 			_alchemist.destroy(_slotHost);
 			assertThat(signal.hasListeners, isFalse());
+		}
+		
+		[Test]
+		public function testThreeParameterSignalRecievesArguments():void
+		{
+			const signal:ISignal = _slotHost.target.threeArgumentSignal;
+			const actual:Array = [];
+			const expected:Array = [1, 'string'];
+			signal.dispatch(actual, expected[0], expected[1]);
+			assertThat(actual, equalTo(expected));
 		}
 		
 	}
